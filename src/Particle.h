@@ -10,6 +10,9 @@
 
 #include "utils/Vector.h"
 
+
+//this class layout totally sucks! something should be refactored here...
+
 class Particle {
 
 private:
@@ -61,6 +64,10 @@ public:
 	double getM();
 
 	int getType();
+
+	void					 setX(utils::Vector<double, 3> _x)	{x = _x;}
+	void					 setF(utils::Vector<double, 3> _f)	{f = _f;}
+	void					 setV(utils::Vector<double, 3> _v)	{v = _v;}
 
 	bool operator==(Particle& other);
 

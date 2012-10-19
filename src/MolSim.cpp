@@ -23,7 +23,7 @@ void calculateF();
 void calculateX();
 
 /**
- * calculate the position for all particles
+ * calculate the velocity for all particles
  */
 void calculateV();
 
@@ -116,7 +116,11 @@ void calculateX() {
 
 		Particle& p = *iterator;
 
-		// insert calculation of X here!
+		//base calculation on Velocity-Störmer-Verlet-Algorithm
+
+		//x_i ( t^{n+1} ) = x_i(T^n) + dt * v_i(t^n) + (dt)^2 * F_i(t^n) / 2m_i
+
+		p.setX(p.getX() + delta_t * p.getV() + delta_t * delta_t * p.getF() * 0.5 *(1.0 / p.getM()));
 
 		++iterator;
 	}
@@ -129,7 +133,11 @@ void calculateV() {
 
 		Particle& p = *iterator;
 
-		// insert calculation of velocity here!
+		//base calculation on Velocity-Störmer-Verlet-Algorithm
+
+		//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
+
+		p.setV(p.getV() +  delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.getM() ));
 
 		++iterator;
 	}
