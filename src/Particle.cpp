@@ -70,6 +70,11 @@ int Particle::getType() {
 	return type;
 }
 
+void Particle::changeForce(utils::Vector<double, 3> force) {
+	old_f = f;
+	f = force;
+}
+
 std::string Particle::toString() {
 	std::stringstream stream;
 	stream << "Particle: X:" << x <<  " v: " << v << " f: " << f << " old_f: " << old_f << " type: " << type;

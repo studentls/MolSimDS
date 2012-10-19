@@ -62,6 +62,8 @@ public:
 
 	int getType();
 
+	void Particle::changeForce(utils::Vector<double, 3> force);
+
 	bool operator==(Particle& other);
 
 	std::string toString();

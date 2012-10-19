@@ -87,24 +87,41 @@ int main(int argc, char* argsv[]) {
 }
 
 
+// gets the distance between two Particles
+long GetDistance(Particle p1, Particle p2) {
+	long acc = 0;
+	for (int i = 0; i < 3; i++) {
+		long diff = p1[i] - p2[i];
+		acc = acc + diff * diff;
+	}
+	return sqrt(acc);
+}
+
+// the strength of gravity
+const long gravitationalConstant = 1;
+
 void calculateF() {
 	list<Particle>::iterator iterator;
 	iterator = particles.begin();
 
 	while (iterator != particles.end()) {
 		list<Particle>::iterator innerIterator = particles.begin();
-
+		utils::Vector<double, 3> forceAcc = 0.0;
+		Particle& p1 = *iterator;
 		while (innerIterator != particles.end()) {
 			if (innerIterator != iterator) {
 
-				Particle& p1 = *iterator;
 				Particle& p2 = *innerIterator;
 
 				// insert calculation of force here!
-
+				long dist = GetDistance(p1, p2);
+				long factor = p1.getM() * p2.getM() / dist / dist / dist * gravitationalConstant;
+				utils::Vector<double, 3> force = (p1.getX() - p2.getX()) * factor;
+				forceAcc = forceAcc + force;
 			}
 			++innerIterator;
 		}
+		p1.changeForce(forceAcc);
 		++iterator;
 	}
 }
