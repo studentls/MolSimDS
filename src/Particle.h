@@ -69,6 +69,8 @@ public:
 	void					 setF(utils::Vector<double, 3> _f)	{f = _f;}
 	void					 setV(utils::Vector<double, 3> _v)	{v = _v;}
 
+	void Particle::changeForce(utils::Vector<double, 3> force);
+
 	bool operator==(Particle& other);
 
 	std::string toString();
