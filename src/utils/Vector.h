@@ -13,38 +13,37 @@
 #include <string>
 #include <sstream>
 
-
+//fixed issue, namespace was used inapproriately
 namespace utils {
+
 template <typename type, int length>
 class Vector;
-}
+
 
 
 /** Global operators first */
 
-//original code was bad style, improved by adding inline
-//another oppurtunity would be, to write the function body in a Vector.cpp file!
-template <typename type, int length> std::ostream& operator << (std::ostream& stream, const utils::Vector<type, length>& v);
-
+template <typename type, int length>
+std::ostream& operator << (std::ostream& , const Vector<type, length>& );
 
 template <typename type, int length>
-utils::Vector<type, length> operator*(double scalar, const utils::Vector<type, length>& v) {
+Vector<type, length> operator*(double scalar, const Vector<type, length>& v) {
 	return v * scalar;
 }
 
 /** Vector class definition */
 
 template <typename type, int length>
-class utils::Vector {
-
-	friend std::ostream& operator<< <type,length>(std::ostream& stream, const Vector& v);
-	friend Vector operator* <type,length>(double scalar, const Vector& v);
-
+class Vector {
 private:
-
 	type content[length];
 
+	friend Vector operator* <type,length>(double scalar, const Vector& v);
+	
+	friend std::ostream& operator << <>(std::ostream& stream, const Vector<type, length>& v);
+
 public:
+	
 	Vector() {
 	}
 
@@ -150,5 +149,17 @@ public:
 	}
 };
 
+template <typename type, int length>
+std::ostream& operator << (std::ostream& stream, const Vector<type, length>& v) {
+
+	stream << "[";
+	for (int i = 0; i < length; i++) {
+		stream << v.content[i] << ";";
+	}
+	stream << "]";
+	return stream;
+}
+
+}
 
 #endif /* VECTOR_ */

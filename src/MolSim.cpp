@@ -41,7 +41,7 @@ std::list<Particle> particles;
 
 
 int main(int argc, char* argsv[]) {
-
+	
 	cout << "Hello from MolSim for PSE!" << endl;
 	if (argc != 2) {
 		cout << "Errounous programme call! " << endl;
@@ -50,6 +50,9 @@ int main(int argc, char* argsv[]) {
 		//quit program to prevent bad memory access!
 		return 0;
 	}
+
+	
+
 
 	FileReader fileReader;
 	fileReader.readFile(particles, argsv[1]);

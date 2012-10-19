@@ -22,6 +22,7 @@
 obj/
 [Rr]elease*/
 _ReSharper*/
+ipch/
 
 #ignore thumbnails created by windows
 Thumbs.db
