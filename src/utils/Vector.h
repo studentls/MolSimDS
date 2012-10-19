@@ -8,9 +8,11 @@
 #ifndef VECTOR_
 #define VECTOR_
 
-#include <cmath>
-#include <sstream>
 #include <iostream>
+#include <cmath>
+#include <string>
+#include <sstream>
+
 
 namespace utils {
 template <typename type, int length>
@@ -20,16 +22,9 @@ class Vector;
 
 /** Global operators first */
 
-template <typename type, int length>
-std::ostream& operator<<(std::ostream& stream, const utils::Vector<type, length>& v) {
-
-	stream << "[";
-	for (int i = 0; i < length; i++) {
-		stream << v.content[i] << ";";
-	}
-	stream << "]";
-	return stream;
-}
+//original code was bad style, improved by adding inline
+//another oppurtunity would be, to write the function body in a Vector.cpp file!
+template <typename type, int length> std::ostream& operator << (std::ostream& stream, const utils::Vector<type, length>& v);
 
 
 template <typename type, int length>

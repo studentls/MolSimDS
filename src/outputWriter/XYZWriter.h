@@ -8,7 +8,7 @@
 #ifndef XYZWRITER_H_
 #define XYZWRITER_H_
 
-#include "Particle.h"
+#include "../Particle.h"
 #include <fstream>
 #include <list>
 

@@ -8,8 +8,8 @@
 #ifndef VTKWRITER_H_
 #define VTKWRITER_H_
 
-#include "Particle.h"
-#include "outputWriter/vtk-unstructured.h"
+#include "../Particle.h"
+#include "vtk-unstructured.h"
 
 #include <list>
 

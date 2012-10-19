@@ -46,6 +46,9 @@ int main(int argc, char* argsv[]) {
 	if (argc != 2) {
 		cout << "Errounous programme call! " << endl;
 		cout << "./molsym filename" << endl;
+
+		//quit program to prevent bad memory access!
+		return 0;
 	}
 
 	FileReader fileReader;
