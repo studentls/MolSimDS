@@ -81,13 +81,21 @@ int main(int argc, char* argsv[]) {
 
 	int iteration = 0;
 
+	//progress counter...
+	int n = (int)((end_time - start_time) / delta_t) + 1; 
+	n /= 40;
+
+	cout<<"starting calculation..."<<endl;
+
 	 // for this loop, we assume: current x, current f and current v are known
 	while (current_time < end_time) {
+
 		// calculate new x
 		calculateX();
 
 		// calculate new f
 		calculateF();
+
 		// calculate new v
 		calculateV();
 		
@@ -98,11 +106,12 @@ int main(int argc, char* argsv[]) {
 		
 		iteration++;
 		
-		cout << "Iteration " << iteration << " finished." << endl;
+		if(iteration % n == 0)cout<<"#";
+		//cout << "Iteration " << iteration << " finished." << endl;
 
 		current_time += delta_t;
 	}
-
+	cout << endl;
 	cout << "output written. Terminating..." << endl;
 	return 0;
 }
@@ -170,7 +179,7 @@ void calculateX() {
 
 		//x_i ( t^{n+1} ) = x_i(T^n) + dt * v_i(t^n) + (dt)^2 * F_i(t^n) / 2m_i
 
-		p.setX(p.getX() + delta_t * p.getV() + delta_t * delta_t * p.getF() * 0.5 *(1.0 / p.getM()));
+		p.setX(p.getX() + delta_t * p.getV() + delta_t * delta_t * p.getF() * 0.5 * (1.0 / p.getM()));
 
 		++iterator;
 	}
@@ -199,10 +208,10 @@ void plotParticles(int iteration) {
 	string out_name("MD_vtk");
 
 	//xyz output...
-	//outputWriter::XYZWriter writer;
-	//writer.plotParticles(particles, out_name, iteration);
+	outputWriter::XYZWriter writer;
+	writer.plotParticles(particles, out_name, iteration);
 
 	//VTK Output
-	outputWriter::VTKWriter writer;
-	writer.plotParticles(particles, out_name, iteration);
+	//outputWriter::VTKWriter writer;
+	//writer.plotParticles(particles, out_name, iteration);
 }
