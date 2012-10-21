@@ -39,10 +39,25 @@ double delta_t = 0.014;
 
 std::list<Particle> particles;
 
+//console tool
+void line()
+{
+	for(int i = 0; i < 40; i++)cout<<"-";
+	cout<<endl;
+}
+
 
 int main(int argc, char* argsv[]) {
-	
-	cout << "Hello from MolSim for PSE!" << endl;
+
+	//added header
+	line();
+	cout << "MolSim for PSE" << endl;
+	line();
+	cout << "(c) 2012 by F.Dietz & L.Spiegelberg" << endl; 
+	line();
+
+
+	//test for correct argument count
 	if (argc != 2) {
 		cout << "Errounous programme call! " << endl;
 		cout << "./molsym filename" << endl;
@@ -130,7 +145,7 @@ void calculateF() {
 		}
 
 		//set new force (sets internally old force to the now old value)
-		p1.changeForce(forceAcc);
+		p1.setForce(forceAcc);
 		++iterator;
 	}
 }

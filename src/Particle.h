@@ -68,8 +68,8 @@ public:
 	void					 setX(utils::Vector<double, 3> _x)	{x = _x;}
 	void					 setF(utils::Vector<double, 3> _f)	{f = _f;}
 	void					 setV(utils::Vector<double, 3> _v)	{v = _v;}
-
-	void Particle::changeForce(utils::Vector<double, 3> force);
+	
+	void Particle::setForce(utils::Vector<double, 3> force);
 
 	bool operator==(Particle& other);
 

@@ -70,7 +70,7 @@ int Particle::getType() {
 	return type;
 }
 
-void Particle::changeForce(utils::Vector<double, 3> force) {
+void Particle::setForce(utils::Vector<double, 3> force) {
 	old_f = f;
 	f = force;
 }
