@@ -50,10 +50,7 @@ int main(int argc, char* argsv[]) {
 		//quit program to prevent bad memory access!
 		return 0;
 	}
-
 	
-
-
 	FileReader fileReader;
 	fileReader.readFile(particles, argsv[1]);
 	// the forces are needed to calculate x, but are not given in the input file.
@@ -88,39 +85,51 @@ int main(int argc, char* argsv[]) {
 
 
 // gets the distance between two Particles
-long GetDistance(Particle p1, Particle p2) {
-	long acc = 0;
-	for (int i = 0; i < 3; i++) {
-		long diff = p1[i] - p2[i];
-		acc = acc + diff * diff;
-	}
-	return sqrt(acc);
+// use double instead of long! long is an integer,here a floating point type is needed
+//revisited code
+double GetDistance(Particle p1, Particle p2) {
+	
+	//distance between p1 and p2
+	utils::Vector<double, 3> distance = p1.getX() - p2.getX();
+
+	return distance.L2Norm();
 }
 
 // the strength of gravity
-const long gravitationalConstant = 1;
+const double gravitationalConstant = 1.0;
 
 void calculateF() {
 	list<Particle>::iterator iterator;
 	iterator = particles.begin();
 
+	//go through particles
 	while (iterator != particles.end()) {
 		list<Particle>::iterator innerIterator = particles.begin();
 		utils::Vector<double, 3> forceAcc = 0.0;
+
 		Particle& p1 = *iterator;
 		while (innerIterator != particles.end()) {
 			if (innerIterator != iterator) {
 
 				Particle& p2 = *innerIterator;
 
-				// insert calculation of force here!
-				long dist = GetDistance(p1, p2);
-				long factor = p1.getM() * p2.getM() / dist / dist / dist * gravitationalConstant;
+				//using simple force calculation model
+				double invdist = 1.0 / GetDistance(p1, p2);
+
+				//use for speed up
+				double denominator = invdist * invdist * invdist; 
+
+				double factor = p1.getM() * p2.getM() *denominator * gravitationalConstant;
+
 				utils::Vector<double, 3> force = (p1.getX() - p2.getX()) * factor;
+
+				//add individual particle to particle force to sum
 				forceAcc = forceAcc + force;
 			}
 			++innerIterator;
 		}
+
+		//set new force (sets internally old force to the now old value)
 		p1.changeForce(forceAcc);
 		++iterator;
 	}
