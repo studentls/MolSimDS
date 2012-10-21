@@ -46,6 +46,16 @@ public:
 	 */
 	void writeFile(const std::string& filename, int iteration);
 
+   /**
+	* plots particle list to file
+	*
+	* @param particles list of particles
+	* @param filename the output file
+	* @param iteration the number of the current iteration used to 
+	*        create a unique filename
+	*/
+	void plotParticles(std::list<Particle> particles, const std::string& filename, int iteration);
+
 private:
 	VTKFile_t* vtkFile;
 };

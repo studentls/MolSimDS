@@ -68,7 +68,9 @@ void VTKWriter::writeFile(const std::string& filename, int iteration) {
 
 void VTKWriter::plotParticle(Particle& p) {
 	if (vtkFile->UnstructuredGrid().present()) {
-		cout << "UnstructuredGrid is present" << endl;
+
+		//disabling nerving warning
+		//cout << "UnstructuredGrid is present" << endl;
 	} else {
 		cout << "ERROR: No UnstructuredGrid present" << endl;
 	}
@@ -101,4 +103,22 @@ void VTKWriter::plotParticle(Particle& p) {
 	pointsIterator->push_back(p.getX()[2]);
 }
 
+
+void VTKWriter::plotParticles(std::list<Particle> particles, const std::string& filename, int iteration)
+{
+	//init
+	initializeOutput(particles.size());
+
+	//plot stuff
+	for(list<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
+		plotParticle(*it);
+
+	//write to file
+	writeFile(filename, iteration);
 }
+
+
+
+//namespace end place functions above
+}
+

@@ -33,8 +33,10 @@ void calculateV();
 void plotParticles(int iteration);
 
 
+
+//use better default values!!! tooo long!
 double start_time = 0;
-double end_time = 1000;
+double end_time = 10;
 double delta_t = 0.014;
 
 std::list<Particle> particles;
@@ -53,14 +55,18 @@ int main(int argc, char* argsv[]) {
 	line();
 	cout << "MolSim for PSE" << endl;
 	line();
+	cout << endl;
 	cout << "(c) 2012 by F.Dietz & L.Spiegelberg" << endl; 
+	cout << endl;
+	cout << "Molecular Simulator handling *.txt files" << endl;
 	line();
+	cout << endl;
 
 
 	//test for correct argument count
 	if (argc != 2) {
 		cout << "Errounous programme call! " << endl;
-		cout << "./molsym filename" << endl;
+		cout << "usage ./molsym filename" << endl;
 
 		//quit program to prevent bad memory access!
 		return 0;
@@ -84,11 +90,14 @@ int main(int argc, char* argsv[]) {
 		calculateF();
 		// calculate new v
 		calculateV();
-
-		iteration++;
+		
+		//we want to start plotting from initial configuration onwards!!!
 		if (iteration % 10 == 0) {
 			plotParticles(iteration);
 		}
+		
+		iteration++;
+		
 		cout << "Iteration " << iteration << " finished." << endl;
 
 		current_time += delta_t;
@@ -189,6 +198,11 @@ void plotParticles(int iteration) {
 
 	string out_name("MD_vtk");
 
-	outputWriter::XYZWriter writer;
+	//xyz output...
+	//outputWriter::XYZWriter writer;
+	//writer.plotParticles(particles, out_name, iteration);
+
+	//VTK Output
+	outputWriter::VTKWriter writer;
 	writer.plotParticles(particles, out_name, iteration);
 }
