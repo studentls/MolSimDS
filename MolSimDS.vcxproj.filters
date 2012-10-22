@@ -45,6 +45,9 @@
     <ClInclude Include="src\outputWriter\VTKWriter.h">
       <Filter>Headerdateien\outputWriter</Filter>
     </ClInclude>
+    <ClInclude Include="ParticleContainer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -63,6 +66,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\MolSim.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="ParticleContainer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
