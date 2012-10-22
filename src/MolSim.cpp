@@ -1,4 +1,35 @@
 
+//defines for debug state should be later included in a separate Base.h
+#ifndef DEBUG
+
+
+//MSVC
+#ifdef _MSC_VER 
+
+#ifdef _DEBUG
+#define DEBUG
+#endif
+
+#endif
+
+//GCC
+#ifdef __GNUC__
+
+//doesn't define an internal DEBUG state, so it should be invoked from withhin the command line
+//add -DDEBUG as an extra flag
+
+#endif
+
+//Intel CC
+#ifdef __INTEL_COMPILER 
+
+//same as withhin GCC
+
+#endif
+
+#endif
+
+
 #include "outputWriter/XYZWriter.h"
 #include "outputWriter/VTKWriter.h"
 #include "FileReader.h"
@@ -36,7 +67,7 @@ void plotParticles(int iteration);
 
 //use better default values!!! tooo long!
 double start_time = 0;
-double end_time = 10;
+double end_time = 20;
 double delta_t = 0.014;
 
 std::list<Particle> particles;
@@ -54,6 +85,10 @@ int main(int argc, char* argsv[]) {
 	//added header
 	line();
 	cout << "MolSim for PSE" << endl;
+#ifdef DEBUG
+	cout << "compiled: "<<__DATE__<<"  "<<__TIME__<<endl;
+#endif
+
 	line();
 	cout << endl;
 	cout << "(c) 2012 by F.Dietz & L.Spiegelberg" << endl; 
@@ -128,8 +163,10 @@ double GetDistance(Particle p1, Particle p2) {
 	return distance.L2Norm();
 }
 
+//has to be set to -1.0 to work properly, positive values mean repugnance
+//whereas negative values mean attractive
 // the strength of gravity
-const double gravitationalConstant = 1.0;
+const double gravitationalConstant = -1.0;
 
 void calculateF() {
 	list<Particle>::iterator iterator;
@@ -208,10 +245,10 @@ void plotParticles(int iteration) {
 	string out_name("MD_vtk");
 
 	//xyz output...
-	outputWriter::XYZWriter writer;
-	writer.plotParticles(particles, out_name, iteration);
+	//outputWriter::XYZWriter writer;
+	//writer.plotParticles(particles, out_name, iteration);
 
 	//VTK Output
-	//outputWriter::VTKWriter writer;
-	//writer.plotParticles(particles, out_name, iteration);
+	outputWriter::VTKWriter writer;
+	writer.plotParticles(particles, out_name, iteration);
 }
