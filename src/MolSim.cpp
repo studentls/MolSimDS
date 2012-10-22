@@ -67,7 +67,7 @@ void plotParticles(int iteration);
 
 //use better default values!!! tooo long!
 double start_time = 0;
-double end_time = 20;
+double end_time = 50;
 double delta_t = 0.014;
 
 std::list<Particle> particles;
@@ -81,6 +81,10 @@ void line()
 
 
 int main(int argc, char* argsv[]) {
+
+
+	//syntax should be
+	//molsym filename -set dt 0.1 -s et 20
 
 	//added header
 	line();
@@ -243,10 +247,6 @@ void calculateV() {
 void plotParticles(int iteration) {
 
 	string out_name("MD_vtk");
-
-	//xyz output...
-	//outputWriter::XYZWriter writer;
-	//writer.plotParticles(particles, out_name, iteration);
 
 	//VTK Output
 	outputWriter::VTKWriter writer;

@@ -35,3 +35,8 @@ Thumbs.db
 *.gz
 *.vtu
 *.xyz
+
+#ignore doxygen
+doc/
+.project
+.cproject
