@@ -11,11 +11,19 @@ include files.mk
 
 # Compiler flags
 # -------------------------------------------------------------------------
-CFLAGS=-g -O3
+CFLAGS=-I/opt/include -g -O3
 
 # Linker flags
 # ------------
-LDFLAGS= -lxerces-c 
+LDFLAGS= -L/opt/lib -lxerces-c 
+
+SOURCES=\
+src/MolSim.cpp\
+src/outputWriter/XYZWriter.cpp\
+src/outputWriter/VTKWriter.cpp\
+src/outputWriter/vtk-unstructured.cpp\
+src/FileReader.cpp\
+src/Particle.cpp\
 
 INCLUDES= -I./src -I./libxsd
 
@@ -25,7 +33,7 @@ EXECUTABLE=MolSim
 all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
-	$(CC) $(LDFLAGS) $(OBJECTS) -o $@ 
+	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ 
 
 clean:
 	rm $(OBJECTS)

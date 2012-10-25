@@ -41,3 +41,7 @@ doc/
 .project
 .cproject
 .orig
+
+#linux files
+*.so
+*.mk
