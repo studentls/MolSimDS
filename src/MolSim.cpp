@@ -1,67 +1,138 @@
+//------------------------------------------------------------------------------------------------
+// (C) 2012 by F.Dietz & L.Spiegelberg
+// include License here...
 
-//defines for debug state should be later included in a separate Base.h
-#ifndef DEBUG
+//At the moment you must not distribute or use this code at all,
+//cause license details are not clear yet
+//If you want to receive updates feel free to subscribe
+//------------------------------------------------------------------------------------------------
+// File MolSim.cpp
+// contains main class MolSim
+//------------------------------------------------------------------------------------------------
+/// @author F.Dietz
+/// @author L.Spiegelberg
+//------------------------------------------------------------------------------------------------
 
-
-//MSVC
-#ifdef _MSC_VER 
-
-#ifdef _DEBUG
-#define DEBUG
-#endif
-
-#endif
-
-//GCC
-#ifdef __GNUC__
-
-//doesn't define an internal DEBUG state, so it should be invoked from withhin the command line
-//add -DDEBUG as an extra flag
-
-#endif
-
-//Intel CC
-#ifdef __INTEL_COMPILER 
-
-//same as withhin GCC
-
-#endif
-
-#endif
-
-
-#include "outputWriter/XYZWriter.h"
-#include "outputWriter/VTKWriter.h"
-#include "FileReader.h"
-
-#include <list>
-#include <cstring>
-#include <cstdlib>
-#include <iostream>
+#include "MolSim.h"
 
 using namespace std;
+using namespace utils;
+
+
+err_type MolSim::Init(int argc, char *argsv[])
+{
+	//parse command line arguments
+	if(FAILED(parseLine(argc, argsv)))return E_INVALIDPARAM;
+
+	//print hello message
+	printHelloMessage();
+
+	//Init Simulation Data
+	sim = new Simulation();
+	if(!sim)
+	{
+		cout<<"failed to allocate mem"<<endl;
+		return E_OUTOFMEMORY;
+	}
+
+	//set desc
+	SimulationDesc desc;
+
+	desc.output_fmt = SOF_VTK;
+	desc.start_time = 0.0;
+	desc.end_time = atof(argsv[2]);
+	desc.delta_t = atof(argsv[3]);
+	
+	if(FAILED(sim->Init(desc)))return E_UNKNOWN;
+
+	if(FAILED(sim->AddParticlesFromFile(argsv[1])))return E_INVALIDPARAM;
+
+	return S_OK;
+}
+
+err_type MolSim::Run()
+{
+	if(!sim)return E_NOTINITIALIZED;
+
+	//run simulation...
+	return sim->Run();
+}
+
+err_type MolSim::Release()
+{
+	DELETE(sim);
+
+	return S_OK;
+}
+///
+/// parses and verifies command line arguments
+/// @param argc count of arguments
+/// @param argsv string arguments
+/// @return returns E_INVALIDPARAM if argument count is wrong(not four) or second
+///					or third argument are of non number format
+///			returns E_FILENOTFOUND if no file exists
+///
+err_type MolSim::parseLine(int argc, char *argsv[])
+{
+	//Syntax is molsim scene.txt t_end delta_t
+	//where t_end and delta_t denote a floating point value
+	if(argc != 4)
+	{
+		cout<<"error: invalid count of arguments"<<endl;
+		cout<<"usage: molsim file endtime delta_t"<<endl;
+		return E_INVALIDPARAM;
+	}
+
+	//check if endtime, delta are numbers and file exists
+	if(!fileExists(argsv[1]))
+	{
+		cout<<"error: file doesn't exist!"<<endl;
+		cout<<"usage: molsim file endtime delta_t"<<endl;
+		return E_FILENOTFOUND;
+	}
+
+	if(!strIsNumber(argsv[2]))
+	{
+		cout<<"error: endtime not a valid number"<<endl;
+		cout<<"usage: molsim file endtime delta_t"<<endl;
+		return E_INVALIDPARAM;
+	}
+
+	if(!strIsNumber(argsv[3]))
+	{
+		cout<<"error: delta_t not a valid number"<<endl;
+		cout<<"usage: molsim file endtime delta_t"<<endl;
+		return E_INVALIDPARAM;
+	}
+
+	//parse args...
+
+
+	return S_OK;
+}
+
+
+void MolSim::printHelloMessage()
+{
+	line();
+	cout << "MolSim for PSE" << endl;
+#ifdef DEBUG
+	cout << "compiled: "<<__DATE__<<"  "<<__TIME__<<endl;
+#endif
+
+	line();
+	cout << endl;
+	cout << "(c) 2012 by F.Dietz & L.Spiegelberg" << endl; 
+	cout << endl;
+	cout << "Molecular Simulator handling *.txt files" << endl;
+	line();
+	cout << endl;
+}
+
 
 /**** forward declaration of the calculation functions ****/
 
-/**
- * calculate the force for all particles
- */
-void calculateF();
 
-/**
- * calculate the position for all particles
- */
-void calculateX();
-
-/**
- * calculate the velocity for all particles
- */
-void calculateV();
-
-/**
- * plot the particles to a xyz-file
- */
-void plotParticles(int iteration);
 
 
 
@@ -79,176 +150,3 @@ void line()
 	cout<<endl;
 }
 
-
-int main(int argc, char* argsv[]) {
-
-
-	//syntax should be
-	//molsym filename -set dt 0.1 -s et 20
-
-	//added header
-	line();
-	cout << "MolSim for PSE" << endl;
-#ifdef DEBUG
-	cout << "compiled: "<<__DATE__<<"  "<<__TIME__<<endl;
-#endif
-
-	line();
-	cout << endl;
-	cout << "(c) 2012 by F.Dietz & L.Spiegelberg" << endl; 
-	cout << endl;
-	cout << "Molecular Simulator handling *.txt files" << endl;
-	line();
-	cout << endl;
-
-
-	//test for correct argument count
-	if (argc != 2) {
-		cout << "Errounous programme call! " << endl;
-		cout << "usage ./molsym filename" << endl;
-
-		//quit program to prevent bad memory access!
-		return 0;
-	}
-	
-	FileReader fileReader;
-	fileReader.readFile(particles, argsv[1]);
-	// the forces are needed to calculate x, but are not given in the input file.
-	calculateF();
-
-	double current_time = start_time;
-
-	int iteration = 0;
-
-	//progress counter...
-	int n = (int)((end_time - start_time) / delta_t) + 1; 
-	n /= 40;
-
-	cout<<"starting calculation..."<<endl;
-
-	 // for this loop, we assume: current x, current f and current v are known
-	while (current_time < end_time) {
-
-		// calculate new x
-		calculateX();
-
-		// calculate new f
-		calculateF();
-
-		// calculate new v
-		calculateV();
-		
-		//we want to start plotting from initial configuration onwards!!!
-		if (iteration % 10 == 0) {
-			plotParticles(iteration);
-		}
-		
-		iteration++;
-		
-		if(iteration % n == 0)cout<<"#";
-		//cout << "Iteration " << iteration << " finished." << endl;
-
-		current_time += delta_t;
-	}
-	cout << endl;
-	cout << "output written. Terminating..." << endl;
-	return 0;
-}
-
-
-// gets the distance between two Particles
-// use double instead of long! long is an integer,here a floating point type is needed
-//revisited code
-double GetDistance(Particle p1, Particle p2) {
-	
-	//distance between p1 and p2
-	utils::Vector<double, 3> distance = p1.getX() - p2.getX();
-
-	return distance.L2Norm();
-}
-
-//has to be set to -1.0 to work properly, positive values mean repugnance
-//whereas negative values mean attractive
-// the strength of gravity
-const double gravitationalConstant = -1.0;
-
-void calculateF() {
-	list<Particle>::iterator iterator;
-	iterator = particles.begin();
-
-	//go through particles
-	while (iterator != particles.end()) {
-		list<Particle>::iterator innerIterator = particles.begin();
-		utils::Vector<double, 3> forceAcc = 0.0;
-
-		Particle& p1 = *iterator;
-		while (innerIterator != particles.end()) {
-			if (innerIterator != iterator) {
-
-				Particle& p2 = *innerIterator;
-
-				//using simple force calculation model
-				double invdist = 1.0 / GetDistance(p1, p2);
-
-				//use for speed up
-				double denominator = invdist * invdist * invdist; 
-
-				double factor = p1.getM() * p2.getM() *denominator * gravitationalConstant;
-
-				utils::Vector<double, 3> force = (p1.getX() - p2.getX()) * factor;
-
-				//add individual particle to particle force to sum
-				forceAcc = forceAcc + force;
-			}
-			++innerIterator;
-		}
-
-		//set new force (sets internally old force to the now old value)
-		p1.setForce(forceAcc);
-		++iterator;
-	}
-}
-
-
-void calculateX() {
-	list<Particle>::iterator iterator = particles.begin();
-	while (iterator != particles.end()) {
-
-		Particle& p = *iterator;
-
-		//base calculation on Velocity-Störmer-Verlet-Algorithm
-
-		//x_i ( t^{n+1} ) = x_i(T^n) + dt * v_i(t^n) + (dt)^2 * F_i(t^n) / 2m_i
-
-		p.setX(p.getX() + delta_t * p.getV() + delta_t * delta_t * p.getF() * 0.5 * (1.0 / p.getM()));
-
-		++iterator;
-	}
-}
-
-
-void calculateV() {
-	list<Particle>::iterator iterator = particles.begin();
-	while (iterator != particles.end()) {
-
-		Particle& p = *iterator;
-
-		//base calculation on Velocity-Störmer-Verlet-Algorithm
-
-		//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-
-		p.setV(p.getV() +  delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.getM() ));
-
-		++iterator;
-	}
-}
-
-
-void plotParticles(int iteration) {
-
-	string out_name("MD_vtk");
-
-	//VTK Output
-	outputWriter::VTKWriter writer;
-	writer.plotParticles(particles, out_name, iteration);
-}

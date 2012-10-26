@@ -22,7 +22,7 @@ FileReader::~FileReader() {
 }
 
 
-void FileReader::readFile(std::list<Particle>& particles, char* filename) {
+void FileReader::readFile(std::vector<Particle>& particles, const char* filename) {
 	double x[] = {0,0,0};
 	double v[] = {1,1,1};
 	double m = 1;

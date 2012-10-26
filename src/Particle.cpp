@@ -88,7 +88,7 @@ std::string Particle::toString() {
 
 bool Particle::operator ==(Particle& other) {
 	if ( (x == other.x) && (v == other.v) && (f == other.f) &&
-			(type == other.type) & (m == other.m) && (old_f == other.old_f)) {
+			(type == other.type) && (m == other.m) && (old_f == other.old_f)) {
 		return true;
 	}
 

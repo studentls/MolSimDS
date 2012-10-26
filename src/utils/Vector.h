@@ -100,6 +100,15 @@ public:
 		return sqrt(square_sum);
 	}
 
+	///
+	/// @param to distance between caller vector and vector to
+	/// @return returns distance of vector to given vector
+	///
+	double distance(const Vector& to)
+	{
+		Vector r = to - *this;
+		return r.L2Norm();
+	}
 	bool equals(const Vector& rhs) const {
 		for (int i = 0; i < length; i++) {
 			if (rhs.content[i] != this->content[i]) {

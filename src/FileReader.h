@@ -9,7 +9,7 @@
 #define FILE_READER_H_
 
 #include "Particle.h"
-#include <list>
+#include <vector>
 
 class FileReader {
 
@@ -17,7 +17,7 @@ public:
 	FileReader();
 	virtual ~FileReader();
 
-	void readFile(std::list<Particle>& particles, char* filename);
+	void readFile(std::vector<Particle>& particles, const char* filename);
 
 };
 

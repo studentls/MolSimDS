@@ -54,7 +54,7 @@ public:
 	* @param iteration the number of the current iteration used to 
 	*        create a unique filename
 	*/
-	void plotParticles(std::list<Particle> particles, const std::string& filename, int iteration);
+	void plotParticles(std::vector<Particle> particles, const std::string& filename, int iteration);
 
 private:
 	VTKFile_t* vtkFile;

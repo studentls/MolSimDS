@@ -104,13 +104,13 @@ void VTKWriter::plotParticle(Particle& p) {
 }
 
 
-void VTKWriter::plotParticles(std::list<Particle> particles, const std::string& filename, int iteration)
+void VTKWriter::plotParticles(std::vector<Particle> particles, const std::string& filename, int iteration)
 {
 	//init
 	initializeOutput(particles.size());
 
 	//plot stuff
-	for(list<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
+	for(vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
 		plotParticle(*it);
 
 	//write to file
