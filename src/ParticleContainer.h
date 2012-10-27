@@ -41,6 +41,7 @@ public:
 	void Iterate(void(*func)(Particle));
 	
 	/// a function that takes a void(*func)(Particle, Particle) and uses them to iterate over all pairs of Particles
+	/// each symmetrical pair is only taken once to reduce redundancy
 	void IteratePairwise(void(*func)(Particle, Particle));
 
 };

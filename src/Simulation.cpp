@@ -96,73 +96,45 @@ err_type Simulation::Release()
 }
 
 void Simulation::calculateF() {
+	particles.Iterate(forceResetter);
+	particles.IteratePairwise(forceCalculator);
+}
+
+void Simulation::forceResetter(Particle p) {
+	p.resetForce();
+}
+
+void Simulation::forceCalculator(Particle p1, Particle p2)
 	vector<Particle>::iterator iterator;
-	iterator = particles.begin();
-
-	//go through particles
-	while (iterator != particles.end()) {
-		vector<Particle>::iterator innerIterator = particles.begin();
-		utils::Vector<double, 3> forceAcc = 0.0;
-
-		Particle& p1 = *iterator;
-		while (innerIterator != particles.end()) {
-			if (innerIterator != iterator) {
-
-				Particle& p2 = *innerIterator;
-
-				//using simple force calculation model
-				double invdist = 1.0 / p1.getX().distance(p2.getX());
-
-				//use for speed up
-				double denominator = invdist * invdist * invdist; 
-
-				double factor = p1.getM() * p2.getM() *denominator * desc.gravitational_constant;
-
-				utils::Vector<double, 3> force = (p2.getX() - p1.getX()) * factor;
-
-				//add individual particle to particle force to sum
-				forceAcc = forceAcc + force;
-			}
-			++innerIterator;
-		}
-
-		//set new force (sets internally old force to the now old value)
-		p1.setForce(forceAcc);
-		++iterator;
-	}
+	//using simple force calculation model
+	double invdist = 1.0 / p1.getX().distance(p2.getX());
+	//use for speed up
+	double denominator = invdist * invdist * invdist; 
+	double factor = p1.getM() * p2.getM() *denominator * desc.gravitational_constant;
+	utils::Vector<double, 3> force = (p2.getX() - p1.getX()) * factor;
+	//add individual particle to particle force to sum
+	p1.addForce(force);
+	p2.addForce(-force)
 }
 
 void Simulation::calculateX() {
-	vector<Particle>::iterator iterator = particles.begin();
-	while (iterator != particles.end()) {
-
-		Particle& p = *iterator;
-
-		//base calculation on Velocity-Störmer-Verlet-Algorithm
-
-		//x_i ( t^{n+1} ) = x_i(T^n) + dt * v_i(t^n) + (dt)^2 * F_i(t^n) / 2m_i
-
-		p.setX(p.getX() + desc.delta_t * p.getV() + desc.delta_t * desc.delta_t * p.getF() * 0.5 * (1.0 / p.getM()));
-
-		++iterator;
-	}
+	particles.Iterate(posCalculator);
 }
 
+void Simulation::posCalculator(Particle p) {
+	//base calculation on Velocity-Störmer-Verlet-Algorithm
+	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
+	p.setX(p.getX() + desc.delta_t * p.getV() + desc.delta_t * desc.delta_t * p.getF() * 0.5 * (1.0 / p.getM()));
+}
 
 void Simulation::calculateV() {
-	vector<Particle>::iterator iterator = particles.begin();
-	while (iterator != particles.end()) {
+	particles.Iterate(velCalculator);
+}
 
-		Particle& p = *iterator;
-
-		//base calculation on Velocity-Störmer-Verlet-Algorithm
-
-		//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-
-		p.setV(p.getV() +  desc.delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.getM() ));
-
-		++iterator;
-	}
+void Simulation::velCalculator(Particle p) {
+	//base calculation on Velocity-Störmer-Verlet-Algorithm
+	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
+	p.setV(p.getV() +  desc.delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.getM() ));
 }
 
 

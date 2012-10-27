@@ -58,9 +58,12 @@ public:
 
 	/// get the force that acted on the Particle last iteration
 	utils::Vector<double, 3>& getOldF();
+	
+	/// reset the force acting on the Particle
+	void resetForce();
 
-	/// change the force acting on the Particle
-	void changeForce(utils::Vector<double, 3> force);
+	/// adds force acting on the Particle
+	void addForce(utils::Vector<double, 3> force);
 
 	/// overwrites the equality operator of Particles
 	bool operator==(Particle& other);

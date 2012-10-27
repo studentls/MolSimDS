@@ -18,6 +18,7 @@
 
 #include "utils\utils.h"
 #include "Particle.h"
+#include "ParticleContainer.h"
 #include <vector>
 
 ///
@@ -66,11 +67,10 @@ class Simulation
 private:
 	SimulationDesc	desc;
 
-	//add later here ParticleContainer...
-	std::vector<Particle> particles;
+	ParticleContainer particles;
 
 	/// performs one time step based on delta_t
-	void	performStep();
+	void performStep();
 
 
 	//prototypes...

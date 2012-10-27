@@ -48,11 +48,15 @@ utils::Vector<double, 3>& Particle::getOldF() {
 	return old_f;
 }
 
-void Particle::changeForce(utils::Vector<double, 3> force) {
+void Particle::resetForce() {
 	/// set the old_force to the current one
 	old_f = f;
-	/// and replace the current force with the function's argument
-	f = force;
+	/// and replace the current force with 0
+	f = 0;
+}
+
+void addForce(utils::Vector<double, 3> force); {
+	f = f + force;
 }
 
 std::string Particle::toString() {

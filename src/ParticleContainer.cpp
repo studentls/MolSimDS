@@ -40,7 +40,9 @@ void ParticleContainer::IteratePairwise(void(*func)(Particle, Particle)) {
 	/// iterate over all Particles
 	for (std::vector<Particle>::iterator it1=particles.begin() ; it1 < particles.end(); it1++)
 		/// iterate over all Particles again, within the first loop
-		for (std::vector<Particle>::iterator it2=particles.begin() ; it2 < particles.end(); it2++)
+		// TODO: 'it1+' does not do what I want. I want the functionality of it1++
+		// but without overwriting it1, just returning the successor
+		for (std::vector<Particle>::iterator it2=it1+; it2 < particles.end(); it2++)
 			/// make sure that a Particle is not paired with itself
 			if (it1 != it2)
 			{
