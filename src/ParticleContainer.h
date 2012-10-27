@@ -9,19 +9,19 @@
 #ifndef PARTICLE_CONTAINER_H_
 #define PARTICLE_CONTAINER_H_
 
-#include "utils/Vector.h"
+#include <vector>
 #include "Particle.h"
 
 
 class ParticleContainer {
 
 private:
-	utils::Vector<Particle> particles;
+	std::vector<Particle> particles;
 
 public:
 	ParticleContainer();
 
-	ParticleContainer(util::vector<Particle> particles);
+	ParticleContainer(std::vector<Particle> particles);
 
 	void AddParticle(Particle particle);
 
