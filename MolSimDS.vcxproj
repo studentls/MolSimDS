@@ -80,6 +80,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="ParticleContainer.h" />
     <ClInclude Include="src\FileReader.h" />
     <ClInclude Include="src\MolSim.h" />
     <ClInclude Include="src\outputWriter\vtk-unstructured.h" />
@@ -93,6 +94,7 @@
     <ClInclude Include="src\utils\Vector.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ParticleContainer.cpp" />
     <ClCompile Include="src\FileReader.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MolSim.cpp" />
