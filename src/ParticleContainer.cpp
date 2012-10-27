@@ -11,7 +11,7 @@ ParticleContainer() {
 	particles = new util::vector<Particle>();
 };
 
-ParticleContainer(util::vector<Particle> particles) {
+ParticleContainer(utils::Vector<Particle> particles) {
 	this.particles = particles;
 };
 
@@ -20,7 +20,7 @@ void AddParticle(Particle particle) {
 };
 
 void Iterate(void(*func)(Particle)) {
-	for (util::vector<Particle>::iterator it=particles.begin() ; it < particles.end(); it++)
+	for (utils::Vector<Particle>::iterator it=particles.begin() ; it < particles.end(); it++)
 	{
 		Particle p = *it;
 		(*func)(p);
@@ -28,8 +28,8 @@ void Iterate(void(*func)(Particle)) {
 };
 
 void IteratePairwise(void(*func)(Particle, Particle)) {
-	for (util::vector<Particle>::iterator it1=particles.begin() ; it1 < particles.end(); it1++)
-		for (util::vector<Particle>::iterator it2=particles.begin() ; it2 < particles.end(); it2++)
+	for (utils::Vector<Particle>::iterator it1=particles.begin() ; it1 < particles.end(); it1++)
+		for (utils::Vector<Particle>::iterator it2=particles.begin() ; it2 < particles.end(); it2++)
 			if (it1 != it2)
 			{
 				Particle p1 = *it1;

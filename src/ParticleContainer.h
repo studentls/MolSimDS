@@ -16,7 +16,7 @@
 class ParticleContainer {
 
 private:
-	util::vector<Particle> particles;
+	utils::Vector<Particle> particles;
 
 public:
 	ParticleContainer();
