@@ -60,7 +60,7 @@
     <ClInclude Include="src\utils\utils.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="ParticleContainer.h">
+    <ClInclude Include="src\ParticleContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -89,7 +89,7 @@
     <ClCompile Include="src\Simulation.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="ParticleContainer.cpp">
+    <ClCompile Include="src\ParticleContainer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
