@@ -65,7 +65,9 @@ struct SimulationDesc
 class Simulation
 {
 private:
-	SimulationDesc	desc;
+	static SimulationDesc active_desc;
+
+	SimulationDesc desc;
 
 	ParticleContainer particles;
 
@@ -81,21 +83,21 @@ private:
 
 	static void forceResetter(Particle& p);
 
-	static void forceCalculator(Particle& p1, Particle& p2, float gravitational_constant);
+	static void forceCalculator(Particle& p1, Particle& p2);
 
 	/**
 	 * calculate the position for all particles
 	 */
 	void calculateX();
 
-	static void posCalculator(Particle& p, float delta_t);
+	static void posCalculator(Particle& p);
 
 	/**
 	 * calculate the velocity for all particles
 	 */
 	void calculateV();
 
-	static void velCalculator(Particle& p, float delta_t);
+	static void velCalculator(Particle& p);
 
 	/**
 	 * plot the particles to a xyz-file

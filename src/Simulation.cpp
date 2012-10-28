@@ -55,6 +55,8 @@ void Simulation::performStep()
 
 err_type Simulation::Run(bool showStatistics)
 {	
+	active_desc = desc;
+
 	//particles valid?
 	if(particles.getParticles().empty())return E_NOTINITIALIZED;
 
@@ -104,12 +106,12 @@ void Simulation::forceResetter(Particle& p) {
 	p.resetForce();
 }
 
-void Simulation::forceCalculator(Particle& p1, Particle& p2, float gravitational_constant)
+void Simulation::forceCalculator(Particle& p1, Particle& p2)
 	//using simple force calculation model
 	double invdist = 1.0 / p1.x.distance(p2.x);
 	//use for speed up
 	double denominator = invdist * invdist * invdist; 
-	double factor = p1.m * p2.m * denominator * gravitational_constant;
+	double factor = p1.m * p2.m * denominator * active_desc.gravitational_constant;
 	utils::Vector<double, 3> force = (*p2.x - *p1.x) * factor;
 	//add individual particle to particle force to sum
 	p1.addForce(force);
@@ -120,20 +122,20 @@ void Simulation::calculateX() {
 	particles.Iterate(posCalculator);
 }
 
-void Simulation::posCalculator(Particle& p, float delta_t) {
-	//base calculation on Velocity-Störmer-Verlet-Algorithm
-	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-	p.x = (p.x + delta_t * p.v + desc.delta_t * delta_t * p.getF() * 0.5 * (1.0 / p.m));
+void Simulation::posCalculator(Particle& p) {
+	// TODO: accidentally deleted the description here. put it back in
+	// when merging with main branch
+	p.x = (p.x + active_desc.delta_t * p.v + active_desc.delta_t * active_desc.delta_t * p.getF() * 0.5 * (1.0 / p.m));
 }
 
 void Simulation::calculateV() {
 	particles.Iterate(velCalculator);
 }
 
-void Simulation::velCalculator(Particle& p, float delta_t) {
+void Simulation::velCalculator(Particle& p) {
 	//base calculation on Velocity-Störmer-Verlet-Algorithm
 	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-	p.v = (p.v +  delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
+	p.v = (p.v +  active_desc.delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
 }
 
 

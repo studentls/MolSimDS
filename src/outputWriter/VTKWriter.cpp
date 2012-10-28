@@ -78,13 +78,13 @@ void VTKWriter::plotParticle(Particle& p) {
 	PointData::DataArray_sequence& pointDataSequence = vtkFile->UnstructuredGrid()->Piece().PointData().DataArray();
 	PointData::DataArray_iterator dataIterator = pointDataSequence.begin();
 
-	dataIterator->push_back(p.getM());
+	dataIterator->push_back(p.m);
 	//cout << "Appended mass data in: " << dataIterator->Name();
 
 	dataIterator++;
-	dataIterator->push_back(p.getV()[0]);
-	dataIterator->push_back(p.getV()[1]);
-	dataIterator->push_back(p.getV()[2]);
+	dataIterator->push_back(p.v[0]);
+	dataIterator->push_back(p.v[1]);
+	dataIterator->push_back(p.v[2]);
 	//cout << "Appended velocity data in: " << dataIterator->Name();
 
 	dataIterator++;
@@ -94,13 +94,13 @@ void VTKWriter::plotParticle(Particle& p) {
 	//cout << "Appended force data in: " << dataIterator->Name();
 
 	dataIterator++;
-	dataIterator->push_back(p.getType());
+	dataIterator->push_back(p.type);
 
 	Points::DataArray_sequence& pointsSequence = vtkFile->UnstructuredGrid()->Piece().Points().DataArray();
 	Points::DataArray_iterator pointsIterator = pointsSequence.begin();
-	pointsIterator->push_back(p.getX()[0]);
-	pointsIterator->push_back(p.getX()[1]);
-	pointsIterator->push_back(p.getX()[2]);
+	pointsIterator->push_back(p.x[0]);
+	pointsIterator->push_back(p.x[1]);
+	pointsIterator->push_back(p.x[2]);
 }
 
 
