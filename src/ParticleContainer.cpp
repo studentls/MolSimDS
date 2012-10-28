@@ -23,26 +23,23 @@ ParticleContainer::ParticleContainer(std::vector<Particle> particles_args) {
 	particles = particles_args;
 }
 
-void ParticleContainer::AddParticle(Particle particle) {
+void ParticleContainer::AddParticle(Particle& particle) {
 	particles.push_back(particle);
 }
 
-void ParticleContainer::Iterate(void(*func)(Particle)) {
+void ParticleContainer::Iterate(void(*func)(Particle&)) {
 	/// iterate over all Particles and call the function on it
-	for (std::vector<Particle>::iterator it=particles.begin() ; it < particles.end(); it++)
+	for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
 	{
 		Particle& p = *it;
 		(*func)(p);
 	}
 }
 
-void ParticleContainer::IteratePairwise(void(*func)(Particle, Particle)) {
+void ParticleContainer::IteratePairwise(void(*func)(Particle&, Particle&)) {
 	/// iterate over all Particles
-	for (std::vector<Particle>::iterator it1=particles.begin() ; it1 < particles.end(); it1++)
-		/// iterate over all Particles again, within the first loop
-		// TODO: 'it1+' does not do what I want. I want the functionality of it1++
-		// but without overwriting it1, just returning the successor
-		for (std::vector<Particle>::iterator it2=it1+; it2 < particles.end(); it2++)
+	for (std::vector<Particle>::iterator it1 = particles.begin() ; it1 < particles.end(); it1++)
+		for (std::vector<Particle>::iterator it2 = it1 + 1; it2 < particles.end(); it2++)
 			/// make sure that a Particle is not paired with itself
 			if (it1 != it2)
 			{

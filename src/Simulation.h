@@ -79,15 +79,23 @@ private:
 	 */
 	void calculateF();
 
+	void forceResetter(Particle& p);
+
+	void forceCalculator(Particle& p1, Particle& p2);
+
 	/**
 	 * calculate the position for all particles
 	 */
 	void calculateX();
 
+	void posCalculator(Particle& p);
+
 	/**
 	 * calculate the velocity for all particles
 	 */
 	void calculateV();
+
+	void velCalculator(Particle& p);
 
 	/**
 	 * plot the particles to a xyz-file

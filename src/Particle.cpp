@@ -55,7 +55,7 @@ void Particle::resetForce() {
 	f = 0;
 }
 
-void addForce(utils::Vector<double, 3> force); {
+void addForce(utils::Vector<double, 3> force) {
 	f = f + force;
 }
 

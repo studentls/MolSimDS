@@ -90,7 +90,7 @@ err_type Simulation::Run(bool showStatistics)
 err_type Simulation::Release()
 {
 	//delete Particle data...
-	if(!particles.empty())particles.clear();
+	if(!particles.getParticles().empty())particles.getParticles().clear();
 
 	return S_OK;
 }
@@ -100,11 +100,11 @@ void Simulation::calculateF() {
 	particles.IteratePairwise(forceCalculator);
 }
 
-void Simulation::forceResetter(Particle p) {
+void Simulation::forceResetter(Particle& p) {
 	p.resetForce();
 }
 
-void Simulation::forceCalculator(Particle p1, Particle p2)
+void Simulation::forceCalculator(Particle& p1, Particle& p2)
 	vector<Particle>::iterator iterator;
 	//using simple force calculation model
 	double invdist = 1.0 / p1.getX().distance(p2.getX());
@@ -121,7 +121,7 @@ void Simulation::calculateX() {
 	particles.Iterate(posCalculator);
 }
 
-void Simulation::posCalculator(Particle p) {
+void Simulation::posCalculator(Particle& p) {
 	//base calculation on Velocity-Störmer-Verlet-Algorithm
 	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
 	p.setX(p.getX() + desc.delta_t * p.getV() + desc.delta_t * desc.delta_t * p.getF() * 0.5 * (1.0 / p.getM()));
@@ -131,7 +131,7 @@ void Simulation::calculateV() {
 	particles.Iterate(velCalculator);
 }
 
-void Simulation::velCalculator(Particle p) {
+void Simulation::velCalculator(Particle& p) {
 	//base calculation on Velocity-Störmer-Verlet-Algorithm
 	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
 	p.setV(p.getV() +  desc.delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.getM() ));
