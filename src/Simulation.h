@@ -79,23 +79,23 @@ private:
 	 */
 	void calculateF();
 
-	void forceResetter(Particle& p);
+	static void forceResetter(Particle& p);
 
-	void forceCalculator(Particle& p1, Particle& p2);
+	static void forceCalculator(Particle& p1, Particle& p2, float gravitational_constant);
 
 	/**
 	 * calculate the position for all particles
 	 */
 	void calculateX();
 
-	void posCalculator(Particle& p);
+	static void posCalculator(Particle& p, float delta_t);
 
 	/**
 	 * calculate the velocity for all particles
 	 */
 	void calculateV();
 
-	void velCalculator(Particle& p);
+	static void velCalculator(Particle& p, float delta_t);
 
 	/**
 	 * plot the particles to a xyz-file

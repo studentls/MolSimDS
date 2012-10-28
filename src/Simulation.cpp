@@ -25,7 +25,7 @@ err_type Simulation::Init(const SimulationDesc& desc)
 	this->desc = desc;
 
 	//clear
-	if(!particles.empty())particles.clear();
+	if(!particles.getParticles().empty())particles.getParticles().clear();
 
 	return S_OK;
 }
@@ -33,7 +33,7 @@ err_type Simulation::Init(const SimulationDesc& desc)
 err_type Simulation::AddParticlesFromFile(const char *filename)
 {
 	FileReader fileReader;
-	fileReader.readFile(particles, filename);
+	fileReader.readFile(particles.getParticles(), filename);
 	
 	// the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
@@ -56,7 +56,7 @@ void Simulation::performStep()
 err_type Simulation::Run(bool showStatistics)
 {	
 	//particles valid?
-	if(particles.empty())return E_NOTINITIALIZED;
+	if(particles.getParticles().empty())return E_NOTINITIALIZED;
 
 	double current_time = desc.start_time;
 
@@ -104,37 +104,36 @@ void Simulation::forceResetter(Particle& p) {
 	p.resetForce();
 }
 
-void Simulation::forceCalculator(Particle& p1, Particle& p2)
-	vector<Particle>::iterator iterator;
+void Simulation::forceCalculator(Particle& p1, Particle& p2, float gravitational_constant)
 	//using simple force calculation model
-	double invdist = 1.0 / p1.getX().distance(p2.getX());
+	double invdist = 1.0 / p1.x.distance(p2.x);
 	//use for speed up
 	double denominator = invdist * invdist * invdist; 
-	double factor = p1.getM() * p2.getM() *denominator * desc.gravitational_constant;
-	utils::Vector<double, 3> force = (p2.getX() - p1.getX()) * factor;
+	double factor = p1.m * p2.m * denominator * gravitational_constant;
+	utils::Vector<double, 3> force = (*p2.x - *p1.x) * factor;
 	//add individual particle to particle force to sum
 	p1.addForce(force);
-	p2.addForce(-force)
+	p2.addForce(-1 * force);
 }
 
 void Simulation::calculateX() {
 	particles.Iterate(posCalculator);
 }
 
-void Simulation::posCalculator(Particle& p) {
+void Simulation::posCalculator(Particle& p, float delta_t) {
 	//base calculation on Velocity-Störmer-Verlet-Algorithm
 	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-	p.setX(p.getX() + desc.delta_t * p.getV() + desc.delta_t * desc.delta_t * p.getF() * 0.5 * (1.0 / p.getM()));
+	p.x = (p.x + delta_t * p.v + desc.delta_t * delta_t * p.getF() * 0.5 * (1.0 / p.m));
 }
 
 void Simulation::calculateV() {
 	particles.Iterate(velCalculator);
 }
 
-void Simulation::velCalculator(Particle& p) {
+void Simulation::velCalculator(Particle& p, float delta_t) {
 	//base calculation on Velocity-Störmer-Verlet-Algorithm
 	//v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-	p.setV(p.getV() +  desc.delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.getM() ));
+	p.v = (p.v +  delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
 }
 
 
@@ -148,14 +147,14 @@ void Simulation::plotParticles(int iteration) {
 		{
 			//VTK Output
 			outputWriter::VTKWriter writer;
-			writer.plotParticles(particles, out_name, iteration);
+			writer.plotParticles(particles.getParticles(), out_name, iteration);
 			break;
 		}
 	case SOF_XYZ:
 		{
 			//XYZ Output
 			outputWriter::XYZWriter writer;
-			writer.plotParticles(particles, out_name, iteration);
+			writer.plotParticles(particles.getParticles(), out_name, iteration);
 			break;
 		}
 
