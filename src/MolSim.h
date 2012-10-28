@@ -18,7 +18,7 @@
 #include "outputWriter/XYZWriter.h"
 #include "outputWriter/VTKWriter.h"
 #include "FileReader.h"
-#include "utils\utils.h"
+#include "utils/utils.h"
 
 #include <list>
 #include <cstring>

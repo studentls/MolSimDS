@@ -45,3 +45,4 @@ doc/
 #linux files
 *.so
 *.mk
+*.o

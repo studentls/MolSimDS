@@ -43,7 +43,7 @@ namespace utils
 		//testwise opening
 		FILE *pFile = NULL;
 
-		fopen_s(&pFile, filename, "rb");
+		pFile = fopen(filename, "rb");
 		
 		if(pFile)fclose(pFile);
 	

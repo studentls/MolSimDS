@@ -15,8 +15,8 @@
 
 #include "Simulation.h"
 #include "FileReader.h"
-#include "outputWriter\VTKWriter.h"
-#include "outputWriter\XYZWriter.h"
+#include "outputWriter/VTKWriter.h"
+#include "outputWriter/XYZWriter.h"
 
 using namespace std;
 

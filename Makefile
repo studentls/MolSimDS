@@ -17,13 +17,6 @@ CFLAGS=-I/opt/include -g -O3
 # ------------
 LDFLAGS= -L/opt/lib -lxerces-c 
 
-SOURCES=\
-src/MolSim.cpp\
-src/outputWriter/XYZWriter.cpp\
-src/outputWriter/VTKWriter.cpp\
-src/outputWriter/vtk-unstructured.cpp\
-src/FileReader.cpp\
-src/Particle.cpp\
 
 INCLUDES= -I./src -I./libxsd
 

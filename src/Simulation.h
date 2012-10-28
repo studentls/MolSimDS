@@ -16,7 +16,7 @@
 #ifndef SIMULATION_HEADER_
 #define SIMULATION_HEADER_
 
-#include "utils\utils.h"
+#include "utils/utils.h"
 #include "Particle.h"
 #include <vector>
 
