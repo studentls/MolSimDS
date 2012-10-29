@@ -24,18 +24,20 @@ err_type Simulation::Init(const SimulationDesc& desc)
 {
 	this->desc = desc;
 
-	//clear
-	if(!particles.getParticles().empty())particles.getParticles().clear();
+	/// clear particles if it is not already empty
+	if(!particles.getParticles().empty())
+		particles.getParticles().clear();
 
 	return S_OK;
 }
 
 err_type Simulation::AddParticlesFromFile(const char *filename)
 {
+	/// read the file
 	FileReader fileReader;
 	fileReader.readFile(particles.getParticles(), filename);
 	
-	// the forces are needed to calculate x, but are not given in the input file.
+	/// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
 
 	return S_OK;
@@ -43,46 +45,53 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 
 void Simulation::performStep()
 {
-	// calculate new x
+	/// calculate new x
 	calculateX();
 
-	// calculate new f
+	/// calculate new f
 	calculateF();
 
-	// calculate new v
+	/// calculate new v
 	calculateV();
 }
 
 err_type Simulation::Run(bool showStatistics)
-{	
-	active_desc = desc;
+{
+	/// set active_desc to this->desc
+	/// this ensures that the correct SimulationDesc is used for calculations
+	active_desc = this->desc;
 
-	//particles valid?
+	/// check if the particles are valid
 	if(particles.getParticles().empty())return E_NOTINITIALIZED;
 
+	/// initialize some values
 	double current_time = desc.start_time;
-
 	int iteration = 0;
 
+	/// output that calculation have started ("starting calculation...")
 	cout<<"starting calculation..."<<endl;
 
-	 // for this loop, we assume: current x, current f and current v are known
+	/// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
 
-		//step Simulation forward
+		/// perform one iteration step
 		performStep();
 		
-		//we want to start plotting from initial configuration onwards!!!
+		/// plot the particles on every tenth iteration, beginning with the first
 		if (iteration % 10 == 0) {
 			plotParticles(iteration);
 		}
 		
+		/// increment loop values
 		iteration++;
+		current_time += desc.delta_t;
 		
+		/// output that an iteration has finished
 		cout << "Iteration " << iteration << " finished." << endl;
 
-		current_time += desc.delta_t;
 	}
+
+	/// output that the output has finished
 	cout << endl;
 	cout << "output written. Terminating..." << endl;
 
@@ -91,18 +100,21 @@ err_type Simulation::Run(bool showStatistics)
 
 err_type Simulation::Release()
 {
-	//delete Particle data...
+	/// delete Particle data
 	if(!particles.getParticles().empty())particles.getParticles().clear();
 
 	return S_OK;
 }
 
 void Simulation::calculateF() {
+	/// call particles.Iterate() on forceResetter
 	particles.Iterate(forceResetter);
+	/// call particles.IteratePairwise() on forceCalculator
 	particles.IteratePairwise(forceCalculator);
 }
 
 void Simulation::forceResetter(Particle& p) {
+	/// call particlesresetForce(), which also ensures that old_f gets changed as well as f
 	p.resetForce();
 }
 
@@ -119,6 +131,7 @@ void Simulation::forceCalculator(Particle& p1, Particle& p2)
 }
 
 void Simulation::calculateX() {
+	/// call particles.Iterate() on posCalculator
 	particles.Iterate(posCalculator);
 }
 
@@ -129,6 +142,7 @@ void Simulation::posCalculator(Particle& p) {
 }
 
 void Simulation::calculateV() {
+	/// call particles.Iterate() on velCalculator
 	particles.Iterate(velCalculator);
 }
 
@@ -142,19 +156,20 @@ void Simulation::velCalculator(Particle& p) {
 void Simulation::plotParticles(int iteration) {
 
 	string out_name("MD_vtk");
-
+	/// switch between VTK and XYZ output
+	/// depending on the value of desc.output_fmt
 	switch(desc.output_fmt)
 	{
 	case SOF_VTK:
 		{
-			//VTK Output
+			/// VTK Output
 			outputWriter::VTKWriter writer;
 			writer.plotParticles(particles.getParticles(), out_name, iteration);
 			break;
 		}
 	case SOF_XYZ:
 		{
-			//XYZ Output
+			/// XYZ Output
 			outputWriter::XYZWriter writer;
 			writer.plotParticles(particles.getParticles(), out_name, iteration);
 			break;
