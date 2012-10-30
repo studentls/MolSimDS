@@ -31,14 +31,12 @@ enum SimulationOutputFormat
 	SOF_XYZ
 };
 
-///
-/// describes common Simulation params
+/// a struct that describes common Simulation params
 /// @param delta_t step size
 /// @param start_time start time of simulation
 /// @param end_time end time of simulation
 /// @param gravitational_constant the gravitational constant used in the Simulation
 /// @param output_fmt specify OutputFormat, use SOF_NONE for no output
-///
 struct SimulationDesc
 {
 	double	delta_t;
@@ -62,9 +60,7 @@ struct SimulationDesc
 };
 
 
-///
-/// Molecule Simulation class
-///
+/// a class that is used to represent a simulation
 class Simulation
 {
 private:
@@ -86,30 +82,26 @@ private:
 	/// calculate the force for all particles
 	void calculateF();
 
-	/// resets the force on a particle for a new iteration
-	/// used in calculateF()
+	/// resets the force on a particle for a new iteration. Used in calculateF()
 	static void forceResetter(Particle& p);
 
-	/// calculate and apply the force between a pair of particles
-	/// used in calculateF()
+	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	static void forceCalculator(Particle& p1, Particle& p2);
 
 	/// calculate the position for all particles
 	void calculateX();
 
-	/// calculate the new position of a particle for a new iteration
-	/// used in calculateX()
+	/// calculate the new position of a particle for a new iteration. Used in calculateX()
 	static void posCalculator(Particle& p);
 
 	/// calculate the velocity for all particles
 	void calculateV();
 
-	/// calculate the new velocity of a particle for a new iteration
-	/// used in calculateV()
+	/// calculate the new velocity of a particle for a new iteration. Used in calculateV()
 	static void velCalculator(Particle& p);
 
 	/// plot the particles to a xyz-file
-	// @param iteration the number of this iteration
+	/// @param iteration the number of this iteration
 	void plotParticles(int iteration);
 
 
@@ -117,27 +109,20 @@ public:
 	Simulation()	{}
 
 	~Simulation()	{ Release(); }
-	///
+	
 	/// set up simulation using description desc
-	// @param desc simulation description
-	///
+	/// @param desc simulation description
 	err_type Init(const SimulationDesc& desc);
 
-	///
 	/// adds Particles to particle list from file
 	/// @param filename particle file, has to use .txt format
-	///
 	err_type AddParticlesFromFile(const char *filename);
 
-	///
 	/// Run Simulation
 	/// @param showStatistics print out statistic Data at end
-	///
 	err_type Run(bool showStatistics = false);
 
-	///
 	/// cleans memory and flushes Simulation Data
-	/// 
 	err_type Release();
 };
 

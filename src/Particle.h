@@ -28,8 +28,7 @@ public:
 	/// a constructor that clones an existing Particle
 	Particle(const Particle& other);
 
-	/// a full constructor that takes the position and velocity (both as 3-tuple vectors)
-	/// as well as the mass and type
+	/// a full constructor that takes the position and velocity (both as 3-tuple vectors) as well as the mass and type
 	Particle(
 			/// for visualization, we need always 3 coordinates
 			/// -> in case of 2d, we use only the first and the second
@@ -48,9 +47,7 @@ public:
 	/// the mass of this particle
 	double m;
 
-	/// type of the particle
-	/// The use of this value depends on particularities of the implementation
-	/// currently not in use
+	/// type of the particle. The use of this value depends on particularities of the implementation. Currently not in use
 	int type;
 
 	/// get the current force acting on the Particle
