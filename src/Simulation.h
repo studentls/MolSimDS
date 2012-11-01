@@ -44,6 +44,7 @@ struct SimulationDesc
 	double	delta_t;
 	double	start_time;
 	double	end_time;
+
 	/// this value may be renamed appropriately in a later version
 	/// if the particles are affected by magnetic instead of gravitational forces
 	double	gravitational_constant;
@@ -108,7 +109,7 @@ public:
 
 	~Simulation()	{ Release(); }
 	
-	/// set up simulation using description desc
+	/// sets up simulation using description desc, any old Simulation will be lost when this function is called
 	/// @param desc simulation description
 	err_type Init(const SimulationDesc& desc);
 
@@ -116,7 +117,7 @@ public:
 	/// @param filename particle file, has to use .txt format
 	err_type AddParticlesFromFile(const char *filename);
 
-	/// Run Simulation
+	/// runs Simulation according to settings given by Init
 	/// @param showStatistics print out statistic Data at end
 	err_type Run(bool showStatistics = false);
 

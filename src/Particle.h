@@ -62,8 +62,8 @@ public:
 	/// adds force acting on the Particle
 	void addForce(utils::Vector<double, 3> force);
 
-	/// overwrites the equality operator of Particles
-	bool operator==(Particle& other);
+	/// compares two particles by their type, position, velocity, force and mass
+	bool operator == (Particle& other);
 
 	/// print information about this Particle
 	std::string toString();

@@ -46,7 +46,7 @@ public:
 	/// runs a simulation
 	err_type Run();
 
-	/// clean up
+	/// cleans up
 	err_type Release();
 	
 };

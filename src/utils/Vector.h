@@ -171,4 +171,9 @@ std::ostream& operator << (std::ostream& stream, const Vector<type, length>& v) 
 
 }
 
+
+//typedef for easier understanding
+typedef utils::Vector<double, 3> Vec3;
+typedef utils::Vector<double, 2> Vec2;
+
 #endif /* VECTOR_ */
