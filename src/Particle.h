@@ -74,4 +74,4 @@ public:
 
 std::ostream& operator<<(std::ostream& stream, Particle& p);
 
-#endif /* PARTICLE_H_ */
+#endif 

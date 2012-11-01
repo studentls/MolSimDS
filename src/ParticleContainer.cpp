@@ -21,7 +21,7 @@ ParticleContainer::ParticleContainer() {
 }
 
 ParticleContainer::ParticleContainer(const std::vector<Particle>& particles_args) {
-	/// copy data
+	// copy data
 	particles = particles_args;
 }
 
@@ -30,7 +30,7 @@ void ParticleContainer::AddParticle(const Particle& particle) {
 }
 
 void ParticleContainer::Iterate(void(*func)(void*, Particle&), void *data) {
-	/// iterate over all Particles and call the function on it
+	// iterate over all Particles and call the function on it
 	for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
 	{
 		Particle& p = *it;
@@ -39,13 +39,13 @@ void ParticleContainer::Iterate(void(*func)(void*, Particle&), void *data) {
 }
 
 void ParticleContainer::IteratePairwise(void(*func)(void *data, Particle&, Particle&), void *data) {
-	/// iterate over all Particles
+	// iterate over all Particles
 	for (std::vector<Particle>::iterator it1 = particles.begin() ; it1 < particles.end(); it1++)
 		for (std::vector<Particle>::iterator it2 = it1 + 1; it2 < particles.end(); it2++)
-			/// make sure that a Particle is not paired with itself
+			// make sure that a Particle is not paired with itself
 			if (it1 != it2)
 			{
-				/// call the function on the pair of Particles
+				// call the function on the pair of Particles
 				Particle& p1 = *it1;
 				Particle& p2 = *it2;
 				(*func)(data, p1, p2);
@@ -54,7 +54,7 @@ void ParticleContainer::IteratePairwise(void(*func)(void *data, Particle&, Parti
 
 void ParticleContainer::AddParticlesFromFile(const char *filename)
 {
-	/// read the file
+	// read the file
 	FileReader fileReader;
 	fileReader.readFile(particles, filename);
 }

@@ -17,7 +17,7 @@ Particle::Particle(int type_arg) {
 }
 
 Particle::Particle(const Particle& other) {
-	/// copy every attribute of the Particle to create a new one
+	// copy every attribute of the Particle to create a new one
 	x = other.x;
 	v = other.v;
 	f = other.f;
@@ -49,9 +49,9 @@ utils::Vector<double, 3>& Particle::getOldF() {
 }
 
 void Particle::resetForce() {
-	/// set the old_force to the current one
+	// set the old_force to the current one
 	old_f = f;
-	/// and replace the current force with 0
+	// and replace the current force with 0
 	f = 0.0;
 }
 
@@ -66,8 +66,8 @@ std::string Particle::toString() {
 }
 
 bool Particle::operator ==(Particle& other) {
-	/// two Particles are considered identical iff
-	/// all of their values are equal
+	// two Particles are considered identical iff
+	// all of their values are equal
 	if ( (x == other.x) && (v == other.v) && (f == other.f) &&
 			(type == other.type) && (m == other.m) && (old_f == other.old_f)) {
 		return true;

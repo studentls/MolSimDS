@@ -14,7 +14,7 @@
 #include "MolSim.h"
 
 
-/// entry point
+// entry point
 int main(int argc, char* argsv[]) {
 
 	MolSim *molsim = new MolSim();

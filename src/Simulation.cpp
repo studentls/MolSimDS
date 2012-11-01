@@ -23,7 +23,7 @@ err_type Simulation::Init(const SimulationDesc& desc)
 {
 	this->desc = desc;
 
-	/// clear particles if it is not already empty
+	// clear particles if it is not already empty
 	particles.Clear();
 
 	return S_OK;
@@ -31,10 +31,10 @@ err_type Simulation::Init(const SimulationDesc& desc)
 
 err_type Simulation::AddParticlesFromFile(const char *filename)
 {
-	/// read the file
+	// read the file
 	particles.AddParticlesFromFile(filename);
 	
-	/// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
+	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
 
 	return S_OK;
@@ -42,35 +42,35 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 
 void Simulation::performStep()
 {
-	/// calculate new x
+	// calculate new x
 	calculateX();
 
-	/// calculate new f
+	// calculate new f
 	calculateF();
 
-	/// calculate new v
+	// calculate new v
 	calculateV();
 }
 
 err_type Simulation::Run(bool showStatistics)
 {
-	/// check if the particles are valid
+	// check if the particles are valid
 	if(particles.IsEmpty())return E_NOTINITIALIZED;
 
-	/// initialize some values
+	// initialize some values
 	double current_time = desc.start_time;
 	int iteration = 0;
 
-	/// output that calculation have started ("starting calculation...")
+	// output that calculation have started ("starting calculation...")
 	cout<<"starting calculation..."<<endl;
 
-	/// iterate until the end time is reached...
+	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
 
-		/// perform one iteration step
+		// perform one iteration step
 		performStep();
 		
-		/// plot the particles on every hundredth iteration, beginning with the first
+		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % 10 == 0) {
 			plotParticles(iteration);
 			
@@ -78,12 +78,12 @@ err_type Simulation::Run(bool showStatistics)
 			cout << "Iteration " << iteration << " finished." << endl;
 		}
 		
-		/// increment loop values
+		// increment loop values
 		iteration++;
 		current_time += desc.delta_t;
 	}
 
-	/// output that the output has finished
+	// output that the output has finished
 	cout << endl;
 	cout << "output written. Terminating..." << endl;
 
@@ -92,28 +92,28 @@ err_type Simulation::Run(bool showStatistics)
 
 err_type Simulation::Release()
 {
-	/// delete Particle data
+	// delete Particle data
 	particles.Clear();
 
 	return S_OK;
 }
 
 void Simulation::calculateF() {
-	/// call particles.Iterate() on forceResetter
+	// call particles.Iterate() on forceResetter
 	particles.Iterate(forceResetter, (void*)&desc);
-	/// call particles.IteratePairwise() on forceCalculator
+	// call particles.IteratePairwise() on forceCalculator
 	particles.IteratePairwise(forceCalculator, (void*)&desc);
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
-	/// call particlesresetForce(), which also ensures that old_f gets changed as well as f
+	// call particlesresetForce(), which also ensures that old_f gets changed as well as f
 	p.resetForce();
 }
 
 void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 {
 #ifdef DEBUG
-	/// assert data is a valid pointer!
+	// assert data is a valid pointer!
 	if(!data)
 	{
 		std::cout<<"error: data is not a valid pointer!"<<std::endl;
@@ -123,29 +123,29 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 
 	SimulationDesc *desc = (SimulationDesc*)data;
 
-	/// using simple force calculation model
+	// using simple force calculation model
 	double invdist = 1.0 / p1.x.distance(p2.x);
 	
-	/// use for speed up
+	// use for speed up
 	double denominator = invdist * invdist * invdist; 
 	double factor = p1.m * p2.m * denominator * desc->gravitational_constant;
 	
 	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
 	
-	/// add individual particle to particle force to sum
+	// add individual particle to particle force to sum
 	p1.addForce(force);
 	p2.addForce(-1 * force);
 }
 
 void Simulation::calculateX() {
 	
-	/// call particles.Iterate() on posCalculator
+	// call particles.Iterate() on posCalculator
 	particles.Iterate(posCalculator, (void*)&desc);
 }
 
 void Simulation::posCalculator(void* data, Particle& p) {
 	#ifdef DEBUG
-	/// assert data is a valid pointer!
+	// assert data is a valid pointer!
 	if(!data)
 	{
 		std::cout<<"error: data is not a valid pointer!"<<std::endl;
@@ -155,20 +155,20 @@ void Simulation::posCalculator(void* data, Particle& p) {
 
 	SimulationDesc *desc = (SimulationDesc*)data;
 	
-	/// calc new pos
-	/// base calculation on Velocity-Störmer-Verlet-Algorithm
+	// calc new pos
+	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// x_i ( t^{n+1} ) = x_i (t^n) + delta_t * p_i (t^n) + delta_t^2 * f_i (t^n) * 0.5 / m_i
 	p.x = (p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * 0.5 * (1.0 / p.m));
 }
 
 void Simulation::calculateV() {
-	/// call particles.Iterate() on velCalculator
+	// call particles.Iterate() on velCalculator
 	particles.Iterate(velCalculator, (void*)&desc);
 }
 
 void Simulation::velCalculator(void* data, Particle& p) {
 	#ifdef DEBUG
-	/// assert data is a valid pointer!
+	// assert data is a valid pointer!
 	if(!data)
 	{
 		std::cout<<"error: data is not a valid pointer!"<<std::endl;
@@ -178,8 +178,8 @@ void Simulation::velCalculator(void* data, Particle& p) {
 
 	SimulationDesc *desc = (SimulationDesc*)data;
 
-	/// calc new vel
-	/// base calculation on Velocity-Störmer-Verlet-Algorithm
+	// calc new vel
+	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
 	p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
 }
