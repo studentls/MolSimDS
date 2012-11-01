@@ -16,6 +16,9 @@ open project in VC and compile
 
 
 
+
+---
 Note:
 You have to have xerces library installed
+
 To generate docfiles, run doxygen Doxyfile.doxy
