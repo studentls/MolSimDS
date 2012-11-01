@@ -14,6 +14,7 @@
 //------------------------------------------------------------------------------------------------
 
 #include "ParticleContainer.h"
+#include "FileReader.h"
 
 ParticleContainer::ParticleContainer() {
 	particles = std::vector<Particle>();
@@ -27,16 +28,16 @@ void ParticleContainer::AddParticle(Particle& particle) {
 	particles.push_back(particle);
 }
 
-void ParticleContainer::Iterate(void(*func)(Particle&)) {
+void ParticleContainer::Iterate(void(*func)(void*, Particle&), void *data) {
 	/// iterate over all Particles and call the function on it
 	for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
 	{
 		Particle& p = *it;
-		(*func)(p);
+		(*func)(data, p);
 	}
 }
 
-void ParticleContainer::IteratePairwise(void(*func)(Particle&, Particle&)) {
+void ParticleContainer::IteratePairwise(void(*func)(void *data, Particle&, Particle&), void *data) {
 	/// iterate over all Particles
 	for (std::vector<Particle>::iterator it1 = particles.begin() ; it1 < particles.end(); it1++)
 		for (std::vector<Particle>::iterator it2 = it1 + 1; it2 < particles.end(); it2++)
@@ -46,6 +47,14 @@ void ParticleContainer::IteratePairwise(void(*func)(Particle&, Particle&)) {
 				/// call the function on the pair of Particles
 				Particle& p1 = *it1;
 				Particle& p2 = *it2;
-				(*func)(p1, p2);
+				(*func)(data, p1, p2);
 			}
+}
+
+void ParticleContainer::AddParticlesFromFile(const char *filename)
+{
+	/// read the file
+	FileReader fileReader;
+	fileReader.readFile(particles, filename);
+
 }

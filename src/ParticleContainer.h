@@ -34,19 +34,28 @@ public:
 	/// a constructor that takes one argument, which is the vector<Particles>
 	ParticleContainer(std::vector<Particle> particles);
 
-	/// a method to return the particles held by this ParticleContainer
-	std::vector<Particle> getParticles() {
-		return particles;
-	}
-
 	/// a method to add a Particle to the ParticleContainer
 	void AddParticle(Particle& particle);
 
 	/// a method that takes a void(*func)(Particle) and uses it to iterate over all Particles
-	void Iterate(void(*func)(Particle&));
+	/// @param data additional data given to func
+	void Iterate(void(*func)(void*, Particle&), void *data);
 	
 	/// a method that takes a void(*func)(Particle, Particle) and uses it to iterate over all pairs of Particles (each symmetrical pair is only taken once to reduce redundancy)
-	void IteratePairwise(void(*func)(Particle&, Particle&));
+	/// @param data additional data given to func
+	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
+
+	/// add particles from *.txt file
+	void AddParticlesFromFile(const char *filename);
+
+	/// removes all particles
+	void Clear()	{if(!particles.empty())particles.clear();}
+
+	/// are any particles contained?
+	bool IsEmpty()	{return particles.empty();}
+
+	/// this method shall be later removed...
+	std::vector<Particle>& getParticles()	{return particles;}
 
 };
 

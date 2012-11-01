@@ -21,6 +21,8 @@
 #include "ParticleContainer.h"
 #include <vector>
 
+
+
 ///
 /// Output Format
 ///
@@ -64,12 +66,6 @@ struct SimulationDesc
 class Simulation
 {
 private:
-	/// a static value that stores what parameters are being used for the currently active simulation.
-	/// This is a simple and flexible way to allow the static methods of this class to access that data
-	/// without changing the prototype of those functions that are given as arguments to
-	/// ParticleContainer.Iterate() and ParticleContainer.IteratePairwise().
-	static SimulationDesc active_desc;
-
 	/// stores values that are used for calculations for this Simulation
 	SimulationDesc desc;
 
@@ -83,26 +79,28 @@ private:
 	void calculateF();
 
 	/// resets the force on a particle for a new iteration. Used in calculateF()
-	static void forceResetter(Particle& p);
+	static void forceResetter(void*, Particle& p);
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
-	static void forceCalculator(Particle& p1, Particle& p2);
+	static void forceCalculator(void*, Particle&, Particle&);
 
 	/// calculate the position for all particles
 	void calculateX();
 
 	/// calculate the new position of a particle for a new iteration. Used in calculateX()
-	static void posCalculator(Particle& p);
+	static void posCalculator(void*, Particle&);
 
 	/// calculate the velocity for all particles
 	void calculateV();
 
 	/// calculate the new velocity of a particle for a new iteration. Used in calculateV()
-	static void velCalculator(Particle& p);
+	static void velCalculator(void*, Particle& p);
 
 	/// plot the particles to a xyz-file
 	/// @param iteration the number of this iteration
 	void plotParticles(int iteration);
+
+	static void test(Particle& p);
 
 
 public:
