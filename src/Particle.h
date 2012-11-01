@@ -38,6 +38,9 @@ public:
 	        int type = 0
 	);
 
+	/// destructor
+	~Particle()  		{}
+	
 	/// the position of the particle
 	utils::Vector<double, 3> x;
 
