@@ -23,9 +23,7 @@
 
 
 
-///
 /// Output Format
-///
 enum SimulationOutputFormat
 {
 	SOF_NONE,

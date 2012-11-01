@@ -21,13 +21,13 @@ using namespace utils;
 
 err_type MolSim::Init(int argc, char *argsv[])
 {
-	//parse command line arguments
+	/// parse command line arguments
 	if(FAILED(parseLine(argc, argsv)))return E_INVALIDPARAM;
 
-	//print hello message
+	/// print hello message
 	printHelloMessage();
 
-	//Init Simulation Data
+	/// Init Simulation Data
 	sim = new Simulation();
 	if(!sim)
 	{
@@ -35,7 +35,7 @@ err_type MolSim::Init(int argc, char *argsv[])
 		return E_OUTOFMEMORY;
 	}
 
-	//set desc
+	/// set desc
 	SimulationDesc desc;
 
 	desc.output_fmt = SOF_VTK;
@@ -54,7 +54,7 @@ err_type MolSim::Run()
 {
 	if(!sim)return E_NOTINITIALIZED;
 
-	//run simulation...
+	/// run simulation...
 	return sim->Run();
 }
 
@@ -64,18 +64,17 @@ err_type MolSim::Release()
 
 	return S_OK;
 }
-///
+
 /// parses and verifies command line arguments
 /// @param argc count of arguments
 /// @param argsv string arguments
 /// @return returns E_INVALIDPARAM if argument count is wrong(not four) or second
 ///					or third argument are of non number format
 ///			returns E_FILENOTFOUND if no file exists
-///
 err_type MolSim::parseLine(int argc, char *argsv[])
 {
-	//Syntax is molsim scene.txt t_end delta_t
-	//where t_end and delta_t denote a floating point value
+	/// Syntax is molsim scene.txt t_end delta_t
+	/// where t_end and delta_t denote a floating point value
 	if(argc != 4)
 	{
 		cout<<"error: invalid count of arguments"<<endl;
@@ -83,7 +82,7 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		return E_INVALIDPARAM;
 	}
 
-	//check if endtime, delta are numbers and file exists
+	/// check if endtime, delta are numbers and file exists
 	if(!fileExists(argsv[1]))
 	{
 		cout<<"error: file doesn't exist!"<<endl;
@@ -105,7 +104,7 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		return E_INVALIDPARAM;
 	}
 
-	//parse args...
+	/// parse args...
 
 
 	return S_OK;
@@ -136,14 +135,14 @@ void MolSim::printHelloMessage()
 
 
 
-//use better default values!!! tooo long!
+// TODO: use better default values!!! tooo long!
 double start_time = 0;
 double end_time = 50;
 double delta_t = 0.014;
 
 std::list<Particle> particles;
 
-//console tool
+/// console tool
 void line()
 {
 	for(int i = 0; i < 40; i++)cout<<"-";

@@ -25,9 +25,7 @@
 #include <cstdlib>
 #include <iostream>
 
-///
 /// application's main class, handling all logic stuff
-///
 class MolSim
 {
 private:
