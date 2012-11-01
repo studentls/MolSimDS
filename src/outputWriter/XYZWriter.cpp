@@ -35,7 +35,7 @@ void XYZWriter::plotParticles(std::vector<Particle> particles, const std::string
 	vector<Particle>::iterator iterator = particles.begin();
 	while (iterator != particles.end()) {
 		Particle& p = *iterator;
-		utils::Vector<double, 3> x = p.getX();
+		utils::Vector<double, 3> x = p.x;
 		file << "Ar ";
 		file.setf(ios_base::showpoint);
 

@@ -11,68 +11,61 @@
 #include "utils/Vector.h"
 
 
-//this class layout totally sucks! something should be refactored here...
-
+/// a class that is used to represent a particle and all its attributes and physical circumstances
 class Particle {
 
 private:
-
-	/** the position of the particle */
-	utils::Vector<double, 3> x;
-
-	/** the velocity of the particle */
-	utils::Vector<double, 3> v;
-
-	/** the force effective on this particle */
+	/// the force effective on this particle
 	utils::Vector<double, 3> f;
 
-	/** the force wich was effective on this particle */
+	/// the force wich was effective on this particle
 	utils::Vector<double, 3> old_f;
 
-	/** the mass of this particle */
-	double m;
-
-	/** type of the particle. Use it for whatever you want (e.g. to seperate
-	 * molecules belonging to different bodies, matters, and so on)
-	 */
-	int type;
-
 public:
+	/// a constructor that takes and sets its type
 	Particle(int type = 0);
 
+	/// a constructor that clones an existing Particle
 	Particle(const Particle& other);
 
+	/// a full constructor that takes the position and velocity (both as 3-tuple vectors) as well as the mass and type
 	Particle(
-			// for visualization, we need always 3 coordinates
-			// -> in case of 2d, we use only the first and the second
+			/// for visualization, we need always 3 coordinates
+			/// -> in case of 2d, we use only the first and the second
 			utils::Vector<double, 3> x_arg,
 	        utils::Vector<double, 3> v_arg,
 	        double m_arg,
 	        int type = 0
 	);
 
-	virtual ~Particle();
+	/// the position of the particle
+	utils::Vector<double, 3> x;
 
-	utils::Vector<double, 3>& getX();
+	/// the velocity of the particle
+	utils::Vector<double, 3> v;
 
+	/// the mass of this particle
+	double m;
+
+	/// type of the particle. The use of this value depends on particularities of the implementation. Currently not in use
+	int type;
+
+	/// get the current force acting on the Particle
 	utils::Vector<double, 3>& getF();
 
+	/// get the force that acted on the Particle last iteration
 	utils::Vector<double, 3>& getOldF();
-
-	utils::Vector<double, 3>& getV();
-
-	double getM();
-
-	int getType();
-
-	void					 setX(utils::Vector<double, 3> _x)	{x = _x;}
-	void					 setF(utils::Vector<double, 3> _f)	{f = _f;}
-	void					 setV(utils::Vector<double, 3> _v)	{v = _v;}
 	
-	void setForce(utils::Vector<double, 3> force);
+	/// reset the force acting on the Particle
+	void resetForce();
 
+	/// adds force acting on the Particle
+	void addForce(utils::Vector<double, 3> force);
+
+	/// overwrites the equality operator of Particles
 	bool operator==(Particle& other);
 
+	/// print information about this Particle
 	std::string toString();
 };
 

@@ -46,18 +46,21 @@
       <Filter>Headerdateien\outputWriter</Filter>
     </ClInclude>
     <ClInclude Include="src\MolSim.h">
-      <Filter>Quelldateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Base.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Helper.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\utils.h">
-      <Filter>Headerdateien\utils</Filter>
+      <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\Simulation.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Base.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Helper.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\utils.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -84,6 +87,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\Simulation.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ParticleContainer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

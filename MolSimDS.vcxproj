@@ -86,6 +86,7 @@
     <ClInclude Include="src\outputWriter\VTKWriter.h" />
     <ClInclude Include="src\outputWriter\XYZWriter.h" />
     <ClInclude Include="src\Particle.h" />
+    <ClInclude Include="src\ParticleContainer.h" />
     <ClInclude Include="src\Simulation.h" />
     <ClInclude Include="src\utils\Base.h" />
     <ClInclude Include="src\utils\Helper.h" />
@@ -102,6 +103,7 @@
     <ClCompile Include="src\outputWriter\VTKWriter.cpp" />
     <ClCompile Include="src\outputWriter\XYZWriter.cpp" />
     <ClCompile Include="src\Particle.cpp" />
+    <ClCompile Include="src\ParticleContainer.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
