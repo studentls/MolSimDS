@@ -183,10 +183,6 @@ void Simulation::velCalculator(void* data, Particle& p) {
 	// v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
 	p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
 }
-void Simulation::test(Particle& p)
-{
-	std::cout<<"Hallo Welt";
-}
 
 void Simulation::plotParticles(int iteration) {
 

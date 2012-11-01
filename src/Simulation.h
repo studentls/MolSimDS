@@ -99,9 +99,6 @@ private:
 	/// @param iteration the number of this iteration
 	void plotParticles(int iteration);
 
-	static void test(Particle& p);
-
-
 public:
 	Simulation()	{}
 
