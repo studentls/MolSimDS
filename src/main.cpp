@@ -25,4 +25,6 @@ int main(int argc, char* argsv[]) {
 	molsim->Release();
 
 	SAFE_DELETE(molsim);
+
+	return 0;
 }
