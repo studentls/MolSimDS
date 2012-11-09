@@ -1,0 +1,88 @@
+//------------------------------------------------------------------------------------------------
+// (C) 2012 by F.Dietz & L.Spiegelberg
+// include License here...
+
+//At the moment you must not distribute or use this code at all,
+//cause license details are not clear yet
+//If you want to receive updates feel free to subscribe
+//------------------------------------------------------------------------------------------------
+// File Timer.h
+// implements a high accurate timer class on multiple platforms
+//------------------------------------------------------------------------------------------------
+
+#ifndef TIMER_HEADER_
+#define TIMER_HEADER_
+
+#include "Base.h"
+
+//windows
+#ifdef WINDOWS
+#include <Windows.h>
+#endif
+
+//linux
+#ifdef LINUX
+
+#endif
+
+namespace utils
+{
+	/// defines a timer class, used to accurately measure time with high accurate timers
+	class Timer
+	{
+	private:
+			
+#ifdef WINDOWS
+		// last saved timestamp
+		LARGE_INTEGER lLastTime;
+#endif
+
+#ifdef LINUX
+#endif
+
+	public:
+
+		Timer()
+		{
+			reset();
+		}
+
+		/// reset timer
+		void	reset()
+		{
+#ifdef WINDOWS
+		QueryPerformanceCounter(&lLastTime);
+#endif
+		}
+
+		/// returns elapsed time since last call of constructor or reset() in seconds
+		double	getElapsedTime(const bool reset = false)
+		{
+#ifdef WINDOWS
+			LARGE_INTEGER lTime;
+			LARGE_INTEGER lFrequency;
+
+			QueryPerformanceCounter(&lTime);
+			QueryPerformanceFrequency(&lFrequency);
+
+			lTime.QuadPart -= lLastTime.QuadPart;
+
+			double elapsed = (double)lTime.QuadPart / (double)lFrequency.QuadPart;
+
+			if(reset)this->reset();
+
+			return  elapsed;
+#endif
+
+#ifdef LINUX
+			//see http://stackoverflow.com/questions/538609/high-resolution-timer-with-c-and-linux
+#endif
+			return 0.0;
+		}
+
+	};
+}
+
+
+
+#endif
