@@ -17,7 +17,6 @@
 #include "Base.h"
 #include "Helper.h"
 #include "Vector.h"
-
-
+#include "Timer.h"
 
 #endif

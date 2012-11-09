@@ -123,13 +123,28 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 
 	SimulationDesc *desc = (SimulationDesc*)data;
 
+	// calculate force via Lennard-Jones Potential
+	// these calculations are rather straightforward, looking at the formula
+	double dist = p1.x.distance(p2.x);
+	double temp1 = desc->sigma / dist;
+	// this is faster than power functions or manual multiplication
+	double pow2 = temp1 * temp1;
+	double pow3 = pow2 * temp1;
+	double pow6 = pow3 * pow3;
+	double pow12 = pow6 * pow6;
+
+	double temp2 = pow6 - 2 * pow12;
+	double prefactor = 24 * desc->epsilon / dist / dist;
+	double factor = prefactor * temp2;
+	
+	// DEPRECATED
 	// using simple force calculation model
-	double invdist = 1.0 / p1.x.distance(p2.x);
-	
+	//double invdist = 1.0 / p1.x.distance(p2.x);
 	// use for speed up
-	double denominator = invdist * invdist * invdist; 
-	double factor = p1.m * p2.m * denominator * desc->gravitational_constant;
+	//double denominator = invdist * invdist * invdist; 
+	//double factor = p1.m * p2.m * denominator * desc->gravitational_constant;
 	
+
 	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
 	
 	// add individual particle to particle force to sum
