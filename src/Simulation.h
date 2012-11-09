@@ -42,21 +42,32 @@ struct SimulationDesc
 	double	delta_t;
 	double	start_time;
 	double	end_time;
+	
+	double brownianMotionFactor;
+	double epsilon;
+	double sigma;
 
-	/// this value may be renamed appropriately in a later version
-	/// if the particles are affected by magnetic instead of gravitational forces
-	double	gravitational_constant;
+	// DEPRECATED
+	// this value may be renamed appropriately in a later version
+	// if the particles are affected by magnetic instead of gravitational forces
+	//double	gravitational_constant;
 
 	SimulationOutputFormat output_fmt;
 
 	/// constructor that creates a default SimulationDesc object
 	SimulationDesc()
 	{
-		delta_t = 0.01;
+		delta_t = 0.0002;
 		start_time = 0.0;
-		end_time = 1.0;
+		end_time = 5.0;
 		output_fmt = SOF_NONE;
-		gravitational_constant = 1.0;
+		
+	    brownianMotionFactor = 0.1;
+		epsilon = 5.0;
+		sigma = 1.0;
+
+		// DEPRECATED
+		//gravitational_constant = 1.0;
 	}
 };
 
