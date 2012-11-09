@@ -69,7 +69,7 @@
 //Linux kernel
 #ifdef __linux__
 #define LINUX
-#endif+
+#endif
 
 //OS X define
 #if defined __APPLE__ & __MACH__

@@ -22,7 +22,7 @@
 
 //linux
 #ifdef LINUX
-
+#include <sys/time.h>
 #endif
 
 namespace utils
@@ -34,10 +34,12 @@ namespace utils
 			
 #ifdef WINDOWS
 		// last saved timestamp
-		LARGE_INTEGER lLastTime;
+		LARGE_INTEGER 	lLastTime;
 #endif
 
 #ifdef LINUX
+		//last saved timestamp
+		timespec	lLastTime;
 #endif
 
 	public:
@@ -52,6 +54,10 @@ namespace utils
 		{
 #ifdef WINDOWS
 		QueryPerformanceCounter(&lLastTime);
+#endif
+#ifdef LINUX
+		//use CLOCK_PROCESS_CPUTIME_ID to measure CPU Performance, not IO
+		clock_gettime(CLOCK_MONOTONIC, &lLastTime);
 #endif
 		}
 
@@ -76,6 +82,26 @@ namespace utils
 
 #ifdef LINUX
 			//see http://stackoverflow.com/questions/538609/high-resolution-timer-with-c-and-linux
+			timespec lTime;
+			timespec lDiff;
+
+			clock_gettime(CLOCK_MONOTONIC, &lTime);
+			
+			lDiff.tv_sec = lTime.tv_sec - lLastTime.tv_sec;
+			lDiff.tv_nsec = lTime.tv_nsec - lLastTime.tv_nsec;
+
+			//is there a carry?
+			if(lDiff.tv_nsec < 0)
+			{
+				lDiff.tv_sec -= 1;
+				lDiff.tv_nsec += 1000000000; //10^9
+			}
+			
+			double elapsed = (double)lDiff.tv_sec + (double)lDiff.tv_nsec / 1000000000.0;
+			
+			if(reset)this->reset();
+			
+			return elapsed;
 #endif
 			return 0.0;
 		}

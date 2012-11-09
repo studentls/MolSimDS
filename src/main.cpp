@@ -13,7 +13,6 @@
 
 #include "MolSim.h"
 
-
 // entry point
 int main(int argc, char* argsv[]) {
 
@@ -26,6 +25,4 @@ int main(int argc, char* argsv[]) {
 	molsim->Release();
 
 	SAFE_DELETE(molsim);
-
-	return 0;
 }
