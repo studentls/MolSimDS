@@ -58,6 +58,27 @@
 #endif
 
 
+// Platform defines...
+// see http://sourceforge.net/p/predef/wiki/OperatingSystems/ for useful list of platform defines
+
+//Windows
+#if defined  _WIN32 || _WIN64
+#define WINDOWS
+#endif
+
+//Linux kernel
+#ifdef __linux__
+#define LINUX
+#endif+
+
+//OS X define
+#if defined __APPLE__ & __MACH__
+#ifdef LINUX
+#undef LINUX
+#endif
+#define MACINTOSH
+#endif
+
 //typedef's
 
 typedef int				err_type;
@@ -65,8 +86,12 @@ typedef unsigned char	byte;
 
 
 //error macros&constants
+
+//windows defines several macros, so fix it
+#ifndef WINDOWS
+
 #define FAILED(x)		( (x) < 0 ? true : false )
-#define SUCCEEDED(x)	( (x) > 0 ? true : false )
+#define SUCCEEDED(x)	( (x) >= 0 ? true : false )
 #define E_UNKNOWN			-1
 #define E_OUTOFMEMORY		-2
 #define E_INVALIDPARAM		-3
@@ -75,9 +100,20 @@ typedef unsigned char	byte;
 #define E_NOTINITIALIZED	-6
 #define S_OK				1
 
+#else
+
+#define E_UNKNOWN			-1
+#define E_INVALIDPARAM		-3
+#define E_INDEXOUTOFRANGE	-4
+#define E_FILENOTFOUND		-5
+#define E_NOTINITIALIZED	-6
+
+#endif
+
+
 //delete macros
-#define DELETE(x)		 {if((x))delete (x); (x) = NULL;}
-#define DELETE_A(x)		 {if((x))delete [] (x); (x) = NULL;}
+#define SAFE_DELETE(x)		{if((x))delete (x); (x) = NULL;}
+#define SAFE_DELETE_A(x)	{if((x))delete [] (x); (x) = NULL;}
 
 
 #endif

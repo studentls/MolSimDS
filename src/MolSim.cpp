@@ -60,7 +60,7 @@ err_type MolSim::Run()
 
 err_type MolSim::Release()
 {
-	DELETE(sim);
+	SAFE_DELETE(sim);
 
 	return S_OK;
 }
