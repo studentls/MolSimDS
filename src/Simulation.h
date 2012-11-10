@@ -21,8 +21,6 @@
 #include "ParticleContainer.h"
 #include <vector>
 
-
-
 /// Output Format
 enum SimulationOutputFormat
 {

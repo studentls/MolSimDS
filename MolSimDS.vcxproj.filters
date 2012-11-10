@@ -66,6 +66,9 @@
     <ClInclude Include="src\utils\Base.h">
       <Filter>Headerdateien\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\ParticleContainerTest.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">

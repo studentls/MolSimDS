@@ -18,7 +18,12 @@ int main(int argc, char* argsv[]) {
 
 	MolSim *molsim = new MolSim();
 
-	molsim->Init(argc, argsv);
+	if(FAILED(molsim->Init(argc, argsv)))
+	{
+		std::cout<<">> Initialization of Molecular Simulator failed"<<std::endl;
+		std::cout<<">> quitting program..."<<std::endl;
+		return 0;
+	}
 
 	molsim->Run();
 

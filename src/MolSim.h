@@ -25,6 +25,9 @@
 #include <cstdlib>
 #include <iostream>
 
+//include tests
+#include "ParticleContainerTest.h"
+
 /// application's main class, handling all logic stuff
 class MolSim
 {
@@ -32,11 +35,22 @@ private:
 
 	Simulation	*sim;
 
+	bool		bTestMode; //is in test mode?	
+
+	/// parse Argument line, check for variable ranges
 	err_type	parseLine(int argc, char *argsv[]);
+
+	/// print sime nice logo
 	void		printHelloMessage();
 
+	/// print Usage
+	void		printUsage();
+
+	/// run Tests
+	void		RunTests();
+
 public:
-	MolSim():sim(NULL)			{}
+	MolSim():sim(NULL), bTestMode(false)			{}
 
 	/// sets up simulator and parses any given arguments
 	err_type Init(int argc, char *argsv[]);
@@ -45,9 +59,7 @@ public:
 	err_type Run();
 
 	/// cleans up
-	err_type Release();
-	
+	err_type Release();	
 };
-
 
 #endif
