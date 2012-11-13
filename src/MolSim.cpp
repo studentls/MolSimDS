@@ -31,13 +31,13 @@ err_type MolSim::Init(int argc, char *argsv[])
 	printHelloMessage();
 
 	// test mode?
-	if(bTestMode)return S_OK;
+	if(state != AS_SIMULATION)return S_OK;
 
 	// Init Simulation Data
 	sim = new Simulation();
 	if(!sim)
 	{
-		cout<<"failed to allocate mem"<<endl;
+		cout<<" >> failed to allocate mem"<<endl;
 		return E_OUTOFMEMORY;
 	}
 
@@ -55,8 +55,8 @@ err_type MolSim::Init(int argc, char *argsv[])
 	//if more than 1000000 steps warn user
 	if(nSteps > 1000000)
 	{
-		cout<<">> The Simulation will need approximately "<<nSteps<<" steps to finish"<<endl;
-		cout<<"   finishing calculation may take a very long time, proceed ? (y/n)"<<endl;
+		cout<<" >> The Simulation will need approximately "<<nSteps<<" steps to finish"<<endl;
+		cout<<"    finishing calculation may take a very long time, proceed ? (y/n)"<<endl;
 		std::string s;
 		cin>>s;
 
@@ -66,7 +66,7 @@ err_type MolSim::Init(int argc, char *argsv[])
 		else if(s[0] == 'n')return E_INVALIDPARAM;
 		else 
 		{
-			cout<<">> please enter next time (y/n)"<<endl;
+			cout<<" >> please enter next time (y/n)"<<endl;
 			return E_INVALIDPARAM;
 		}
 		
@@ -82,14 +82,33 @@ err_type MolSim::Init(int argc, char *argsv[])
 
 err_type MolSim::Run()
 {
-	// test mode?
-	if(bTestMode)RunTests();	
+	switch(state)
+	{
+	case AS_NONE:
+		return E_UNKNOWN;
+		break;
+	case AS_HELP:
+		showHelp();
+		break;
+	case AS_SHOWTESTS:
+		showTests();
+		break;
+	case AS_TESTS:
+		RunTests();	
+		break;
+	case AS_SINGLETEST:
+		runSingleTest(strTestCase);
+		break;
+	case AS_SIMULATION:
+		// valid pointer?
+		if(!sim)return E_NOTINITIALIZED;
 	
-	// valid pointer?
-	if(!sim)return E_NOTINITIALIZED;
+		// run simulation...
+		return sim->Run();
+		break;
+	}
 	
-	// run simulation...
-	return sim->Run();
+	return S_OK;
 }
 
 err_type MolSim::Release()
@@ -109,18 +128,36 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 {
 	// Syntax is molsim scene.txt t_end delta_t
 	// where t_end and delta_t denote a floating point value
-	if(argc != 4 && argc != 2)
+	if(argc != 4 && argc != 2 && argc != 3)
 	{
 		cout<<">> error: invalid count of arguments"<<endl;
 		printUsage();
 		return E_INVALIDPARAM;
 	}
 
-	//check if called with -test
+	// check if called with -test
 	if(argc == 2)
 	{
 		if(strcmp(argsv[1], "-test") == 0)
-			bTestMode = true;
+			state = AS_TESTS;
+		else if(strcmp(argsv[1], "-help") == 0)
+			state = AS_HELP;
+		else if(strcmp(argsv[1], "-showtests") == 0)
+			state = AS_SHOWTESTS;
+		else
+		{
+			cout<<">> error: invalid argument"<<endl;
+			printUsage();
+			return E_INVALIDPARAM;
+		}
+	}
+	else if(argc == 3)
+	{
+		if(strcmp(argsv[1], "-test") == 0)
+		{
+			state = AS_SINGLETEST;
+			strTestCase = argsv[2];
+		}
 		else
 		{
 			cout<<">> error: invalid argument"<<endl;
@@ -151,6 +188,9 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			printUsage();
 			return E_INVALIDPARAM;
 		}
+
+		//run Simulation
+		state = AS_SIMULATION;
 	}
 	// parse args...
 
@@ -158,6 +198,62 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 	return S_OK;
 }
 
+void MolSim::showHelp()
+{
+	cout<<" >> "<<"options\t\t\tdescription"<<endl<<endl;
+	cout<<"    "<<" <file> <endtime> <delta_t>"<<"\t"<<"run simulation according to file"<<endl;
+	cout<<"    "<<"-help"<<"\t\t\t"<<"show help"<<endl;
+	cout<<"    "<<"-test <name>"<<"\t\t"<<"run single test case or leave"<<endl<<"\t\t\t\t<name> blank to run all tests"<<endl;
+	cout<<"    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name"<<endl;
+	
+}
+
+void MolSim::showTestTree(CppUnit::Test *node, int level, int maxlevel)
+{
+	// no children?
+	if(node->getChildTestCount() == 0)
+	{
+		cout<<"    ";
+
+		// space indent
+		for(int i = 0; i < level; i++)cout<<"  ";
+
+		cout<<"- "<<node->getName()<<endl;
+	}
+	else
+	{
+		cout<<"    ";
+
+		// space indent
+		for(int i = 0; i < level; i++)cout<<"  ";
+		
+		// max level reached?
+		if(level >= maxlevel)cout<<"..."<<endl;
+		else
+		{
+			int count = node->getChildTestCount();
+			cout<<"+ "<<node->getName()<<endl;
+
+			//print children
+			for(int i = 0; i < count; i++)
+				showTestTree(node->getChildTestAt(i), level + 1, maxlevel);
+		}
+			
+	}
+}
+
+void MolSim::showTests()
+{
+	CppUnit::TestSuite *suite = NULL;
+	
+	// show some info
+	std::cout<<" >> displaying test structure, to run a single test\n    or a bevy of tests call molsym -test <name>"<<endl<<endl;
+	
+	// recursive tree display
+	CppUnit::Test* root = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
+
+	showTestTree(root, 0, MAX_LEVEL);
+}
 
 void MolSim::printHelloMessage()
 {
@@ -184,14 +280,46 @@ void MolSim::printUsage()
 
 void MolSim::RunTests()
 {
-	cout<<">> start running test Suite"<<endl;
+	cout<<" >> start running test suite"<<endl;
 
 	CppUnit::TextUi::TestRunner runner;
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 	bool wasSuccessful = runner.run( "", false );
 	
-	if(wasSuccessful)cout<<">> all tests succeeded! "<<endl;
-	else cout<<"test suite failed! "<<endl;
+	if(wasSuccessful)cout<<" >> all tests succeeded! "<<endl;
+	else cout<<" >> test suite failed! "<<endl;
 
+}
+
+void MolSim::runSingleTest(string s)
+{
+	//find test according to name
+	CppUnit::Test* root = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
+
+	CppUnit::Test* test = NULL;
+
+	try
+	{
+		// find test
+		// maybe later some custom string matching routine would be desirable,
+		// as the testcase has to be specified very, very exactly
+		test = root->findTest(s);
+	}
+	catch(...)
+	{
+		// no test found
+		cout<<" >> "<<"no test "<<s<<" could be found! "<<endl;
+	}
+
+	if(test)
+	{
+		// run single test
+		CppUnit::TextUi::TestRunner runner;
+		runner.addTest(test);
+		bool wasSuccessful = runner.run( "", false);
+	
+		if(wasSuccessful)cout<<" >> test succeeded! "<<endl;
+		else cout<<" >> test failed! "<<endl;
+	}
 }

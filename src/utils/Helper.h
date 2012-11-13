@@ -17,6 +17,7 @@
 
 #include <iostream>
 #include <cstdio>
+#include <cassert>
 
 /// specifies line width used by line(...)
 static const int g_linewidth = 40;

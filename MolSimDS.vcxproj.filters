@@ -51,9 +51,6 @@
     <ClInclude Include="src\Simulation.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\utils\Helper.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="src\ParticleContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -68,6 +65,9 @@
     </ClInclude>
     <ClInclude Include="src\ParticleContainerTest.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Helper.h">
+      <Filter>Headerdateien\utils</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
