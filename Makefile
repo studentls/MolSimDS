@@ -15,13 +15,13 @@ CFLAGS=-I/opt/include -g -O3
 
 # Linker flags
 # ------------
-LDFLAGS= -L/opt/lib -lxerces-c -lrt 
+LDFLAGS= -L/opt/lib -lxerces-c -lrt -lcppunit 
 
 
 INCLUDES= -I./src -I./libxsd
 
 OBJECTS=$(SOURCES:.cpp=.o)
-EXECUTABLE=MolSim
+EXECUTABLE=molsim
 
 all: $(SOURCES) $(EXECUTABLE)
 
