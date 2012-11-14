@@ -34,18 +34,18 @@ void FileReader::readFile(std::vector<Particle>& particles, const char* filename
     if (input_file.is_open()) {
 
     	getline(input_file, tmp_string);
-    	cout << "Read line: " << tmp_string << endl;
+    	LOG4CXX_INFO(fileReaderLogger, "Read line: " << tmp_string);
 
     	while (tmp_string.size() == 0 || tmp_string[0] == '#') {
     		getline(input_file, tmp_string);
-    		cout << "Read line: " << tmp_string << endl;
+    		LOG4CXX_INFO(fileReaderLogger, "Read line: " << tmp_string);
     	}
 
     	istringstream numstream(tmp_string);
     	numstream >> num_particles;
-    	cout << "Reading " << num_particles << "." << endl;
+    	LOG4CXX_INFO(fileReaderLogger, "Reading " << num_particles << ".");
     	getline(input_file, tmp_string);
-    	cout << "Read line: " << tmp_string << endl;
+    	LOG4CXX_INFO(fileReaderLogger, "Read line: " << tmp_string);
 
     	for (int i = 0; i < num_particles; i++) {
     		istringstream datastream(tmp_string);
@@ -58,7 +58,7 @@ void FileReader::readFile(std::vector<Particle>& particles, const char* filename
     			datastream >> v[j];
     		}
     		if (datastream.eof()) {
-    			cout << "Error reading file: eof reached unexpectedly reading from line " << i << endl;
+    			LOG4CXX_ERROR(fileReaderLogger, "Error reading file: eof reached unexpectedly reading from line " << i);
     			exit(-1);
     		}
     		datastream >> m;
@@ -69,7 +69,7 @@ void FileReader::readFile(std::vector<Particle>& particles, const char* filename
     		cout << "Read line: " << tmp_string << endl;
     	}
     } else {
-    	std::cout << "Error: could not open file " << filename << std::endl;
+    	LOG4CXX_ERROR(fileReaderLogger, "Error: could not open file " << filename);
     	exit(-1);
     }
 

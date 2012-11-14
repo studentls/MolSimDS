@@ -62,7 +62,7 @@ err_type Simulation::Run(bool showStatistics)
 	int iteration = 0;
 
 	// output that calculation have started ("starting calculation...")
-	cout<<"starting calculation..."<<endl;
+	LOG4CXX_TRACE(simulationLogger, "starting calculation...");
 
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
@@ -75,7 +75,7 @@ err_type Simulation::Run(bool showStatistics)
 			plotParticles(iteration);
 			
 			// output that an iteration has finished
-			cout << "Iteration " << iteration << " finished." << endl;
+			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
 		}
 		
 		// increment loop values
@@ -85,7 +85,7 @@ err_type Simulation::Run(bool showStatistics)
 
 	// output that the output has finished
 	cout << endl;
-	cout << "output written. Terminating..." << endl;
+	LOG4CXX_TRACE(simulationLogger, "output written. Terminating...");
 
 	return S_OK;
 }
@@ -116,7 +116,7 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	// assert data is a valid pointer!
 	if(!data)
 	{
-		std::cout<<"error: data is not a valid pointer!"<<std::endl;
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
 		return;
 	}
 #endif
@@ -163,7 +163,7 @@ void Simulation::posCalculator(void* data, Particle& p) {
 	// assert data is a valid pointer!
 	if(!data)
 	{
-		std::cout<<"error: data is not a valid pointer!"<<std::endl;
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
 		return;
 	}
 #endif
@@ -186,7 +186,7 @@ void Simulation::velCalculator(void* data, Particle& p) {
 	// assert data is a valid pointer!
 	if(!data)
 	{
-		std::cout<<"error: data is not a valid pointer!"<<std::endl;
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
 		return;
 	}
 #endif

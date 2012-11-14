@@ -20,8 +20,8 @@ int main(int argc, char* argsv[]) {
 
 	if(FAILED(molsim->Init(argc, argsv)))
 	{
-		std::cout<<">> Initialization of Molecular Simulator failed"<<std::endl;
-		std::cout<<">> quitting program..."<<std::endl;
+		LOG4CXX_ERROR(generalOutputLogger, ">> Initialization of Molecular Simulator failed");
+		LOG4CXX_ERROR(generalOutputLogger, ">> quitting program...");
 		return 0;
 	}
 

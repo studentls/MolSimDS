@@ -111,7 +111,7 @@ bool ParticleContainer::AddParticlesFromFileNew(const char *filename)
 					x, dim, meshwidth, mass, v);
 			}
 		}
-		else std::cout<<" >> matching error, file corrupted?"<<std::endl;
+		else LOG4CXX_ERROR(particleGenerationLogger, " >> matching error, file corrupted?");
 		
 	}
 

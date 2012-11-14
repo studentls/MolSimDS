@@ -39,7 +39,7 @@ err_type MolSim::Init(int argc, char *argsv[])
 	sim = new Simulation();
 	if(!sim)
 	{
-		cout<<" >> failed to allocate mem"<<endl;
+		LOG4CXX_ERROR(initializationLogger, " >> failed to allocate mem");
 		return E_OUTOFMEMORY;
 	}
 
@@ -61,10 +61,11 @@ err_type MolSim::Init(int argc, char *argsv[])
 	//if more than 1000000 steps warn user
 	if(nSteps > 1000000)
 	{
-		cout<<" >> The Simulation will need approximately "<<nSteps<<" steps to finish"<<endl;
-		cout<<"    finishing calculation may take a very long time, proceed ? (y/n)"<<endl;
+		LOG4CXX_INFO(generalOutputLogger, " >> The Simulation will need approximately "<<nSteps<<" steps to finish");
+		LOG4CXX_INFO(generalOutputLogger, "    finishing calculation may take a very long time, proceed ? (y/n)");
 		std::string s;
 		cin>>s;
+		LOG4CXX_INFO(generalOutputLogger, "input: " << s);
 
 		if(s[0] == 'y') {
 			//...
@@ -72,7 +73,7 @@ err_type MolSim::Init(int argc, char *argsv[])
 		else if(s[0] == 'n')return E_INVALIDPARAM;
 		else 
 		{
-			cout<<" >> please enter next time (y/n)"<<endl;
+			LOG4CXX_INFO(generalOutputLogger, " >> please enter next time (y/n)");
 			return E_INVALIDPARAM;
 		}
 		
@@ -136,7 +137,7 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 	// where t_end and delta_t denote a floating point value
 	if(argc != 4 && argc != 2 && argc != 3)
 	{
-		cout<<">> error: invalid count of arguments"<<endl;
+		LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid count of arguments");
 		printUsage();
 		return E_INVALIDPARAM;
 	}
@@ -152,7 +153,7 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_SHOWTESTS;
 		else
 		{
-			cout<<">> error: invalid argument"<<endl;
+			LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid argument");
 			printUsage();
 			return E_INVALIDPARAM;
 		}
@@ -166,7 +167,7 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		}
 		else
 		{
-			cout<<">> error: invalid argument"<<endl;
+			LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid argument");
 			printUsage();
 			return E_INVALIDPARAM;
 		}
@@ -176,21 +177,21 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		// check if endtime, delta are numbers and file exists
 		if(!fileExists(argsv[1]))
 		{
-			cout<<"error: file doesn't exist!"<<endl;
+			LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
 			printUsage();
 			return E_FILENOTFOUND;
 		}
 
 		if(!strIsNumber(argsv[2]))
 		{
-			cout<<"error: endtime not a valid number"<<endl;
+			LOG4CXX_ERROR(simulationInitializationLogger, "error: endtime not a valid number");
 			printUsage();
 			return E_INVALIDPARAM;
 		}
 
 		if(!strIsNumber(argsv[3]))
 		{
-			cout<<"error: delta_t not a valid number"<<endl;
+			LOG4CXX_ERROR(simulationInitializationLogger, "error: delta_t not a valid number");
 			printUsage();
 			return E_INVALIDPARAM;
 		}
@@ -206,11 +207,11 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 
 void MolSim::showHelp()
 {
-	cout<<" >> "<<"options\t\t\tdescription"<<endl<<endl;
-	cout<<"    "<<" <file> <endtime> <delta_t>"<<"\t"<<"run simulation according to file"<<endl;
-	cout<<"    "<<"-help"<<"\t\t\t"<<"show help"<<endl;
-	cout<<"    "<<"-test <name>"<<"\t\t"<<"run single test case or leave"<<endl<<"\t\t\t\t<name> blank to run all tests"<<endl;
-	cout<<"    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name"<<endl;
+	LOG4CXX_INFO(generalOutputLogger, " >> "<<"options\t\t\tdescription");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<" <file> <endtime> <delta_t>"<<"\t"<<"run simulation according to file");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"-help"<<"\t\t\t"<<"show help");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave"<<endl<<"\t\t\t\t<name> blank to run all tests");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name");
 	
 }
 
@@ -224,7 +225,7 @@ void MolSim::showTestTree(CppUnit::Test *node, int level, int maxlevel)
 		// space indent
 		for(int i = 0; i < level; i++)cout<<"  ";
 
-		cout<<"- "<<node->getName()<<endl;
+		LOG4CXX_INFO(generalOutputLogger, "- "<<node->getName());
 	}
 	else
 	{
@@ -238,7 +239,7 @@ void MolSim::showTestTree(CppUnit::Test *node, int level, int maxlevel)
 		else
 		{
 			int count = node->getChildTestCount();
-			cout<<"+ "<<node->getName()<<endl;
+			LOG4CXX_INFO(generalOutputLogger, "+ "<<node->getName());
 
 			//print children
 			for(int i = 0; i < count; i++)
@@ -253,7 +254,7 @@ void MolSim::showTests()
 	CppUnit::TestSuite *suite = NULL;
 	
 	// show some info
-	std::cout<<" >> displaying test structure, to run a single test\n    or a bevy of tests call molsym -test <name>"<<endl<<endl;
+	LOG4CXX_INFO(generalOutputLogger, " >> displaying test structure, to run a single test\n    or a bevy of tests call molsym -test <name>");
 	
 	// recursive tree display
 	CppUnit::Test* root = CppUnit::TestFactoryRegistry::getRegistry().makeTest();
@@ -264,37 +265,37 @@ void MolSim::showTests()
 void MolSim::printHelloMessage()
 {
 	line();
-	cout << "MolSim for PSE" << endl;
+	LOG4CXX_INFO(generalOutputLogger, "MolSim for PSE");
 #ifdef DEBUG
 	cout << "compiled: "<<__DATE__<<"  "<<__TIME__<<endl;
 #endif
 
 	line();
 	cout << endl;
-	cout << "(c) 2012 by F.Dietz & L.Spiegelberg" << endl; 
+	LOG4CXX_INFO(generalOutputLogger, "(c) 2012 by F.Dietz & L.Spiegelberg"); 
 	cout << endl;
-	cout << "Molecular Simulator handling *.txt files" << endl;
+	LOG4CXX_INFO(generalOutputLogger, "Molecular Simulator handling *.txt files");
 	line();
 	cout << endl;
 }
 
 void MolSim::printUsage()
 {
-	cout<<"   usage: molsim file endtime delta_t"<<endl;
-	cout<<"   usage: molsim -test"<<endl;
+	LOG4CXX_INFO(generalOutputLogger, "   usage: molsim file endtime delta_t");
+	LOG4CXX_INFO(generalOutputLogger, "   usage: molsim -test");
 }
 
 void MolSim::RunTests()
 {
-	cout<<" >> start running test suite"<<endl;
+	LOG4CXX_INFO(testLogger, " >> start running test suite");
 
 	CppUnit::TextUi::TestRunner runner;
 	CppUnit::TestFactoryRegistry &registry = CppUnit::TestFactoryRegistry::getRegistry();
 	runner.addTest( registry.makeTest() );
 	bool wasSuccessful = runner.run( "", false );
 	
-	if(wasSuccessful)cout<<" >> all tests succeeded! "<<endl;
-	else cout<<" >> test suite failed! "<<endl;
+	if(wasSuccessful)LOG4CXX_INFO(testLogger, " >> all tests succeeded! ");
+	else LOG4CXX_INFO(testLogger, " >> test suite failed! ");
 
 }
 
@@ -315,7 +316,7 @@ void MolSim::runSingleTest(string s)
 	catch(...)
 	{
 		// no test found
-		cout<<" >> "<<"no test "<<s<<" could be found! "<<endl;
+		LOG4CXX_ERROR(testLogger, " >> "<<"no test "<<s<<" could be found! ");
 	}
 
 	if(test)
@@ -325,7 +326,7 @@ void MolSim::runSingleTest(string s)
 		runner.addTest(test);
 		bool wasSuccessful = runner.run( "", false);
 	
-		if(wasSuccessful)cout<<" >> test succeeded! "<<endl;
-		else cout<<" >> test failed! "<<endl;
+		if(wasSuccessful)LOG4CXX_INFO(testLogger, " >> test succeeded! ");
+		else LOG4CXX_ERROR(testLogger, " >> test failed! ");
 	}
 }
