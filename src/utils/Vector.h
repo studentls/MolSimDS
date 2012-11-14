@@ -12,6 +12,7 @@
 #include <cmath>
 #include <string>
 #include <sstream>
+#include <cassert> 
 
 //fixed issue, namespace was used inapproriately
 namespace utils {
@@ -135,6 +136,10 @@ public:
 	}
 
 	type& operator[](int i) {
+
+		//this function was totally unsafe...
+		assert(i >= 0 && i < length);
+
 		return content[i];
 	}
 

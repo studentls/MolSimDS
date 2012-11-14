@@ -19,6 +19,7 @@
 #include "utils/utils.h"
 #include "Particle.h"
 #include "ParticleContainer.h"
+#include "ParticleGenerator.h"
 #include <vector>
 
 /// Output Format
@@ -41,9 +42,9 @@ struct SimulationDesc
 	double	start_time;
 	double	end_time;
 	
-	double brownianMotionFactor;
-	double epsilon;
-	double sigma;
+	double	brownianMotionFactor;
+	double	epsilon;
+	double	sigma;
 
 	// DEPRECATED
 	// this value may be renamed appropriately in a later version

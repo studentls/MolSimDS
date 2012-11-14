@@ -31,8 +31,8 @@ err_type Simulation::Init(const SimulationDesc& desc)
 
 err_type Simulation::AddParticlesFromFile(const char *filename)
 {
-	// read the file
-	particles.AddParticlesFromFile(filename);
+	// read the file New !
+	particles.AddParticlesFromFileNew(filename);
 	
 	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();

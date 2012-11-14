@@ -15,6 +15,7 @@
 
 #include "ParticleContainer.h"
 #include "FileReader.h"
+#include "ParticleGenerator.h"
 
 ParticleContainer::ParticleContainer() {
 	particles = std::vector<Particle>();
@@ -57,4 +58,65 @@ void ParticleContainer::AddParticlesFromFile(const char *filename)
 	// read the file
 	FileReader fileReader;
 	fileReader.readFile(particles, filename);
+}
+
+/// Quick 'n' Dirty Method
+bool ParticleContainer::AddParticlesFromFileNew(const char *filename)
+{
+	// implement later a separate class
+
+	FILE *pFile = NULL;
+	char buffer[512]; // only 512 characters per line allowed
+
+	pFile = fopen(filename, "r");
+
+	// valid handle?
+	if(!pFile)return false;
+
+	while(!feof(pFile))
+	{
+		memset(buffer, 0, 512 * sizeof(char));
+		fgets(buffer, 512, pFile);
+
+		// if line starts with # or is an empty line ignore
+		if(buffer[0] == '#' || buffer[0] == '\n')continue;
+		
+		// include in doxygen
+		/// the only allowed syntax will be 
+		/// cuboid x1 x2 x3 v1 v2 v3 mass n1 n2 n3 meshwidth
+		/// where x1, x2, x3 are the componets of the position vector
+		///  of the lower left front corner of the cuboid
+		/// v1 v2 v3 are the initial velocity parameters
+		/// n1 n2 n3 are the dimensions of the cuboid
+		/// meshwidth is the distance between two particles
+		/// mass the initial mass
+		
+		utils::Vector<unsigned int, 3> dim;
+		char cmd[256];
+		Vec3 v;
+		Vec3 x;
+		double mass;
+		double meshwidth;
+		
+		if(sscanf(buffer, "%s %lf %lf %lf %lf %lf %lf %lf %d %d %d  %lf", 
+			&cmd, &x[0], &x[1], &x[2], &v[0], &v[1], &v[2], &mass, &dim[0], &dim[1], &dim[2], &meshwidth))
+		{
+			if(strcmp(cmd, "cuboid") == 0)
+			{
+				// assert values
+				// max range for dim should be 1000x1000x1000
+				for(int i = 0; i < 3; i++)assert(dim[i] < 1000);
+
+				ParticleGenerator::makeCuboid(*this,
+					x, dim, meshwidth, mass, v);
+			}
+		}
+		else std::cout<<" >> matching error, file corrupted?"<<std::endl;
+		
+	}
+
+
+	fclose(pFile);
+
+	return true;
 }

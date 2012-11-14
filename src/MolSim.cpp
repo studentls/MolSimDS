@@ -24,6 +24,8 @@ CPPUNIT_TEST_SUITE_REGISTRATION(ParticleContainerTest);
 
 err_type MolSim::Init(int argc, char *argsv[])
 {
+	Timer timer;
+
 	// parse command line arguments
 	if(FAILED(parseLine(argc, argsv)))return E_INVALIDPARAM;
 
@@ -40,6 +42,10 @@ err_type MolSim::Init(int argc, char *argsv[])
 		cout<<" >> failed to allocate mem"<<endl;
 		return E_OUTOFMEMORY;
 	}
+
+	// init random generator, use defined timer for that and offset it a bit,
+	// just to make it look cool!
+	srand((unsigned int)timer.getElapsedTime() + 0x362f0824);
 
 	// set desc
 	SimulationDesc desc;

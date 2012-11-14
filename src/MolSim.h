@@ -52,7 +52,7 @@ private:
 
 	ApplicationState	state;
 
-	std::string				strTestCase;
+	std::string			strTestCase;
 
 	/// parse Argument line, check for variable ranges
 	err_type			parseLine(int argc, char *argsv[]);

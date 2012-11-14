@@ -65,7 +65,7 @@ std::string Particle::toString() {
 	return stream.str();
 }
 
-bool Particle::operator ==(Particle& other) {
+bool Particle::operator == (Particle& other) {
 	// two Particles are considered identical iff
 	// all of their values are equal
 	if ( (x == other.x) && (v == other.v) && (f == other.f) &&

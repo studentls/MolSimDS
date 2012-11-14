@@ -69,7 +69,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>\libxsd;%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>.\libxsd;%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -81,6 +81,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\FileReader.h" />
+    <ClInclude Include="src\MaxwellBoltzmannDistribution.h" />
     <ClInclude Include="src\MolSim.h" />
     <ClInclude Include="src\outputWriter\vtk-unstructured.h" />
     <ClInclude Include="src\outputWriter\VTKWriter.h" />
@@ -88,6 +89,7 @@
     <ClInclude Include="src\Particle.h" />
     <ClInclude Include="src\ParticleContainer.h" />
     <ClInclude Include="src\ParticleContainerTest.h" />
+    <ClInclude Include="src\ParticleGenerator.h" />
     <ClInclude Include="src\Simulation.h" />
     <ClInclude Include="src\utils\Base.h" />
     <ClInclude Include="src\utils\Helper.h" />
@@ -98,6 +100,7 @@
   <ItemGroup>
     <ClCompile Include="src\FileReader.cpp" />
     <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp" />
     <ClCompile Include="src\MolSim.cpp" />
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\libxsd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
