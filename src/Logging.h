@@ -21,6 +21,8 @@
 
 using namespace log4cxx;
 using namespace log4cxx::helpers;
+using namespace log4cxx::xml;
+
 
 /// define all loggers used in this application
 static LoggerPtr initializationLogger(Logger::getLogger("initializationLogger"));

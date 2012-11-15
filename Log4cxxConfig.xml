@@ -25,11 +25,5 @@
         <appender-ref ref="appxConsoleAppender"/>
   </root>
 
-  <!-- Specify the level for some specific categories -->
-  <category name="functionA" >
-        <priority value ="info" />
-        <appender-ref ref="appxNormalAppender"/>
-        <appender-ref ref="appxConsoleAppender"/>
-  </category>
 
  </log4j:configuration>

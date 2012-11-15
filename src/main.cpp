@@ -17,6 +17,8 @@
 // entry point
 int main(int argc, char* argsv[]) {
 
+	configureLoggers();
+
 	MolSim *molsim = new MolSim();
 
 	if(FAILED(molsim->Init(argc, argsv)))
