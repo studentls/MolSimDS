@@ -16,15 +16,15 @@
 #include "Logging.h"
 
 using namespace log4cxx;
-using namespace log4cxx::helpers;
-using namespace log4cxx::xml;
 
 void configureLoggers() {
 	// Load configuration file
 	// this currently just sets the root logger to output to the console
 	// and also to a file called "appxLogFile.log"
-    DOMConfigurator::configure("Log4cxxConfig.xml");
-	// this makes the differentiation between loggers meaningless for now
+   // this makes the differentiation between loggers meaningless for now
 	// but if we decide to make several types of output go to different files
 	// this will be very easy and fast to change
+	PropertyConfigurator::configure("config.property");
+
 }
+ich ich h

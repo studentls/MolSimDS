@@ -17,11 +17,12 @@
 
 #include <log4cxx/logger.h>
 #include <log4cxx/basicconfigurator.h>
+#include <log4cxx/xml/domconfigurator.h>
+#include <log4cxx/propertyconfigurator.h>
 #include <log4cxx/helpers/exception.h>
 
 using namespace log4cxx;
 using namespace log4cxx::helpers;
-using namespace log4cxx::xml;
 
 
 /// define all loggers used in this application
