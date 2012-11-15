@@ -328,7 +328,9 @@ void MolSim::runSingleTest(string s)
 		runner.addTest(test);
 		bool wasSuccessful = runner.run( "", false);
 	
-		if(wasSuccessful)LOG4CXX_INFO(testLogger, " >> test succeeded! ");
+		if(wasSuccessful) {
+			LOG4CXX_INFO(testLogger, " >> test succeeded! ");
+		}
 		else LOG4CXX_ERROR(testLogger, " >> test failed! ");
 	}
 }

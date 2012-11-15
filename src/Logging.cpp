@@ -15,14 +15,6 @@
 
 #include "Logging.h"
 
-LoggerPtr initializationLogger(Logger::getLogger("initializationLogger"));
-LoggerPtr particleGenerationLogger(Logger::getLogger("initializationLogger.particleGenerationLogger"));
-LoggerPtr fileReaderLogger(Logger::getLogger("initializationLogger.particleGenerationLogger.fileReaderLogger"));
-LoggerPtr simulationInitializationLogger(Logger::getLogger("initializationLogger.simulationInitializationLogger"));
-LoggerPtr generalOutputLogger(Logger::getLogger("generalOutputLogger"));
-LoggerPtr testLogger(Logger::getLogger("generalOutputLogger.testLogger"));
-LoggerPtr simulationLogger(Logger::getLogger("simulationLogger"));
-
 void configureLoggers() {
 	// this currently just sets the root logger to output to the console
 	BasicConfigurator::configure();
