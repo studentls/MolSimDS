@@ -20,11 +20,9 @@ using namespace log4cxx;
 void configureLoggers() {
 	// Load configuration file
 	// this currently just sets the root logger to output to the console
-	// and also to a file called "appxLogFile.log"
-   // this makes the differentiation between loggers meaningless for now
+	// and also to a file called "molsim.log"
+	// this makes the differentiation between loggers meaningless for now
 	// but if we decide to make several types of output go to different files
 	// this will be very easy and fast to change
 	PropertyConfigurator::configure("config.property");
-
 }
-ich ich h
