@@ -30,7 +30,7 @@
 //include tests
 #include "ParticleContainerTest.h"
 
-/// specifies in which state the application is currently
+/// specifies in which state the application currently is
 enum ApplicationState
 {
 	AS_NONE,		/// no state 

@@ -72,11 +72,19 @@ err_type Simulation::Run(bool showStatistics)
 		
 		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % 10 == 0) {
+<<<<<<< HEAD
 			plotParticles(iteration);
 			
 			// output that an iteration has finished
 			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
 		}
+=======
+			plotParticles(iteration);			
+			}
+		if(iteration % 100 == 0) // output that an iteration has finished
+			cout << "Iteration " << iteration << " finished." << endl;
+		
+>>>>>>> master
 		
 		// increment loop values
 		iteration++;

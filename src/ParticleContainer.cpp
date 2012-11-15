@@ -13,9 +13,17 @@
 /// @author L.Spiegelberg
 //------------------------------------------------------------------------------------------------
 
+#include <cstdio>
+#include <cstring>
+
 #include "ParticleContainer.h"
 #include "FileReader.h"
 #include "ParticleGenerator.h"
+
+// gcc has currently problems, to compile sources with indirect includes for STL!
+// so to fix this, use direct include 
+// and include old c libraries in C++ style, as internet sources state
+// in the current gcc version seems to reorganize files
 
 ParticleContainer::ParticleContainer() {
 	particles = std::vector<Particle>();
