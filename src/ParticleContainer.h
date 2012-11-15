@@ -11,6 +11,7 @@
 #define PARTICLE_CONTAINER_H_
 
 #include <vector>
+#include "Logging.h"
 #include "Particle.h"
 
 /// a class that is used to store Particles and iterate over them

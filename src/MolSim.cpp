@@ -210,7 +210,7 @@ void MolSim::showHelp()
 	LOG4CXX_INFO(generalOutputLogger, " >> "<<"options\t\t\tdescription");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<" <file> <endtime> <delta_t>"<<"\t"<<"run simulation according to file");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-help"<<"\t\t\t"<<"show help");
-	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave"<<endl<<"\t\t\t\t<name> blank to run all tests");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave\n\t\t\t\t<name> blank to run all tests");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name");
 	
 }
@@ -294,7 +294,9 @@ void MolSim::RunTests()
 	runner.addTest( registry.makeTest() );
 	bool wasSuccessful = runner.run( "", false );
 	
-	if(wasSuccessful)LOG4CXX_INFO(testLogger, " >> all tests succeeded! ");
+	if(wasSuccessful) {
+		LOG4CXX_INFO(testLogger, " >> all tests succeeded! ");
+	}
 	else LOG4CXX_INFO(testLogger, " >> test suite failed! ");
 
 }

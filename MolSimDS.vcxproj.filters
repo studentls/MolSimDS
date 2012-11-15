@@ -48,9 +48,6 @@
     <ClInclude Include="src\MolSim.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\Simulation.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="src\ParticleContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -73,6 +70,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\MaxwellBoltzmannDistribution.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logging.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Simulation.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -105,6 +108,9 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logging.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>

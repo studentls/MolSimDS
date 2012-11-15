@@ -8,6 +8,7 @@
 #ifndef FILE_READER_H_
 #define FILE_READER_H_
 
+#include "Logging.h"
 #include "Particle.h"
 #include <vector>
 

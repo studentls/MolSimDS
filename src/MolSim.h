@@ -13,6 +13,7 @@
 #ifndef MOLSIM_HEADER_
 #define MOLSIM_HEADER_
 
+#include "Logging.h"
 #include "Simulation.h"
 
 #include "outputWriter/XYZWriter.h"

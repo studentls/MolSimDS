@@ -76,11 +76,12 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>cppunit.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>cppunit.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;apr-1.lib;aprutil-1.lib;log4cxx.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\FileReader.h" />
+    <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\MaxwellBoltzmannDistribution.h" />
     <ClInclude Include="src\MolSim.h" />
     <ClInclude Include="src\outputWriter\vtk-unstructured.h" />
@@ -99,6 +100,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FileReader.cpp" />
+    <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp" />
     <ClCompile Include="src\MolSim.cpp" />

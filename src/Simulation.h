@@ -16,6 +16,7 @@
 #ifndef SIMULATION_HEADER_
 #define SIMULATION_HEADER_
 
+#include "Logging.h"
 #include "utils/utils.h"
 #include "Particle.h"
 #include "ParticleContainer.h"
