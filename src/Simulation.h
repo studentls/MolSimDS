@@ -19,7 +19,7 @@
 #include "Logging.h"
 #include "utils/utils.h"
 #include "Particle.h"
-#include "ParticleContainer.h"
+#include "ListParticleContainer.h"
 #include "ParticleGenerator.h"
 #include <vector>
 
@@ -80,7 +80,7 @@ private:
 	SimulationDesc desc;
 
 	/// stores the particles used in this Simulation
-	ParticleContainer particles;
+	ListParticleContainer particles;
 
 	/// performs one time step based on delta_t
 	void performStep();

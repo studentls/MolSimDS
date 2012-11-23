@@ -41,6 +41,7 @@
 
 
 #include "ParticleContainer.h"
+#include "ListParticleContainer.h"
 
 // see http://cppunit.sourceforge.net/doc/lastest/cppunit_cookbook.html for details
 
@@ -49,12 +50,13 @@ class ParticleContainerTest : public CppUnit::TestFixture
 {	
 	//fast setup macros
 	CPPUNIT_TEST_SUITE(ParticleContainerTest);
-	CPPUNIT_TEST(testIteration);
-	CPPUNIT_TEST(testIterationPairwise);
+	CPPUNIT_TEST(testListParticleContainerIteration);
+	CPPUNIT_TEST(testListParticleContainerIterationPairwise);
 	CPPUNIT_TEST_SUITE_END();
 private:
 
-	static void ItFunc(void *data, Particle& p)
+	/// test function, summing up data
+	static void funcIterationSum(void *data, Particle& p)
 	{
 		double *d = ((double*)data);
 
@@ -62,7 +64,8 @@ private:
 		*d += p.m;
 	}
 
-	static void ItPWFunc(void *data, Particle& p1, Particle& p2)
+	/// test function, summing up data pairwise
+	static void funcIterationPWSum(void *data, Particle& p1, Particle& p2)
 	{
 		double *d = ((double*)data);
 
@@ -75,9 +78,9 @@ public:
 
 	void tearDown()	{}
 
-	void testIteration()
+	void testListParticleContainerIteration()
 	{
-		ParticleContainer PC;
+		ListParticleContainer PC;
 		
 		//add 10 Particles with position, velocity and mass
 		int iParticleCount = 10;
@@ -89,7 +92,7 @@ public:
 
 		//now simple iterate over the Particles and add their mass
 		double sum = 0.0;
-		PC.Iterate(ItFunc, &sum);
+		PC.Iterate(funcIterationSum, &sum);
 
 		//the final value in sum should be something around iParticleCount 
 		//because of floating point arithmetics
@@ -99,9 +102,9 @@ public:
 		CPPUNIT_ASSERT( -epsilon < (sum - (double)iParticleCount)  && (sum - (double)iParticleCount) < epsilon);
 	}
 
-	void testIterationPairwise()
+	void testListParticleContainerIterationPairwise()
 	{
-		ParticleContainer PC;
+		ListParticleContainer PC;
 
 		//add 10 Particles with position, velocity and mass
 		int iParticleCount = 10;
@@ -113,7 +116,7 @@ public:
 
 		//now simple iterate over the Particles and add their mass
 		double sum = 0.0;
-		PC.IteratePairwise(ItPWFunc, &sum);
+		PC.IteratePairwise(funcIterationPWSum, &sum);
 
 		// Iterate Pairwise shall be called for every unsorted pair once!
 		// also pairs like (1,1) are not allowed!

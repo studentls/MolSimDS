@@ -1,6 +1,6 @@
 //------------------------------------------------------------------------------------------------
-// File ParticleContainer.h
-// contains class ParticleContainer
+// File ListParticleContainer.h
+// contains class ListParticleContainer
 //------------------------------------------------------------------------------------------------
 /// @author F.Dietz
 /// @author L.Spiegelberg
@@ -14,47 +14,35 @@
 #include "Logging.h"
 #include "Particle.h"
 
-/// a class that is used to store Particles and iterate over them
+/// an abstract class that is used to store Particles and iterate over them
 class ParticleContainer {
-
-private:
-	/// the vector<Particles> that is used by the ParticleContainer to store the Particles
-	std::vector<Particle> particles;
-
 public:
-	/// a constructor that creates the value particles from scratch
-	ParticleContainer();
-
-	/// a constructor that takes one argument, which is the vector<Particles>
-	ParticleContainer(const std::vector<Particle>& particles);
-
-	/// a method to add a Particle to the ParticleContainer
-	void AddParticle(const Particle& particle);
+	/// a method to add a Particle to the ListParticleContainer
+	virtual void AddParticle(const Particle& particle) = 0;
 
 	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
 	/// @param data additional data given to func
-	void Iterate(void(*func)(void*, Particle&), void *data);
+	virtual void Iterate(void(*func)(void*, Particle&), void *data) = 0;
 	
 	/// a method that takes a void(*func)(void*, Particle, Particle) and uses it to iterate over all pairs of Particles (each symmetrical pair is only taken once to reduce redundancy)
 	/// @param data additional data given to func
-	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
+	virtual void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) = 0;
 
 	/// add particles from *.txt file
-	void AddParticlesFromFile(const char *filename);
+	virtual void AddParticlesFromFile(const char *filename) = 0;
 
 	/// our new fileformat, replace later AddParticlesFromFile
 	/// @return return true if file could be read
-	bool AddParticlesFromFileNew(const char *filename);
+	virtual bool AddParticlesFromFileNew(const char *filename) = 0;
 
 	/// removes all particles
-	void Clear()	{if(!particles.empty())particles.clear();}
+	virtual void Clear() = 0;
 
 	/// are any particles contained?
-	bool IsEmpty()	{return particles.empty();}
-
+	virtual bool IsEmpty() = 0;
 	// this method shall be later removed...
-	///returns ParticleContainer's internal container
-	const std::vector<Particle>& getParticles()	{return particles;}
+	///returns ListParticleContainer's internal container
+	virtual const std::vector<Particle>& getParticles() = 0;
 
 };
 
