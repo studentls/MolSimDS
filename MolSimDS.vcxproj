@@ -81,6 +81,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="src\FileReader.h" />
+    <ClInclude Include="src\LinkedCellParticleContainer.h" />
     <ClInclude Include="src\ListParticleContainer.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\MaxwellBoltzmannDistribution.h" />
@@ -101,6 +102,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FileReader.cpp" />
+    <ClCompile Include="src\LinkedCellParticleContainer.cpp" />
     <ClCompile Include="src\ListParticleContainer.cpp" />
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\main.cpp" />

@@ -19,6 +19,7 @@
 #include "Logging.h"
 #include "utils/utils.h"
 #include "Particle.h"
+#include "LinkedCellParticleContainer.h"
 #include "ListParticleContainer.h"
 #include "ParticleGenerator.h"
 #include <vector>

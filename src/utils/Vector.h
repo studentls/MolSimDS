@@ -54,7 +54,14 @@ public:
 		}
 	}
 
-	Vector(type args[length]) {
+	// improve performance by reducing senseless copy calls...
+	Vector(type *args) {
+
+		// check if valid and correct length!
+#ifdef DEBUG
+		assert(args);
+		assert(args[length - 1]); // valid array?		
+#endif
 		for (int i = 0; i < length; i++) {
 			content[i] = args[i];
 		}
@@ -66,16 +73,16 @@ public:
 		}
 	}
 
-	Vector operator+(const Vector& rhs) const {
-		type result[length];
+	Vector operator + (const Vector& rhs) const {
+		 type result[length];
 
-		for (int i = 0; i < length; i++) {
+		 for (int i = 0; i < length; i++) {
 			result[i] = this->content[i] + rhs.content[i];
-		}
-		return Vector(result);
+		 }
+		 return Vector(result);
 	}
 
-	Vector operator-(const Vector& rhs) const {
+	Vector operator - (const Vector& rhs) const {
 		type result[length];
 
 		for (int i = 0; i < length; i++) {
@@ -110,6 +117,7 @@ public:
 		Vector r = to - *this;
 		return r.L2Norm();
 	}
+
 	bool equals(const Vector& rhs) const {
 		for (int i = 0; i < length; i++) {
 			if (rhs.content[i] != this->content[i]) {

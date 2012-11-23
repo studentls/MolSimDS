@@ -81,6 +81,9 @@
     <ClInclude Include="src\ListParticleContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\LinkedCellParticleContainer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -114,7 +117,10 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\ListParticleContainer.cpp">
-      <Filter>Headerdateien</Filter>
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinkedCellParticleContainer.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
