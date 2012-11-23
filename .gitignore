@@ -9,6 +9,7 @@
 *_p.c
 *.ncb
 *.suo
+*.vsp
 *.tlb
 *.tlh
 *.bak

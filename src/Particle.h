@@ -63,7 +63,7 @@ public:
 	void resetForce();
 
 	/// adds force acting on the Particle
-	void addForce(utils::Vector<double, 3> force);
+	inline void addForce(const utils::Vector<double, 3>& force)			{f = f + force; }
 
 	/// compares two particles by their type, position, velocity, force and mass
 	bool operator == (Particle& other);

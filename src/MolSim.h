@@ -79,6 +79,9 @@ private:
 	/// show help, list all avaliable commands
 	void				showHelp();
 
+	// displays statistics
+	void				showStatistics(SimulationStatistics& s);
+
 public:
 
 	MolSim():sim(NULL), state(AS_NONE)			{}

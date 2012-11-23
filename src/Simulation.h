@@ -71,64 +71,91 @@ struct SimulationDesc
 	}
 };
 
+/// a struct to hold statistical data of a simulation
+struct SimulationStatistics
+{
+	unsigned int	particle_count; /// total particles in simulation
+	unsigned int	step_count;		/// how many steps?
+	double			time;			/// contains how many seconds the simulation lasted
+	double			timeperstep;	/// how long did a step last?
+
+	/// constructor to set everything to zero
+	SimulationStatistics()
+	{
+		particle_count	= 0;
+		step_count		= 0;
+		time			= 0.0;
+		timeperstep		= 0.0;
+	}
+};
 
 /// a class that is used to represent a simulation
 class Simulation
 {
 private:
 	/// stores values that are used for calculations for this Simulation
-	SimulationDesc desc;
+	SimulationDesc			desc;
+
+	/// stores a simulation's statistical data
+	SimulationStatistics	statistics;
 
 	/// stores the particles used in this Simulation
-	ListParticleContainer particles;
+	ListParticleContainer	particles;
 
 	/// performs one time step based on delta_t
-	void performStep();
+	void					performStep();
 
 	/// calculate the force for all particles
-	void calculateF();
+	void					calculateF();
 
 	/// resets the force on a particle for a new iteration. Used in calculateF()
-	static void forceResetter(void*, Particle& p);
+	static void				forceResetter(void*, Particle& p);
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
-	static void forceCalculator(void*, Particle&, Particle&);
+	static void				forceCalculator(void*, Particle&, Particle&);
 
 	/// calculate the position for all particles
-	void calculateX();
+	void					calculateX();
 
 	/// calculate the new position of a particle for a new iteration. Used in calculateX()
-	static void posCalculator(void*, Particle&);
+	static void				posCalculator(void*, Particle&);
 
 	/// calculate the velocity for all particles
-	void calculateV();
+	void					calculateV();
 
 	/// calculate the new velocity of a particle for a new iteration. Used in calculateV()
-	static void velCalculator(void*, Particle& p);
+	static void				velCalculator(void*, Particle& p);
 
 	/// plot the particles to a xyz-file
 	/// @param iteration the number of this iteration
-	void plotParticles(int iteration);
+	void					plotParticles(int iteration);
 
 public:
-	Simulation()	{}
+	Simulation()			{}
 
-	~Simulation()	{ Release(); }
+	~Simulation()			{ Release(); }
 	
 	/// sets up simulation using description desc, any old Simulation will be lost when this function is called
 	/// @param desc simulation description
-	err_type Init(const SimulationDesc& desc);
+	/// @return returns always S_OK, 
+	err_type				Init(const SimulationDesc& desc);
 
 	/// adds Particles to particle list from file
 	/// @param filename particle file, has to use .txt format
-	err_type AddParticlesFromFile(const char *filename);
+	/// @return returns S_OK if file could be loaded successfully, otherwise E_FILEERROR
+	err_type				AddParticlesFromFile(const char *filename);
 
 	/// runs Simulation according to settings given by Init
-	/// @param showStatistics print out statistic Data at end
-	err_type Run(bool showStatistics = false);
+	/// @return returns S_OK or E_NOTINITIALIZED if particle data is empty
+	err_type				Run();
 
 	/// cleans memory and flushes Simulation Data
-	err_type Release();
+	/// @return returns always S_OK
+	err_type				Release();
+
+	/// get statistics
+	/// @return statistical data about the simulation
+	SimulationStatistics&	getStatistics()	{return this->statistics;}
 };
 
 

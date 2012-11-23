@@ -111,7 +111,12 @@ err_type MolSim::Run()
 		if(!sim)return E_NOTINITIALIZED;
 	
 		// run simulation...
-		return sim->Run();
+		err_type e = sim->Run();
+		if(FAILED(e))return e;
+
+		// show statistics...
+		SimulationStatistics &stats = sim->getStatistics();
+		showStatistics(stats);
 		break;
 	}
 	
@@ -333,4 +338,13 @@ void MolSim::runSingleTest(string s)
 		}
 		else LOG4CXX_ERROR(testLogger, " >> test failed! ");
 	}
+}
+
+void MolSim::showStatistics(SimulationStatistics& s)
+{
+	LOG4CXX_INFO(generalOutputLogger, "Statistics\n----------------------------");
+	LOG4CXX_INFO(generalOutputLogger, "total particle count:\t"<<s.particle_count);
+	LOG4CXX_INFO(generalOutputLogger, "iteration count: \t"<<s.step_count);
+	LOG4CXX_INFO(generalOutputLogger, "total time:\t\t "<<s.time);
+	LOG4CXX_INFO(generalOutputLogger, "timer per step:\t"<<s.timeperstep);
 }

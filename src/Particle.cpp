@@ -55,10 +55,6 @@ void Particle::resetForce() {
 	f = 0.0;
 }
 
-void Particle::addForce(utils::Vector<double, 3> force) {
-	f = f + force;
-}
-
 std::string Particle::toString() {
 	std::stringstream stream;
 	stream << "Particle: X:" << x <<  " v: " << v << " f: " << f << " old_f: " << old_f << " type: " << type;

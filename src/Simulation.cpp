@@ -32,7 +32,7 @@ err_type Simulation::Init(const SimulationDesc& desc)
 err_type Simulation::AddParticlesFromFile(const char *filename)
 {
 	// read the file New !
-	particles.AddParticlesFromFileNew(filename);
+	if(!particles.AddParticlesFromFileNew(filename))return E_FILEERROR;
 	
 	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
@@ -52,7 +52,7 @@ void Simulation::performStep()
 	calculateV();
 }
 
-err_type Simulation::Run(bool showStatistics)
+err_type Simulation::Run()
 {
 	// check if the particles are valid
 	if(particles.IsEmpty())return E_NOTINITIALIZED;
@@ -61,8 +61,15 @@ err_type Simulation::Run(bool showStatistics)
 	double current_time = desc.start_time;
 	int iteration = 0;
 
+	// set common statistical values...
+	statistics.particle_count = particles.getParticleCount();
+	statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
+
 	// output that calculation have started ("starting calculation...")
 	LOG4CXX_TRACE(simulationLogger, "starting calculation...");
+
+	//start timer
+	utils::Timer timer;
 
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
@@ -83,6 +90,10 @@ err_type Simulation::Run(bool showStatistics)
 		iteration++;
 		current_time += desc.delta_t;
 	}
+
+	//generate statistical data
+	statistics.time = timer.getElapsedTime();
+	statistics.timeperstep = statistics.time / statistics.step_count;
 
 	// output that the output has finished
 	cout << endl;
