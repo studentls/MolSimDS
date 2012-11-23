@@ -10,8 +10,7 @@ log4j.appender.R=org.apache.log4j.RollingFileAppender
 log4j.appender.R.File=molsim.log
 
 log4j.appender.R.MaxFileSize=100KB
-# Keep one backup file
-log4j.appender.R.MaxBackupIndex=1
+# Keep one backup filelog4j.appender.R.MaxBackupIndex=1
 
 log4j.appender.R.layout=org.apache.log4j.PatternLayout
 log4j.appender.R.layout.ConversionPattern=%5p [%t] (%F:%L) - %m%n

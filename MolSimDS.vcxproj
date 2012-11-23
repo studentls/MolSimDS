@@ -112,7 +112,6 @@
     <ClCompile Include="src\outputWriter\VTKWriter.cpp" />
     <ClCompile Include="src\outputWriter\XYZWriter.cpp" />
     <ClCompile Include="src\Particle.cpp" />
-    <ClCompile Include="src\ParticleContainer.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
