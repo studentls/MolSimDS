@@ -59,7 +59,9 @@ public:
 					p.m		= mass;
 
 					// apply Brownian motion via Boltzmann distribution
-					MaxwellBoltzmannDistribution(p, dBrownianMotion, 3);
+
+					// at the moment only 2D !!!
+					MaxwellBoltzmannDistribution(p, dBrownianMotion, 2);
 					
 					// add it
 					pc.AddParticle(p);
