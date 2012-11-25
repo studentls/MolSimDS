@@ -19,3 +19,4 @@
 #include "LinkedCellParticleContainer.h"
 
 // ...
+// program in header file, as LinkedCell is a template class

@@ -16,7 +16,7 @@
 #include "ParticleContainer.h"
 
 /// a class that is used to store Particles and iterate over them
-class LinkedCellParticleContainer : public ParticleContainer {
+template<typename T> class LinkedCellParticleContainer : public ParticleContainer {
 
 private:
 
@@ -57,6 +57,15 @@ public:
 	const std::vector<Particle>& getParticles();
 
 };
+
+
+// implement here...
+
+template<typename T> void LinkedCellParticleContainer<T>::AddParticle(const Particle& particle)
+{
+	// functions have to look like this...
+	// first template<typename T> ... LinkedCellParticleContainer<T>::...
+}
 
 #endif 
 
