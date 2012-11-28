@@ -159,38 +159,7 @@ private:
 		for (std::vector<Particle>::const_iterator it = particles.begin() ; it < particles.end(); it++)
 		{
 			Particle p = *it;
-			
-			// 2D
-			if (dim == 2) {
-				// calc Index
-				xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-				yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-
-				// is particle contained in grid or halo?
-				if (xIndex < 0 || yIndex < 0 ||
-					xIndex >= cellCount[0] || yIndex >= cellCount[1])
-					halo.push_back(p);
-				else {
-					int index = Index2DTo1D(xIndex, yIndex);
-					Cells[index].push_back(p);
-				}
-			}
-			// 3D
-			else if (dim == 3) {
-				// calc Index
-				xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-				yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-				zIndex = (int)((p.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
-
-				// particle in halo?
-				if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
-					xIndex >= cellCount[0] || yIndex >= cellCount[1] || zIndex >= cellCount[2])
-					halo.push_back(p);
-				else {
-					int index = Index3DTo1D(xIndex, yIndex, zIndex);
-					Cells[index].push_back(p);
-				}
-			}
+			AddParticle(p);		
 		}
 
 	}
@@ -201,6 +170,8 @@ private:
 	/// the default value of this variable for the LinkedCellAlgorithm is one
 	void ReassignParticles()
 	{
+		int xIndex = 0,yIndex = 0, zIndex = 0;
+
 		// go through all Cells...
 		for(int i = 0; i < getCellCount(); i++)
 		{
@@ -228,7 +199,7 @@ private:
 						}
 
 						// remove particle from current cell (i-th cell)
-						Cells[index].erase(it);
+						Cells[i].erase(it);
 
 					}
 				}
@@ -252,7 +223,7 @@ private:
 						}
 					
 						// remove particle from current cell (i-th cell)
-						Cells[index].erase(it);
+						Cells[i].erase(it);
 
 					}
 				}
@@ -336,105 +307,106 @@ public:
 			}
 		}
 	}
+	*/
+	/// a method to add a Particle to the ListParticleContainer
+	void AddParticle(const Particle& particle)
+	{
+		int xIndex = 0,yIndex = 0, zIndex = 0;
 
-	/// a method that reassigns the particles to the cells they belong to
-	/// note that this method will only work every 'iterationsPerParticleToCellReassignment'th call
-	/// a good number for this must be determined experimentally for increased efficiency
-	/// the default value of this variable for the LinkedCellAlgorithm is one
-	void ReassignParticles() {
-		iterationsToCellReassignmentLeft--;
-		if (iterationsToCellReassignmentLeft != 0)
-			return;
-		iterationsToCellReassignmentLeft = iterationsPerParticleToCellReassignment;
-		// NOTE (TODO): explicitly delete the old cells? before creating new ones?
-		Cells = new std::vector<Particle>[cellCount];
-		for (int i = 0; i < cellCount; i++)
-			Cells[i] = new std::vector<Particle>();
-		for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
-		{
-			Particle& p = *it;
-			if (dim == 2) {
-				xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-				yIndex = (int)((p.y[1] - frontLowerLeftCorner[1]) / cellSize[1]);
+		// 2D
+		if(dim == 2) {
+				// calc Index
+				xIndex = (int)((particle.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
+				yIndex = (int)((particle.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
+
+				// is particle contained in grid or halo?
 				if (xIndex < 0 || yIndex < 0 ||
-					xIndex >= cellNumbers[0] || yIndex >= cellNumbers[1])
-					halo.push_back(p);
+					xIndex >= cellCount[0] || yIndex >= cellCount[1])
+					halo.push_back(particle);
 				else {
-					int index = yIndex * cellNumbers[0] + xIndex;
-					cells[index].push_back(p);
+					int index = Index2DTo1D(xIndex, yIndex);
+					Cells[index].push_back(particle);
 				}
 			}
-			else if (dim == 3) {
-				xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-				yIndex = (int)((p.y[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-				zIndex = (int)((p.y[2] - frontLowerLeftCorner[2]) / cellSize[2]);
-				if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
-					xIndex >= cellNumbers[0] || yIndex >= cellNumbers[1] || zIndex >= cellNumbers[2])
-					halo.push_back(p);
-				else {
-					int index = (zIndex * cellNumbers[1] + yIndex) * cellNumbers[0] + xIndex;
-					cells[index].push_back(p);
-				}
+		// 3D
+		else if(dim == 3) {
+			// calc Index
+			xIndex = (int)((particle.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
+			yIndex = (int)((particle.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
+			zIndex = (int)((particle.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
+
+			// particle in halo?
+			if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
+				xIndex >= cellCount[0] || yIndex >= cellCount[1] || zIndex >= cellCount[2])
+				halo.push_back(particle);
+			else {
+				int index = Index3DTo1D(xIndex, yIndex, zIndex);
+				Cells[index].push_back(particle);
 			}
-			else
-				// TODO: throw a sensible error message and log an error as well
-				throw Exception();
 		}
 	}
-	*//*
-	/// a method to add a Particle to the ListParticleContainer
-	void AddParticle(const Particle& particle);
 
-	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
-	/// @param data additional data given to func
-	void Iterate(void(*func)(void*, Particle&), void *data) {
-		/*for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
-		{
-			Particle& p = *it;
-			(*func)(data, p);
-		}*/
+//	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
+//	/// @param data additional data given to func
+//	void Iterate(void(*func)(void*, Particle&), void *data) {
+//		/*for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
+//		{
+//			Particle& p = *it;
+//			(*func)(data, p);
+//		}*/
+////	}
 //	}
-	
 	/// a method that takes a void(*func)(void*, Particle, Particle) and uses it to iterate over all pairs of Particles (each symmetrical pair is only taken once to reduce redundancy)
 	/// @param data additional data given to func
-	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {// iterate over all Particles
-		/*// TODO: iterate over all elements of cellPairs. This depends on the data type of cellPairs
-		for () {
-			std::vector<Particle> cell1 = cells[elem[0]];
-			std::vector<Particle> cell2 = cells[elem[1]];
-			for (std::vector<Particle>::iterator it1 = cell1.begin() ; it1 < cell1.end(); it1++)
-				for (std::vector<Particle>::iterator it2 = cell2.begin() ; it2 < cell2.end(); it2++)
-					 make sure that a Particle is not paired with itself
-					if (it1 != it2)
-					{
-						 call the function on the pair of Particles
-						Particle& p1 = *it1;
-						Particle& p2 = *it2;
-						(*func)(data, p1, p2);
-					}
-		}*/
-	}
+	//void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {// iterate over all Particles
+	//	/*// TODO: iterate over all elements of cellPairs. This depends on the data type of cellPairs
+	//	for () {
+	//		std::vector<Particle> cell1 = cells[elem[0]];
+	//		std::vector<Particle> cell2 = cells[elem[1]];
+	//		for (std::vector<Particle>::iterator it1 = cell1.begin() ; it1 < cell1.end(); it1++)
+	//			for (std::vector<Particle>::iterator it2 = cell2.begin() ; it2 < cell2.end(); it2++)
+	//				 make sure that a Particle is not paired with itself
+	//				if (it1 != it2)
+	//				{
+	//					 call the function on the pair of Particles
+	//					Particle& p1 = *it1;
+	//					Particle& p2 = *it2;
+	//					(*func)(data, p1, p2);
+	//				}
+	//	}*/
+	//}
 
 	/// add particles from *.txt file
-	void AddParticlesFromFile(const char *filename);
+	void		AddParticlesFromFile(const char *filename);
 
 	/// our new fileformat, replace later AddParticlesFromFile
 	/// @return return true if file could be read
-	bool AddParticlesFromFileNew(const char *filename);
+	bool		AddParticlesFromFileNew(const char *filename);
 
 	/// removes all particles
-	void Clear();
+	void		Clear();
 
 	/// are any particles contained?
-	bool IsEmpty();
+	bool		IsEmpty();
 
 	/// returns how many particles are contained in this container
 	/// @return returns count of particles in this container
-	unsigned int					getParticleCount();
+	unsigned int					getParticleCount()
+	{
+		unsigned int sum = 0;
+
+		//go through all cells...
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			sum += Cells[i].size();
+		}
+
+		return sum;
+	}
 
 	/// this method shall be later removed...
 	/// returns ListParticleContainer's internal container
-	const std::vector<Particle>& getParticles();
+	const std::vector<Particle>&	getParticles();
 };
 
 #endif 
