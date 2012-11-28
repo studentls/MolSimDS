@@ -68,6 +68,9 @@ private:
 	/// iterations and perform then update
 	/// this variable stores how many iterations the container should wait
 	int iterationsPerParticleToCellReassignment;
+	
+	/// count of iterations so far, note this variable is incremented every time Iterate or (!) IteratePairwise is called!
+	int	iterationCount;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	inline unsigned int Index2DTo1D(unsigned int x, unsigned int y)
@@ -269,6 +272,7 @@ public:
 								)
 	{
 		// member initialization
+		this->iterationCount = 0;
 		this->cutoffDistance = cutoffDistance;
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->iterationsPerParticleToCellReassignment = iterationsPerParticleToCellReassignment;
@@ -313,6 +317,8 @@ public:
 	{
 		int xIndex = 0,yIndex = 0, zIndex = 0;
 
+		assert(Cells);
+
 		// 2D
 		if(dim == 2) {
 				// calc Index
@@ -346,48 +352,75 @@ public:
 		}
 	}
 
-//	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
-//	/// @param data additional data given to func
-//	void Iterate(void(*func)(void*, Particle&), void *data) {
-//		/*for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
-//		{
-//			Particle& p = *it;
-//			(*func)(data, p);
-//		}*/
-////	}
-//	}
-	/// a method that takes a void(*func)(void*, Particle, Particle) and uses it to iterate over all pairs of Particles (each symmetrical pair is only taken once to reduce redundancy)
+	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
 	/// @param data additional data given to func
-	//void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {// iterate over all Particles
-	//	/*// TODO: iterate over all elements of cellPairs. This depends on the data type of cellPairs
-	//	for () {
-	//		std::vector<Particle> cell1 = cells[elem[0]];
-	//		std::vector<Particle> cell2 = cells[elem[1]];
-	//		for (std::vector<Particle>::iterator it1 = cell1.begin() ; it1 < cell1.end(); it1++)
-	//			for (std::vector<Particle>::iterator it2 = cell2.begin() ; it2 < cell2.end(); it2++)
-	//				 make sure that a Particle is not paired with itself
-	//				if (it1 != it2)
-	//				{
-	//					 call the function on the pair of Particles
-	//					Particle& p1 = *it1;
-	//					Particle& p2 = *it2;
-	//					(*func)(data, p1, p2);
-	//				}
-	//	}*/
-	//}
+	void Iterate(void(*func)(void*, Particle&), void *data) {
+		
+		assert(Cells);
+
+		// go through all Cells...
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			{
+				Particle& p = *it;
+				(*func)(data, p);
+			}
+		}
+
+		// inc counter for iterations, if needed reassign particles in cells...
+		iterationCount++;
+		if(iterationCount > this->iterationsPerParticleToCellReassignment)
+		{
+			ReassignParticles();
+			iterationCount = 0;
+		}
+	}
+	/// a method that takes a void(*func)(void*, Particle, Particle) and
+	/// uses it to iterate over all pairs of Particles (each symmetrical pair is
+	/// only taken once to reduce redundancy)
+	/// @param data additional data given to func
+	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {
+		
+		// iterate over all elements of cellPairs. 
+		for (std::vector<utils::Vector<unsigned int, 2>>::iterator it = cellPairs.begin(); it != cellPairs.end(); it++)
+		{
+			utils::Vector<unsigned int, 2> pair = *it;
+
+			// calc data for every pair
+			for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
+				for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 < Cells[pair[1]].end(); it2++)
+					// make sure that a Particle is not paired with itself
+					if (it1 != it2)
+					{
+						// call the function on the pair of Particles
+						Particle& p1 = *it1;
+						Particle& p2 = *it2;
+						(*func)(data, p1, p2);
+					}
+		}
+
+		// inc counter for iterations, if needed reassign particles in cells...
+		iterationCount++;
+		if(iterationCount > this->iterationsPerParticleToCellReassignment)
+		{
+			ReassignParticles();
+			iterationCount = 0;
+		}
+	}
 
 	/// add particles from *.txt file
-	void		AddParticlesFromFile(const char *filename);
+	void							AddParticlesFromFile(const char *filename);
 
 	/// our new fileformat, replace later AddParticlesFromFile
 	/// @return return true if file could be read
-	bool		AddParticlesFromFileNew(const char *filename);
+	bool							AddParticlesFromFileNew(const char *filename);
 
 	/// removes all particles
-	void		Clear();
+	void							Clear();
 
 	/// are any particles contained?
-	bool		IsEmpty();
+	bool							IsEmpty();
 
 	/// returns how many particles are contained in this container
 	/// @return returns count of particles in this container
@@ -395,10 +428,12 @@ public:
 	{
 		unsigned int sum = 0;
 
+		assert(Cells);
+
 		//go through all cells...
 		for(int i = 0; i < getCellCount(); i++)
 		{
-			sum += Cells[i].size();
+			if(!Cells[i].empty())sum += Cells[i].size();
 		}
 
 		return sum;
