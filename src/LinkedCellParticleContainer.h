@@ -53,10 +53,6 @@ private:
 	/// v-----|-----|-----|-----|-----|
 	utils::Vector<double, dim>			frontLowerLeftCorner;
 
-	/// for what reason?
-	/// ???
-	std::vector<Particle>				particles;
-
 	/// a dynamic array, containg all Cells encoded in a 1D array
 	std::vector<Particle>				*Cells;
 	
@@ -158,7 +154,7 @@ private:
 	//double reflectiveBoundaryDistance;
 	// TODO: set reflectiveBoundaryCells; depends on how the value is taken as a constructor parameter
 
-
+	
 
 public:
 
@@ -168,181 +164,32 @@ public:
 	}
 
 	/// a constructor that takes quite a lot of arguments
-	//LinkedCellParticleContainer(const std::vector<Particle>& particles,
-	//							double cutoffDistance,
-	//							utils::Vector<double, dim> frontLowerLeftCorner,
-	//							utils::Vector<double, dim> simulationAreaExtent,
-	//							int iterationsPerParticleToCellReassignment,
-	//							bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-	//							bool frontReflectiveBoundary, bool backReflectiveBoundary,
-	//							// these two will be ignored in the two-dimensional case
-	//							bool bottomReflectiveBoundary, bool topReflectiveBoundary) {
-		/*this.particles = particles;
+	/// @param particles
+	/// TODO: comment params...
+	LinkedCellParticleContainer(const std::vector<Particle>& particles,
+								const double cutoffDistance,
+								utils::Vector<double, dim> frontLowerLeftCorner,
+								utils::Vector<double, dim> simulationAreaExtent,
+								int iterationsPerParticleToCellReassignment,
+								)
+	{
+		// member initialization
 		this.cutoffDistance = cutoffDistance;
 		this.frontLowerLeftCorner = frontLowerLeftCorner;
-		this.iterationsPerParticleToCellReassignment = iterationsPerParticleToCellReassignment;
-		this.iterationsToCellReassignmentLeft = 1;
-		cellSize = new int[dim]
-		cellNumbers = new int[dim]
-		cellCount = 1;
-		for (int i = 0; i < dim; i++) {
-			// round down if the number of cells in a dimension is not a round integer
-			cellNumbers[i] = (int)(simulationAreaExtent[i] / cutoffDistance);
-			cellSize[i] = cellNumbers[i] * cutoffDistance;
-			// special case: a dimension is so small that only one cell fits in
-			if (cellNumbers[i] == 0) {
-				cellNumbers[i] = 1;
-				cellSize[i] = simulationAreaExtent[i];
-			}
-			cellCount *= cellNumbers[i];
-		}
-		halo = new std::vector<Particle>();
-		// TODO: initialize cellPairs correctly
-		cellPairs = new List<utils::Vector<int, 2>>;
-		if (dim == 2) {
-			for (int x = 0; x < cellNumbers[0]; x++)
-				for (int y = 0; y < cellNumbers[1]; y++)
-					for (int xp = 0; xp < 2; xp++)
-						for (int yp = 0; yp < 2; yp++)
-							if (x + xp < cellNumbers[0] && y + yp < cellNumbers[1]) {
-								utils::Vector<int, 2> pair = new utils::Vector<int, 2>;
-								pair[0] = y * cellNumbers[0] + x;
-								pair[1] = (y + yp) * cellNumbers[0] + (x + xp);
-								cellPairs.add(pair);
-							}
-		}
-		else if (dim == 3) {
-			for (int x = 0; x < cellNumbers[0]; x++)
-				for (int y = 0; y < cellNumbers[1]; y++)
-					for (int z = 0; z < cellNumbers[2]; z++)
-						for (int xp = 0; xp < 2; xp++)
-							for (int yp = 0; yp < 2; yp++)
-								for (int zp = 0; zp < 2; zp++)
-									if (x + xp < cellNumbers[0] && y + yp < cellNumbers[1] && z + zp < cellNumbers[2]) {
-										utils::Vector<int, 2> pair = new utils::Vector<int, 2>;
-										pair[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + x;
-										pair[1] = ((z + zp) * cellNumbers[1] + (y + yp)) * cellNumbers[0] + (x + xp);
-										cellPairs.add(pair);
-									}
-		}
-		else
-			// TODO: throw a sensible error message and log an error as well
-			throw new Exception();
-		// define the reflective boundary cells
-		// TODO: this might need some testing and debugging, to be on the safe side
-		reflectiveBoundaryCells = new List<utils::Vector<double, 4>>;
-		if (dim == 2) {
-			if (leftReflectiveBoundary || rightReflectiveBoundary)
-				for (int y = 0; y < cellNumbers[1]; y++) {
-					if (leftReflectiveBoundary) {
-						utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-						vec[0] = y * cellNumbers[0];
-						vec[1] = 0;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[0];
-						reflectiveBoundaryCells.add(vec)
-					}
-					if (rightReflectiveBoundary) {
-						utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-						vec[0] = y * cellNumbers[0] + (cellNumbers[0] - 1);
-						vec[1] = 0;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
-						reflectiveBoundaryCells.add(vec)
-					}
-				}
-			if (frontReflectiveBoundary || backReflectiveBoundary)
-				for (int x = 0; x < cellNumbers[0]; x++) {
-					if (frontReflectiveBoundary) {
-						utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-						vec[0] = x;
-						vec[1] = 1;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[1];
-						reflectiveBoundaryCells.add(vec)
-					}
-					if (backReflectiveBoundary) {
-						utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-						vec[0] = (cellNumbers[1] - 1) * cellNumbers[0] + x;
-						vec[1] = 1;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
-						reflectiveBoundaryCells.add(vec)
-					}
-				}
-		}
-		else if (dim == 3) {
-			if (leftReflectiveBoundary || rightReflectiveBoundary)
-				for (int y = 0; y < cellNumbers[1]; y++)
-					for (int z = 0; z < cellNumbers[2]; z++) {
-						if (leftReflectiveBoundary) {
-							utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-							vec[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + 0;
-							vec[1] = 0;
-							vec[2] = -1.0;
-							vec[3] = frontLowerLeftCorner[0];
-							reflectiveBoundaryCells.add(vec)
-						}
-						if (rightReflectiveBoundary) {
-							utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-							vec[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + (cellNumbers[0] - 1);
-							vec[1] = 0;
-							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
-							reflectiveBoundaryCells.add(vec)
-						}
-					}
-			if (frontReflectiveBoundary || backReflectiveBoundary)
-				for (int x = 0; x < cellNumbers[0]; x++)
-					for (int z = 0; z < cellNumbers[2]; z++) {
-						if (frontReflectiveBoundary) {
-							utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-							vec[0] = (z * cellNumbers[1] + 0) * cellNumbers[0] + x;
-							vec[1] = 1;
-							vec[2] = -1.0;
-							vec[3] = frontLowerLeftCorner[1];
-							reflectiveBoundaryCells.add(vec)
-						}
-						if (backReflectiveBoundary) {
-							utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-							vec[0] = (z * cellNumbers[1] + (cellNumbers[1] - 1)) * cellNumbers[0] + x;
-							vec[1] = 1;
-							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
-							reflectiveBoundaryCells.add(vec)
-						}
-					}
-			if (bottomReflectiveBoundary || topReflectiveBoundary)
-				for (int x = 0; x < cellNumbers[0]; x++)
-					for (int y = 0; y < cellNumbers[1]; y++) {
-						if (bottomReflectiveBoundary) {
-							utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-							vec[0] = y * cellNumbers[0] + x;
-							vec[1] = 2;
-							vec[2] = -1.0;
-							vec[3] = frontLowerLeftCorner[2];
-							reflectiveBoundaryCells.add(vec)
-						}
-						if (topReflectiveBoundary) {
-							utils::Vector<double, 4> vec = new utils::Vector<double, 4>();
-							vec[0] = ((cellNumbers[2] -1) * cellNumbers[1] + y) * cellNumbers[0] + x;
-							vec[1] = 2;
-							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[2] + simulationAreaExtent[2];
-							reflectiveBoundaryCells.add(vec)
-						}
-					}
-		}
-		else
-			// TODO: throw a sensible error message and log an error as well
-			throw new Exception();
-		// assign the particles to their initial cells
-		ReassignParticles();
 
+		// set cell size( is currently simply cutoffDimension)
+		for(int i = 0; i < dim; i++)cellSize[i] = cutoffDistance;
+
+		// calc number of cells in each dimension, note that we are rounding down
+		for(int i = 0; i < dim; i++)cellCount[i] = simulationAreaExtent[i] / cellSize[i];
+		
 		// generate pairs
 		generatePairs();
-	}*/
-
+		
+		// assign the particles to their initial cells
+		ReassignParticles();
+		
+	}
 	/*// applies the reflectove boundary condition to all cells that apply
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
 		// TODO: iterate over all elements of reflectiveBoundaryCells. This depends on the data type of reflectiveBoundaryCells
