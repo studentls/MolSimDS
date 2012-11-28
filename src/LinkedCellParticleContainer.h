@@ -68,7 +68,77 @@ private:
 	/// where 1, 2 are the index of the Cells array
 	std::vector<utils::Vector<int, 2>>	cellPairs;
 
-	
+	/// helper function to convert fast 2D indices to 1D based on cellCount
+	inline unsigned int Index2DTo1D(unsigned int x, unsigned int y)
+	{
+		// correct index?
+		assert(x + cellCount[0] < getCellCount());
+
+		return x + cellCount[0] * y;
+	}
+
+	/// helper function to convert fast 3D indices to 1D based on cellCount
+	inline unsigned int Index3DTo1D(unsigned int x, unsigned int y, unsigned int z)
+	{
+		// correct index?
+		assert(x + y * (cellCount[0] + z * cellCount[1]) < getCellCount());
+
+		return x + y * (cellCount[0] + z * cellCount[1]);
+	}
+
+
+	/// generate Index Pairs according to cellCount
+	// TODO: write a testcase about this function
+	void		generatePairs()	
+	{
+		// temp pair variable
+		utils::Vector<int, 2> pair;
+		
+		// empty array?
+		if(!cellPairs.empty())cellPairs.clear();
+
+		// 2D neighborhood
+		if (dim == 2)
+		{
+			// go through all x, y
+			for (int x = 0; x < cellCount[0]; x++)
+				for (int y = 0; y < cellCount[1]; y++)
+
+					// TODO: comment
+					for (int xp = 0; xp < 2; xp++)
+						for (int yp = 0; yp < 2; yp++)
+							if (x + xp < cellCount[0] && y + yp < cellCount[1])
+							{
+							
+								// make pairs ((x,y), (x + xp, y + yp))
+								pair[0] = Index2DTo1D(x, y);
+								pair[1] = Index2DTo1D(x + xp, y + yp);
+								
+								cellPairs.push_back(pair);
+							}
+		}
+		// 3D neighborhood
+		else if (dim == 3)
+		{
+			//go through all x, y, z
+			for (int x = 0; x < cellCount[0]; x++)
+				for (int y = 0; y < cellCount[1]; y++)
+					for (int z = 0; z < cellCount[2]; z++)
+
+						// TODO: comment
+						for (int xp = 0; xp < 2; xp++)
+							for (int yp = 0; yp < 2; yp++)
+								for (int zp = 0; zp < 2; zp++)
+									if (x + xp < cellNumbers[0] && y + yp < cellNumbers[1] && z + zp < cellNumbers[2])
+									{										
+										// make pairs ((x,y,z), (x + xp, y + yp, z + zp))
+										pair[0] = Index3DTo1D(x, y, z);
+										pair[1] = Index3DTo1D(x + xp, y + yp, z + zp);
+										cellPairs.push_back(pair);
+									}
+		}
+	}
+
 	
 	// Deprecated...
 	//int iterationsPerParticleToCellReassignment;
@@ -92,17 +162,22 @@ private:
 
 public:
 
+	~LinkedCellParticleContainer()
+	{
+		SAFE_DELETE_A(Cells);
+	}
+
 	/// a constructor that takes quite a lot of arguments
-	LinkedCellParticleContainer(const std::vector<Particle>& particles,
-								double cutoffDistance,
-								utils::Vector<double, dim> frontLowerLeftCorner,
-								utils::Vector<double, dim> simulationAreaExtent,
-								int iterationsPerParticleToCellReassignment,
-								bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-								bool frontReflectiveBoundary, bool backReflectiveBoundary,
-								// these two will be ignored in the two-dimensional case
-								bool bottomReflectiveBoundary, bool topReflectiveBoundary) {
-		this.particles = particles;
+	//LinkedCellParticleContainer(const std::vector<Particle>& particles,
+	//							double cutoffDistance,
+	//							utils::Vector<double, dim> frontLowerLeftCorner,
+	//							utils::Vector<double, dim> simulationAreaExtent,
+	//							int iterationsPerParticleToCellReassignment,
+	//							bool leftReflectiveBoundary, bool rightReflectiveBoundary,
+	//							bool frontReflectiveBoundary, bool backReflectiveBoundary,
+	//							// these two will be ignored in the two-dimensional case
+	//							bool bottomReflectiveBoundary, bool topReflectiveBoundary) {
+		/*this.particles = particles;
 		this.cutoffDistance = cutoffDistance;
 		this.frontLowerLeftCorner = frontLowerLeftCorner;
 		this.iterationsPerParticleToCellReassignment = iterationsPerParticleToCellReassignment;
@@ -263,9 +338,12 @@ public:
 			throw new Exception();
 		// assign the particles to their initial cells
 		ReassignParticles();
-	}
 
-	// applies the reflectove boundary condition to all cells that apply
+		// generate pairs
+		generatePairs();
+	}*/
+
+	/*// applies the reflectove boundary condition to all cells that apply
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
 		// TODO: iterate over all elements of reflectiveBoundaryCells. This depends on the data type of reflectiveBoundaryCells
 		for () {
@@ -328,41 +406,41 @@ public:
 			}
 			else
 				// TODO: throw a sensible error message and log an error as well
-				throw new Exception();
+				throw Exception();
 		}
 	}
-
+	*//*
 	/// a method to add a Particle to the ListParticleContainer
 	void AddParticle(const Particle& particle);
 
 	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
 	/// @param data additional data given to func
 	void Iterate(void(*func)(void*, Particle&), void *data) {
-		for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
+		/*for (std::vector<Particle>::iterator it = particles.begin() ; it < particles.end(); it++)
 		{
 			Particle& p = *it;
 			(*func)(data, p);
-		}
-	}
+		}*/
+//	}
 	
 	/// a method that takes a void(*func)(void*, Particle, Particle) and uses it to iterate over all pairs of Particles (each symmetrical pair is only taken once to reduce redundancy)
 	/// @param data additional data given to func
 	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {// iterate over all Particles
-		// TODO: iterate over all elements of cellPairs. This depends on the data type of cellPairs
+		/*// TODO: iterate over all elements of cellPairs. This depends on the data type of cellPairs
 		for () {
 			std::vector<Particle> cell1 = cells[elem[0]];
 			std::vector<Particle> cell2 = cells[elem[1]];
 			for (std::vector<Particle>::iterator it1 = cell1.begin() ; it1 < cell1.end(); it1++)
 				for (std::vector<Particle>::iterator it2 = cell2.begin() ; it2 < cell2.end(); it2++)
-					// make sure that a Particle is not paired with itself
+					 make sure that a Particle is not paired with itself
 					if (it1 != it2)
 					{
-						// call the function on the pair of Particles
+						 call the function on the pair of Particles
 						Particle& p1 = *it1;
 						Particle& p2 = *it2;
 						(*func)(data, p1, p2);
 					}
-		}
+		}*/
 	}
 
 	/// add particles from *.txt file
@@ -382,24 +460,10 @@ public:
 	/// @return returns count of particles in this container
 	unsigned int					getParticleCount();
 
-	// this method shall be later removed...
-	///returns ListParticleContainer's internal container
+	/// this method shall be later removed...
+	/// returns ListParticleContainer's internal container
 	const std::vector<Particle>& getParticles();
-	
-	~LinkedCellParticleContainer()
-	{
-		SAFE_DELETE_A(Cells);
-	}
 };
-
-
-// implement here...
-
-template<typename T> void LinkedCellParticleContainer<T>::AddParticle(const Particle& particle)
-{
-	// functions have to look like this...
-	// first template<typename T> ... LinkedCellParticleContainer<T>::...
-}
 
 #endif 
 
