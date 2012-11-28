@@ -20,40 +20,75 @@ template<int dim> class LinkedCellParticleContainer : public ParticleContainer {
 
 private:
 
-	// NOTE: my Visual Studio seems to be fucked for some reason
-	// I don't get an intellisense list
-	// therefore, some functions may be syntactic garbage and not work at all
-	// this file just defines the logic, but is not compilable
-
 	// TODO:
 	// let's add the methods applyVelocity(...) and applyForce(...) as well (to the general interface ParticleContainer)
 	// they do the same thing and take the same parameters as iterate and iteratePairwaise,
 	// but in the case of this class, they also call additional functions to deal with the borders
 	// and to reassign the particles to cells
 
-	double cutoffDistance;
-	double *cellSize;
-	utils::Vector<double, dim> frontLowerLeftCorner;
-	std::vector<Particle> particles;
-	std::vector<Particle> *cells;
-	int *cellNumbers;
-	int cellCount;
+	/// Cutoff distance
+	double								cutoffDistance;
+
+	/// vector containing X, Y, (Z) size of each cell
+	utils::Vector<double, dim>			cellSize;
+
+	/// vector containg count of cells in X, Y, (Z) direction
+	utils::Vector<unsigned int, dim>	cellCount;
+
+	/// get total cell count
+	inline unsigned int					getCellCount()
+	{
+		unsigned int sum = 0;
+		for(int i = 0; i < dim; i++)
+			sum += CellCount[i];
+		return sum;
+	}
+
+	/// the Linked Cell algorithm establishes a grid, which is located in space
+	/// via the frontLowerLeftCorner, (v beeing the corner)
+	/// |-----|-----|-----|-----|-----|
+	/// |     |     |     |     |     |
+	/// |-----|-----|-----|-----|-----|
+	/// |     |     |     |     |     |
+	/// v-----|-----|-----|-----|-----|
+	utils::Vector<double, dim>			frontLowerLeftCorner;
+
+	/// for what reason?
+	/// ???
+	std::vector<Particle>				particles;
+
+	/// a dynamic array, containg all Cells encoded in a 1D array
+	std::vector<Particle>				*Cells;
+	
+	/// ???
 	// Note that the halo acts only as a storage for the sake of completeness. The field could be dropped as well
 	std::vector<Particle> halo;
-	// TODO: what data type works as a simple list, but is relatively fast? Use it for cellPairs and reflectiveBoundaryCells
-	List<utils::Vector<int, 2>> cellPairs;
-	int iterationsPerParticleToCellReassignment;
-	int iterationsToCellReassignmentLeft;
+	
+	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
+	/// where 1, 2 are the index of the Cells array
+	std::vector<utils::Vector<int, 2>>	cellPairs;
+
+	
+	
+	// Deprecated...
+	//int iterationsPerParticleToCellReassignment;
+	//int iterationsToCellReassignmentLeft;
+
+
+	// Deprecated ...
 	// each double in the Vector means something different
 	// 0, int: the cell
 	// 1, int: the axis
 	// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
 	// 3, double: the border's coordinate on the given axis, in the given direction
 	// TODO: question: is it possible to save an int in a slot that takes a double without manual conversion? Works in c#, unsure about c++
-	List<utils::Vector<double, 4>> reflectiveBoundaryCells;
+	///List<utils::Vector<double, 4>> reflectiveBoundaryCells;
+	
 	// TODO: initialize this
-	double reflectiveBoundaryDistance;
+	//double reflectiveBoundaryDistance;
 	// TODO: set reflectiveBoundaryCells; depends on how the value is taken as a constructor parameter
+
+
 
 public:
 
