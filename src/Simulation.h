@@ -106,7 +106,10 @@ private:
 	// ListParticleContainer	particles;
 
 	// new
-	LinkedCellParticleContainer<2>	particles;
+	//LinkedCellParticleContainer<2>	particles;
+
+	/// the particle container
+	ParticleContainer		*particles;
 
 	/// performs one time step based on delta_t
 	void					performStep();
@@ -137,9 +140,9 @@ private:
 	void					plotParticles(int iteration);
 
 public:
-	Simulation()			{}
+	Simulation():particles(NULL)			{}
 
-	~Simulation()			{ Release(); }
+	~Simulation()							{ Release(); }
 	
 	/// sets up simulation using description desc, any old Simulation will be lost when this function is called
 	/// @param desc simulation description

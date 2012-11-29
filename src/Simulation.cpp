@@ -24,25 +24,36 @@ err_type Simulation::Init(const SimulationDesc& desc)
 	this->desc = desc;
 
 	// clear particles if it is not already empty
-	if(!particles.IsEmpty())particles.Clear();
+	if(particles)if(!particles->IsEmpty())particles->Clear();
 
-	// set up particles with some data...
-	utils::Vector<double, 2> extent;
-	extent[0] = 180;
-	extent[1] = 90;
-
-	ListParticleContainer PC;
-	PC.AddParticlesFromFileNew("cuboid2.txt");
-	particles.Init(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 10); 
 
 	return S_OK;
 }
 
 err_type Simulation::AddParticlesFromFile(const char *filename)
 {
+	//assert(particles);
+
 	// read the file New !
-	if(!particles.AddParticlesFromFileNew(filename))return E_FILEERROR;
+	//if(!particles->AddParticlesFromFileNew(filename))return E_FILEERROR;
 	
+	// set up particles with some data...
+	utils::Vector<double, 2> extent;
+	extent[0] = 180;
+	extent[1] = 90;
+
+	ListParticleContainer PC;
+	PC.AddParticlesFromFileNew(filename);
+
+	//method
+	
+	// use LinkedCell
+	//particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 10); 
+
+	// use standard
+	particles = new ListParticleContainer(PC.getParticles());
+
+
 	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
 
@@ -63,15 +74,17 @@ void Simulation::performStep()
 
 err_type Simulation::Run()
 {
+	assert(particles);
+
 	// check if the particles are valid
-	if(particles.IsEmpty())return E_NOTINITIALIZED;
+	if(particles->IsEmpty())return E_NOTINITIALIZED;
 
 	// initialize some values
 	double current_time = desc.start_time;
 	int iteration = 0;
 
 	// set common statistical values...
-	statistics.particle_count = particles.getParticleCount();
+	statistics.particle_count = particles->getParticleCount();
 	statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
 
 	// output that calculation have started ("starting calculation...")
@@ -114,16 +127,18 @@ err_type Simulation::Run()
 err_type Simulation::Release()
 {
 	// delete Particle data
-	particles.Clear();
+	particles->Clear();
+
+	SAFE_DELETE(particles);
 
 	return S_OK;
 }
 
 void Simulation::calculateF() {
 	// call particles.Iterate() on forceResetter
-	particles.Iterate(forceResetter, (void*)&desc);
+	particles->Iterate(forceResetter, (void*)&desc);
 	// call particles.IteratePairwise() on forceCalculator
-	particles.IteratePairwise(forceCalculator, (void*)&desc);
+	particles->IteratePairwise(forceCalculator, (void*)&desc);
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
@@ -154,8 +169,8 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	double pow6 = pow3 * pow3;
 	double pow12 = pow6 * pow6;
 
-	double temp2 = pow6 - 2 * pow12;
-	double prefactor = 24 * desc->epsilon / dist / dist;
+	double temp2 = pow6 - 2.0 * pow12;
+	double prefactor = 24.0 * desc->epsilon / dist / dist;
 	double factor = prefactor * temp2;
 	
 	// DEPRECATED
@@ -170,13 +185,15 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	
 	// add individual particle to particle force to sum
 	p1.addForce(force);
-	p2.addForce(-1 * force);
+	p2.addForce(-1.0 * force);
 }
 
 void Simulation::calculateX() {
 	
+	assert(particles);
+
 	// call particles.Iterate() on posCalculator
-	particles.Iterate(posCalculator, (void*)&desc);
+	particles->Iterate(posCalculator, (void*)&desc);
 }
 
 void Simulation::posCalculator(void* data, Particle& p) {
@@ -199,7 +216,7 @@ void Simulation::posCalculator(void* data, Particle& p) {
 
 void Simulation::calculateV() {
 	// call particles.Iterate() on velCalculator
-	particles.Iterate(velCalculator, (void*)&desc);
+	particles->Iterate(velCalculator, (void*)&desc);
 }
 
 void Simulation::velCalculator(void* data, Particle& p) {
@@ -222,6 +239,8 @@ void Simulation::velCalculator(void* data, Particle& p) {
 
 void Simulation::plotParticles(int iteration) {
 
+	assert(particles);
+	
 	string out_name("MD_vtk");
 	// switch between VTK and XYZ output
 	// depending on the value of desc.output_fmt
@@ -231,14 +250,15 @@ void Simulation::plotParticles(int iteration) {
 		{
 			// VTK Output
 			outputWriter::VTKWriter writer;
-			writer.plotParticles(particles.getParticles(), out_name, iteration);
+			
+			writer.plotParticles(particles->getParticles(), out_name, iteration);
 			break;
 		}
 	case SOF_XYZ:
 		{
 			// XYZ Output
 			outputWriter::XYZWriter writer;
-			writer.plotParticles(particles.getParticles(), out_name, iteration);
+			writer.plotParticles(particles->getParticles(), out_name, iteration);
 			break;
 		}
 	default:
