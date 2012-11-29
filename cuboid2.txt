@@ -1,0 +1,19 @@
+## file format:
+# lines starting with # or empty lines will be ignored
+# the only allowed syntax will be 
+# cuboid x1 x2 x3 v1 v2 v3 mass n1 n2 n3 meshwidth
+# where x1, x2, x3 are the componets of the position vector
+# of the lower left front corner of the cuboid
+# v1 v2 v3 are the initial velocity parameters
+# n1 n2 n3 are the dimensions of the cuboid
+# meshwidth is the distance between two particles
+# mass the initial mass
+
+
+
+
+# two sample cuboids
+
+cuboid 20.0 20.0 0.0   0.0  0.0  0.0   1.0   100 20 1   1.1225
+
+cuboid 70.0 60.0 0.0   0.0 -10.0 0.0   1.0    20 20 1   1.1225 
