@@ -38,9 +38,9 @@ private:
 	/// get total cell count
 	inline unsigned int					getCellCount()
 	{
-		unsigned int sum = 0;
+		unsigned int sum = 1;
 		for(int i = 0; i < dim; i++)
-			sum += CellCount[i];
+			sum *= cellCount[i];
 		return sum;
 	}
 
@@ -62,7 +62,7 @@ private:
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
-	std::vector<utils::Vector<int, 2>>	cellPairs;
+	std::vector<utils::Vector<unsigned int, 2>>	cellPairs;
 
 	/// updating cells every iteration is not very appropriate, better wait some
 	/// iterations and perform then update
@@ -73,20 +73,16 @@ private:
 	int	iterationCount;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
+	/// note that indices should be asserted!
 	inline unsigned int Index2DTo1D(unsigned int x, unsigned int y)
 	{
-		// correct index?
-		assert(x + cellCount[0] < getCellCount());
-
 		return x + cellCount[0] * y;
 	}
 
 	/// helper function to convert fast 3D indices to 1D based on cellCount
+	/// note that indices should be asserted!
 	inline unsigned int Index3DTo1D(unsigned int x, unsigned int y, unsigned int z)
 	{
-		// correct index?
-		assert(x + y * (cellCount[0] + z * cellCount[1]) < getCellCount());
-
 		return x + y * (cellCount[0] + z * cellCount[1]);
 	}
 
@@ -96,7 +92,7 @@ private:
 	void		generatePairs()	
 	{
 		// temp pair variable
-		utils::Vector<int, 2> pair;
+		utils::Vector<unsigned int, 2> pair;
 		
 		// empty array?
 		if(!cellPairs.empty())cellPairs.clear();
@@ -133,7 +129,7 @@ private:
 						for (int xp = 0; xp < 2; xp++)
 							for (int yp = 0; yp < 2; yp++)
 								for (int zp = 0; zp < 2; zp++)
-									if (x + xp < cellNumbers[0] && y + yp < cellNumbers[1] && z + zp < cellNumbers[2])
+									if (x + xp < cellCount[0] && y + yp < cellCount[1] && z + zp < cellCount[2])
 									{										
 										// make pairs ((x,y,z), (x + xp, y + yp, z + zp))
 										pair[0] = Index3DTo1D(x, y, z);
@@ -173,13 +169,16 @@ private:
 	/// the default value of this variable for the LinkedCellAlgorithm is one
 	void ReassignParticles()
 	{
-		int xIndex = 0,yIndex = 0, zIndex = 0;
+		int xIndex = 0, yIndex = 0, zIndex = 0;
 
 		// go through all Cells...
 		for(int i = 0; i < getCellCount(); i++)
 		{
+			// does cell contain any elements? - if not continue
+			if(Cells[i].empty())continue;
+			
 			// go through every cell's particles...
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
 			{
 				Particle p = *it;
 			
@@ -202,7 +201,7 @@ private:
 						}
 
 						// remove particle from current cell (i-th cell)
-						Cells[i].erase(it);
+						it = Cells[i].erase(it);
 
 					}
 				}
@@ -226,10 +225,13 @@ private:
 						}
 					
 						// remove particle from current cell (i-th cell)
-						Cells[i].erase(it);
+						it = Cells[i].erase(it);
 
 					}
 				}
+
+				// manually increment iterator, as erase may delete last element, and therefore vector::iterator inc will cause an error
+				if(it != Cells[i].end())it++;
 			}
 		}
 	}
@@ -255,7 +257,16 @@ private:
 	
 
 public:
+	/// default constructor, set everthing to good values
+	LinkedCellParticleContainer()
+	{
+		Cells = NULL;
+		iterationCount = 0;
+		cutoffDistance = 0.0;
+		iterationsPerParticleToCellReassignment = 1;
+	}
 
+	/// destructor
 	~LinkedCellParticleContainer()
 	{
 		SAFE_DELETE_A(Cells);
@@ -271,6 +282,20 @@ public:
 								int iterationsPerParticleToCellReassignment
 								)
 	{
+		// set to zero, so Init doesn't crash...
+		Cells = NULL;
+
+		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, iterationsPerParticleToCellReassignment);		
+	}
+
+	/// init function taking a lot of arguments
+	void								Init(const std::vector<Particle>& particles,
+											 const double cutoffDistance,
+											 utils::Vector<double, dim> frontLowerLeftCorner,
+											 utils::Vector<double, dim> simulationAreaExtent,
+											 int iterationsPerParticleToCellReassignment
+											 )
+	{
 		// member initialization
 		this->iterationCount = 0;
 		this->cutoffDistance = cutoffDistance;
@@ -283,12 +308,17 @@ public:
 		// calc number of cells in each dimension, note that we are rounding down
 		for(int i = 0; i < dim; i++)cellCount[i] = simulationAreaExtent[i] / cellSize[i];
 		
+		//delete if necessary
+		SAFE_DELETE_A(Cells);
+
+		// alloc mem
+		Cells = new std::vector<Particle>[getCellCount()];
+
 		// generate pairs
 		generatePairs();
 		
 		// assign the particles to their initial cells
 		AssignParticles(particles);
-		
 	}
 	/*// applies the reflectove boundary condition to all cells that apply
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
@@ -364,7 +394,7 @@ public:
 			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle& p = *it;
-				(*func)(data, p);
+				(*func)(data, p);				
 			}
 		}
 
@@ -387,17 +417,30 @@ public:
 		{
 			utils::Vector<unsigned int, 2> pair = *it;
 
-			// calc data for every pair
-			for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
-				for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 < Cells[pair[1]].end(); it2++)
-					// make sure that a Particle is not paired with itself
-					if (it1 != it2)
-					{
-						// call the function on the pair of Particles
-						Particle& p1 = *it1;
-						Particle& p2 = *it2;
-						(*func)(data, p1, p2);
-					}
+			// are cells valid? - if not next iteration
+			if(Cells[pair[0]].empty() || Cells[pair[1]].empty())continue;
+
+			// calc data for a pair (a, b) where a != b
+			if(pair[0] != pair[1])
+				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
+					for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 < Cells[pair[1]].end(); it2++)
+						{
+							// call the function on the pair of Particles
+							Particle& p1 = *it1;
+							Particle& p2 = *it2;
+							(*func)(data, p1, p2);
+						}
+			else
+				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
+					for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 < Cells[pair[1]].end(); it2++)
+						// make sure that a Particle is not paired with itself
+						if (it1 != it2)
+						{
+							// call the function on the pair of Particles
+							Particle& p1 = *it1;
+							Particle& p2 = *it2;
+							(*func)(data, p1, p2);
+						}
 		}
 
 		// inc counter for iterations, if needed reassign particles in cells...
@@ -410,11 +453,19 @@ public:
 	}
 
 	/// add particles from *.txt file
-	void							AddParticlesFromFile(const char *filename);
+	void							AddParticlesFromFile(const char *filename)
+	{
+		//...
+	}
 
 	/// our new fileformat, replace later AddParticlesFromFile
 	/// @return return true if file could be read
-	bool							AddParticlesFromFileNew(const char *filename);
+	bool							AddParticlesFromFileNew(const char *filename)
+	{
+		//	... 
+		// nothing
+		return true;
+	}
 
 	/// removes all particles
 	void							Clear()
@@ -437,7 +488,8 @@ public:
 		// any particles in halo contained?
 		if(!halo.empty())return false;
 
-		assert(Cells);
+		// any cells contained?
+		if(!Cells)return true;
 
 		// go through all Cells
 		for(int i = 0; i < getCellCount(); i++)
@@ -464,10 +516,37 @@ public:
 
 		return sum;
 	}
-
+	
+	
+	// Quick 'n' dirty hack
+	std::vector<Particle> p;
+	
+	
 	/// this method shall be later removed...
 	/// returns ListParticleContainer's internal container
-	const std::vector<Particle>&	getParticles();
+	const std::vector<Particle>&	getParticles()
+	{
+		// this method is only a quick hack, to test the algorithm...
+		// for this reason we need a static variable to secure, the reference is valid
+
+		
+
+		// clear if necessary
+		if(!p.empty())p.clear();
+
+		// add halo...
+		p.insert(p.end(), halo.begin(), halo.end());
+
+		assert(Cells);
+
+		//go through cells
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			p.insert(p.end(), Cells[i].begin(), Cells[i].end());
+		}
+
+		return p;
+	}
 };
 
 #endif 

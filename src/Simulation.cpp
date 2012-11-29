@@ -24,7 +24,16 @@ err_type Simulation::Init(const SimulationDesc& desc)
 	this->desc = desc;
 
 	// clear particles if it is not already empty
-	particles.Clear();
+	if(!particles.IsEmpty())particles.Clear();
+
+	// set up particles with some data...
+	utils::Vector<double, 2> extent;
+	extent[0] = 180;
+	extent[1] = 90;
+
+	ListParticleContainer PC;
+	PC.AddParticlesFromFileNew("cuboid2.txt");
+	particles.Init(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 10); 
 
 	return S_OK;
 }
@@ -76,13 +85,13 @@ err_type Simulation::Run()
 
 		// perform one iteration step
 		performStep();
-		
+
 		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % 10 == 0) {
 			plotParticles(iteration);
 			
 			// output that an iteration has finished
-			if(iteration % 100 == 0)
+			if(iteration % 25 == 0)
 			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
 		}
 		

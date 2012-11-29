@@ -101,7 +101,12 @@ private:
 	SimulationStatistics	statistics;
 
 	/// stores the particles used in this Simulation
-	ListParticleContainer	particles;
+	
+	// old
+	// ListParticleContainer	particles;
+
+	// new
+	LinkedCellParticleContainer<2>	particles;
 
 	/// performs one time step based on delta_t
 	void					performStep();
