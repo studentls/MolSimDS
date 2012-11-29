@@ -417,10 +417,36 @@ public:
 	bool							AddParticlesFromFileNew(const char *filename);
 
 	/// removes all particles
-	void							Clear();
+	void							Clear()
+	{
+		// delete halo's particles
+		if(!halo.empty())halo.clear();
+
+		assert(Cells);
+
+		// go through all Cells
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			if(!Cells[i].empty())Cells[i].clear();
+		}
+	}
 
 	/// are any particles contained?
-	bool							IsEmpty();
+	bool							IsEmpty()
+	{
+		// any particles in halo contained?
+		if(!halo.empty())return false;
+
+		assert(Cells);
+
+		// go through all Cells
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			if(!Cells[i].empty())return false;
+		}
+
+		return true;
+	}
 
 	/// returns how many particles are contained in this container
 	/// @return returns count of particles in this container
