@@ -432,7 +432,10 @@ public:
 							// call the function on the pair of Particles
 							Particle& p1 = *it1;
 							Particle& p2 = *it2;
-							(*func)(data, p1, p2);
+
+							//is distance squared less than cutoff radius squared?
+							if(p1.x.distanceSq(p2.x) < cutoffDistance*cutoffDistance)
+								(*func)(data, p1, p2);
 						}
 			else
 				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)

@@ -100,6 +100,14 @@ public:
 		return Vector(result);
 	}
 
+	double operator * (const Vector& rhs) const {
+		double sum = 0;
+		for (int i = 0; i < length; i++) {
+			sum += (this->content[i] * rhs.content[i]);
+		}
+		return sum;
+	}
+
 	double L2Norm() const {
 		double square_sum = 0;
 		for (int i = 0; i < length; i++) {
@@ -116,6 +124,19 @@ public:
 	{
 		Vector r = to - *this;
 		return r.L2Norm();
+	}
+
+	///
+	/// @param to distance squared between caller vector and vector to,
+	/// can be useful as sqrt is a very expensive operation
+	/// @return returns distance of vector to given vector
+	///
+	double distanceSq(const Vector& to)
+	{
+		Vector r = to - *this;
+
+		// dot product
+		return r * r;
 	}
 
 	bool equals(const Vector& rhs) const {
