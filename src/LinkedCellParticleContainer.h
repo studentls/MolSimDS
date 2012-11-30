@@ -306,11 +306,21 @@ public:
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->iterationsPerParticleToCellReassignment = iterationsPerParticleToCellReassignment;
 
-		// set cell size( is currently simply cutoffDimension)
-		for(int i = 0; i < dim; i++)cellSize[i] = cutoffDistance;
 
 		// calc number of cells in each dimension, note that we are rounding down
-		for(int i = 0; i < dim; i++)cellCount[i] = simulationAreaExtent[i] / cellSize[i];
+		// this is done because the number of cells that fit in the designated area may not be a natural number
+		// therefore the number of cells is rounded down to give an exact fit
+		for(int i = 0; i < dim; i++) {
+			cellCount[i] = (int)(simulationAreaExtent[i] / cutoffDistance);
+			// special case: not even one cell fits into the area completely
+			if (cellCount[i] == 0)
+				cellCount[i] = 1;
+		}
+
+		// set cell size: adapt the cellSize in each dimension
+		// this can be slightly larger than the cutoffDistance if the cells don't fit
+		// into the the area precisely and have to be enlarged, as just mentioned above
+		for(int i = 0; i < dim; i++)cellSize[i] = (double)(simulationAreaExtent[i] / cellCount[i]);
 		
 		//delete if necessary
 		SAFE_DELETE_A(Cells);
@@ -346,7 +356,7 @@ public:
 		}
 	}
 	*/
-	/// a method to add a Particle to the ListParticleContainer
+	/// a method to add a Particle to the LinkedCellParticleContainer
 	void AddParticle(const Particle& particle)
 	{
 		int xIndex = 0,yIndex = 0, zIndex = 0;
@@ -422,6 +432,7 @@ public:
 			utils::Vector<unsigned int, 2> pair = *it;
 
 			// are cells valid? - if not next iteration
+			// TODO: doesn't this problem resolve itself if it's ignored? This is an unnecessary check that just costs time
 			if(Cells[pair[0]].empty() || Cells[pair[1]].empty())continue;
 
 			// calc data for a pair (a, b) where a != b
@@ -446,7 +457,9 @@ public:
 							// call the function on the pair of Particles
 							Particle& p1 = *it1;
 							Particle& p2 = *it2;
-							(*func)(data, p1, p2);
+							//is distance squared less than cutoff radius squared?
+							if(p1.x.distanceSq(p2.x) < cutoffDistance*cutoffDistance)
+								(*func)(data, p1, p2);
 						}
 		}
 
