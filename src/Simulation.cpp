@@ -48,10 +48,10 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	//method
 	
 	// use LinkedCell
-	//particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 10); 
+	particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 20); 
 
 	// use standard
-	particles = new ListParticleContainer(PC.getParticles());
+	//particles = new ListParticleContainer(PC.getParticles());
 
 
 	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
@@ -185,6 +185,8 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	
 	// add individual particle to particle force to sum
 	p1.addForce(force);
+	
+	
 	p2.addForce(-1.0 * force);
 }
 

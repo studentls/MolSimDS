@@ -198,6 +198,10 @@ private:
 						else {
 							int index = Index2DTo1D(xIndex, yIndex);
 							Cells[index].push_back(p);
+							if(abs(index - i) > 100)
+							{
+								int shgjks = 0;
+							}
 						}
 
 						// remove particle from current cell (i-th cell)
@@ -535,7 +539,7 @@ public:
 		if(!p.empty())p.clear();
 
 		// add halo...
-		p.insert(p.end(), halo.begin(), halo.end());
+		//p.insert(p.end(), halo.begin(), halo.end());
 
 		assert(Cells);
 
