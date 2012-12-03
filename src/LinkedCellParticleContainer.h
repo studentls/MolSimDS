@@ -32,7 +32,7 @@ private:
 	/// vector containing X, Y, (Z) size of each cell
 	utils::Vector<double, dim>			cellSize;
 
-	/// vector containg count of cells in X, Y, (Z) direction
+	/// vector containing count of cells in X, Y, (Z) direction
 	utils::Vector<unsigned int, dim>	cellCount;
 
 	/// get total cell count
@@ -53,7 +53,7 @@ private:
 	/// v-----|-----|-----|-----|-----|
 	utils::Vector<double, dim>			frontLowerLeftCorner;
 
-	/// a dynamic array, containg all Cells encoded in a 1D array
+	/// a dynamic array, containing all Cells encoded in a 1D array
 	std::vector<Particle>				*Cells;
 	
 	/// ???

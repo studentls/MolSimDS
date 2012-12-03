@@ -48,7 +48,7 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	//method
 	
 	// use LinkedCell
-	particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 20); 
+	particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 1); 
 
 	// use standard
 	//particles = new ListParticleContainer(PC.getParticles());
@@ -99,6 +99,7 @@ err_type Simulation::Run()
 		// perform one iteration step
 		performStep();
 
+		// TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % 10 == 0) {
 			plotParticles(iteration);
