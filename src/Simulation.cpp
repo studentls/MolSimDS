@@ -19,6 +19,9 @@
 
 using namespace std;
 
+//ugly start
+int g_i;
+
 err_type Simulation::Init(const SimulationDesc& desc)
 {
 	this->desc = desc;
@@ -26,6 +29,7 @@ err_type Simulation::Init(const SimulationDesc& desc)
 	// clear particles if it is not already empty
 	if(particles)if(!particles->IsEmpty())particles->Clear();
 
+	g_i = 0;
 
 	return S_OK;
 }
@@ -75,6 +79,32 @@ void Simulation::performStep()
 	calculateV();
 }
 
+void Simulation::Step()
+{
+	if(g_i < (desc.end_time - desc.start_time) / desc.delta_t)
+	{
+		// set common statistical values...
+		statistics.particle_count = particles->getParticleCount();
+		statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
+
+		// output that calculation have started ("starting calculation...")
+		//LOG4CXX_TRACE(simulationLogger, "starting calculation...");
+
+		//start timer
+		utils::Timer timer;
+
+		// perform one iteration step
+			performStep();
+
+		//generate statistical data
+		statistics.time += timer.getElapsedTime();
+		statistics.timeperstep = statistics.time / statistics.step_count;
+			// output that an iteration has finished
+			if(g_i % 5 == 0)
+			LOG4CXX_TRACE(simulationLogger, "Iteration " << g_i << " finished.");
+		g_i++;
+	}
+}
 err_type Simulation::Run()
 {
 	assert(particles);
@@ -107,9 +137,15 @@ err_type Simulation::Run()
 		if (iteration % 10 == 0) {
 			plotParticles(iteration);
 			
+#ifndef DEBUG
 			// output that an iteration has finished
 			if(iteration % 25 == 0)
 			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
+#else
+			// output that an iteration has finished
+			if(iteration % 5 == 0)
+			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
+#endif
 		}
 		
 		// increment loop values

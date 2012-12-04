@@ -94,6 +94,15 @@ public:
 
 	/// cleans up
 	err_type			Release();	
+
+
+	/// for test reasons...
+	/// step one forward
+	void				Step() {
+		
+		if(sim)sim->Step();
+		}
+	std::vector<Particle> getParticles()	{if(sim)return sim->getParticles();}
 };
 
 #endif

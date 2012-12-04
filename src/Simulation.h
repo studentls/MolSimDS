@@ -165,6 +165,12 @@ public:
 	/// get statistics
 	/// @return statistical data about the simulation
 	SimulationStatistics&	getStatistics()	{return this->statistics;}
+
+
+	//ugly test 
+	void	Step();
+
+	std::vector<Particle> getParticles()	{return this->particles->getParticles();}
 };
 
 

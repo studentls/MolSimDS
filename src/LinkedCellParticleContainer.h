@@ -343,7 +343,11 @@ private:
 							halo.push_back(p);
 						else {
 							int index = Index2DTo1D(xIndex, yIndex);
+							int s = Cells[index].size();
+							
 							Cells[index].push_back(p);
+
+							 s = Cells[index].size();
 						}
 
 						// remove particle from current cell (i-th cell)
@@ -707,6 +711,8 @@ public:
 		// clear if necessary
 		if(!p.empty())p.clear();
 
+		
+		/*
 		// add halo...
 		//p.insert(p.end(), halo.begin(), halo.end());
 
@@ -716,6 +722,22 @@ public:
 		for(int i = 0; i < getCellCount(); i++)
 		{
 			p.insert(p.end(), Cells[i].begin(), Cells[i].end());
+		}
+
+		*/
+
+
+		// test wise
+
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			if(!Cells[i].empty())for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			{
+				//p.insert(p.end(), Cells[i].begin(), Cells[i].end());
+				Particle pt = *it;
+				pt.type = i % 16; //4 colors!
+				p.push_back(pt);
+			}
 		}
 
 		return p;
