@@ -343,11 +343,7 @@ private:
 							halo.push_back(p);
 						else {
 							int index = Index2DTo1D(xIndex, yIndex);
-							int s = Cells[index].size();
-							
 							Cells[index].push_back(p);
-
-							 s = Cells[index].size();
 						}
 
 						// remove particle from current cell (i-th cell)

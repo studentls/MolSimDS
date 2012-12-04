@@ -68,6 +68,19 @@ public:
 	/// compares two particles by their type, position, velocity, force and mass
 	bool operator == (Particle& other);
 
+	/// assignment operator
+	Particle& operator = (const Particle& p)
+	{
+		f		= p.f;
+		old_f	= p.old_f;
+		x		= p.x;
+		v		= p.v;
+		type	= p.type;
+		m		= p.m;
+
+		return *this;
+	}
+
 	/// print information about this Particle
 	std::string toString();
 };
