@@ -97,6 +97,20 @@ private:
 		return x + cellCount[0] * (y + z * cellCount[1]);
 	}
 
+	/// helper function to calculate the extent of the simulation area
+	/// @return returns the extent of the Simulation area as a 3D vector, note that even if a 2D Grid is used a 3D Vector will be returned
+	utils::Vector<double, 3> calcSimulationAreaExtent()
+	{
+		utils::Vector<double, 3> res;
+
+		// calc based on number of cells in each dimension and their individual extent
+		for(int i = 0; i < dim; i++)
+		{
+			res[i] = cellCount[i] * cellSize[i];
+		}
+
+		return res;
+	}
 
 	/// generate Index Pairs according to cellCount
 	// TODO: write a testcase about this function
@@ -159,7 +173,7 @@ private:
 		// TODO: testing and debugging
 		if (dim == 2) {
 			if (leftReflectiveBoundary || rightReflectiveBoundary)
-				for (int y = 0; y < cellNumbers[1]; y++) {
+				for (int y = 0; y < cellCount[1]; y++) {
 					if (leftReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
@@ -167,20 +181,20 @@ private:
 						vec[1] = 0;
 						vec[2] = -1.0;
 						vec[3] = frontLowerLeftCorner[0];
-						reflectiveBoundaryCells.push_back(vec)
+						reflectiveBoundaryCells.push_back(vec);
 					}
 					if (rightReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
-						vec[0] = Index2DTo1D(cellNumbers[0] - 1, y);;
+						vec[0] = Index2DTo1D(cellCount[0] - 1, y);;
 						vec[1] = 0;
 						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
-						reflectiveBoundaryCells.push_back(vec)
+						vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
+						reflectiveBoundaryCells.push_back(vec);
 					}
 				}
 			if (frontReflectiveBoundary || backReflectiveBoundary)
-				for (int x = 0; x < cellNumbers[0]; x++) {
+				for (int x = 0; x < cellCount[0]; x++) {
 					if (frontReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
@@ -188,23 +202,23 @@ private:
 						vec[1] = 1;
 						vec[2] = -1.0;
 						vec[3] = frontLowerLeftCorner[1];
-						reflectiveBoundaryCells.push_back(vec)
+						reflectiveBoundaryCells.push_back(vec);
 					}
 					if (backReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
-						vec[0] = Index2DTo1D(x, cellNumbers[1] - 1);
+						vec[0] = Index2DTo1D(x, cellCount[1] - 1);
 						vec[1] = 1;
 						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
-						reflectiveBoundaryCells.push_back(vec)
+						vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
+						reflectiveBoundaryCells.push_back(vec);
 					}
 				}
 		}
 	else if (dim == 3) {
 			if (leftReflectiveBoundary || rightReflectiveBoundary)
-				for (int y = 0; y < cellNumbers[1]; y++)
-					for (int z = 0; z < cellNumbers[2]; z++) {
+				for (int y = 0; y < cellCount[1]; y++)
+					for (int z = 0; z < cellCount[2]; z++) {
 						if (leftReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
@@ -212,21 +226,21 @@ private:
 							vec[1] = 0;
 							vec[2] = -1.0;
 							vec[3] = frontLowerLeftCorner[0];
-							reflectiveBoundaryCells.push_back(vec)
+							reflectiveBoundaryCells.push_back(vec);
 						}
 						if (rightReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(cellNumbers[0] - 1, y, z);
+							vec[0] = Index3DTo1D(cellCount[0] - 1, y, z);
 							vec[1] = 0;
 							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
-							reflectiveBoundaryCells.push_back(vec)
+							vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
+							reflectiveBoundaryCells.push_back(vec);
 						}
 					}
 		if (frontReflectiveBoundary || backReflectiveBoundary)
-				for (int x = 0; x < cellNumbers[0]; x++)
-					for (int z = 0; z < cellNumbers[2]; z++) {
+				for (int x = 0; x < cellCount[0]; x++)
+					for (int z = 0; z < cellCount[2]; z++) {
 						if (frontReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
@@ -234,21 +248,21 @@ private:
 							vec[1] = 1;
 							vec[2] = -1.0;
 							vec[3] = frontLowerLeftCorner[1];
-							reflectiveBoundaryCells.push_back(vec)
+							reflectiveBoundaryCells.push_back(vec);
 						}
 						if (backReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(x, cellNumbers[1] - 1, z);
+							vec[0] = Index3DTo1D(x, cellCount[1] - 1, z);
 							vec[1] = 1;
 							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
-							reflectiveBoundaryCells.push_back(vec)
+							vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
+							reflectiveBoundaryCells.push_back(vec);
 						}
 					}
 			if (bottomReflectiveBoundary || topReflectiveBoundary)
-				for (int x = 0; x < cellNumbers[0]; x++)
-					for (int y = 0; y < cellNumbers[1]; y++) {
+				for (int x = 0; x < cellCount[0]; x++)
+					for (int y = 0; y < cellCount[1]; y++) {
 						if (bottomReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
@@ -256,21 +270,19 @@ private:
 							vec[1] = 2;
 							vec[2] = -1.0;
 							vec[3] = frontLowerLeftCorner[2];
-							reflectiveBoundaryCells.push_back(vec)
+							reflectiveBoundaryCells.push_back(vec);
 						}
 						if (topReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(x, y, cellNumbers[2] - 1);
+							vec[0] = Index3DTo1D(x, y, cellCount[2] - 1);
 							vec[1] = 2;
 							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[2] + simulationAreaExtent[2];
-							reflectiveBoundaryCells.push_back(vec)
+							vec[3] = frontLowerLeftCorner[2] + calcSimulationAreaExtent()[2];
+							reflectiveBoundaryCells.push_back(vec);
 						}
 					}
 		}
-		else
-			throw new Exception("Error setting the reflectiveBoundaries");
 	}
 
 
@@ -405,13 +417,20 @@ public:
 								const double cutoffDistance,
 								utils::Vector<double, dim> frontLowerLeftCorner,
 								utils::Vector<double, dim> simulationAreaExtent,
-								int iterationsPerParticleToCellReassignment
-								)
+								int iterationsPerParticleToCellReassignment,
+								bool leftReflectiveBoundary, bool rightReflectiveBoundary,
+								bool frontReflectiveBoundary, bool backReflectiveBoundary,
+								// these two will be ignored in the two-dimensional case
+								bool bottomReflectiveBoundary, bool topReflectiveBoundary,
+								double sigma)
 	{
 		// set to zero, so Init doesn't crash...
 		Cells = NULL;
 
-		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, iterationsPerParticleToCellReassignment);		
+		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, iterationsPerParticleToCellReassignment,
+			leftReflectiveBoundary, rightReflectiveBoundary,
+								frontReflectiveBoundary, backReflectiveBoundary,
+								bottomReflectiveBoundary, topReflectiveBoundary, sigma);		
 	}
 
 	/// init function taking a lot of arguments
@@ -424,8 +443,7 @@ public:
 											 bool frontReflectiveBoundary, bool backReflectiveBoundary,
 											 // these two will be ignored in the two-dimensional case
 											 bool bottomReflectiveBoundary, bool topReflectiveBoundary,
-											 double sigma
-											 )
+											 double sigma)
 	{
 		// member initialization
 		this->iterationCount = 0;
@@ -588,6 +606,8 @@ public:
 			else
 				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
 					for (std::vector<Particle>::iterator it2 = it1 + 1 ; it2 < Cells[pair[1]].end(); it2++)
+					// make sure that a Particle is not paired with itself
+					if (it1 != it2)			
 					{
 						// call the function on the pair of Particles
 						Particle& p1 = *it1;

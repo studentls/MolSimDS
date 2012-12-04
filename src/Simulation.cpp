@@ -145,8 +145,8 @@ void Simulation::calculateF() {
 	// also add forces from boundary conditions if necessary
 
 	// TODO: typechecking in c++? only do this if it's a linkedCell
-	if ()
-		particles->ApplyReflectiveBoundaryConditions();
+//	if ()
+	//	particles->ApplyReflectiveBoundaryConditions();
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
