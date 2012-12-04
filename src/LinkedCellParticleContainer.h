@@ -334,7 +334,7 @@ public:
 		// assign the particles to their initial cells
 		AssignParticles(particles);
 	}
-	/*// applies the reflectove boundary condition to all cells that apply
+	/*// applies the reflective boundary condition to all cells that apply
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
 		// TODO: iterate over all elements of reflectiveBoundaryCells. This depends on the data type of reflectiveBoundaryCells
 		for () {
@@ -450,17 +450,15 @@ public:
 						}
 			else
 				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
-					for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 < Cells[pair[1]].end(); it2++)
-						// make sure that a Particle is not paired with itself
-						if (it1 != it2)
-						{
-							// call the function on the pair of Particles
-							Particle& p1 = *it1;
-							Particle& p2 = *it2;
-							//is distance squared less than cutoff radius squared?
-							if(p1.x.distanceSq(p2.x) < cutoffDistance*cutoffDistance)
-								(*func)(data, p1, p2);
-						}
+					for (std::vector<Particle>::iterator it2 = it1 + 1 ; it2 < Cells[pair[1]].end(); it2++)
+					{
+						// call the function on the pair of Particles
+						Particle& p1 = *it1;
+						Particle& p2 = *it2;
+						//is distance squared less than cutoff radius squared?
+						if(p1.x.distanceSq(p2.x) < cutoffDistance*cutoffDistance)
+							(*func)(data, p1, p2);
+					}
 		}
 
 		// inc counter for iterations, if needed reassign particles in cells...
