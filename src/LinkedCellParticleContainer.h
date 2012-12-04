@@ -94,7 +94,7 @@ private:
 	/// note that indices should be asserted!
 	inline unsigned int Index3DTo1D(unsigned int x, unsigned int y, unsigned int z)
 	{
-		return x + y * (cellCount[0] + z * cellCount[1]);
+		return x + cellCount[0] * (y + z * cellCount[1]);
 	}
 
 
@@ -163,7 +163,7 @@ private:
 					if (leftReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
-						vec[0] = y * cellNumbers[0];
+						vec[0] = Index2DTo1D(0, y);
 						vec[1] = 0;
 						vec[2] = -1.0;
 						vec[3] = frontLowerLeftCorner[0];
@@ -172,7 +172,7 @@ private:
 					if (rightReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
-						vec[0] = y * cellNumbers[0] + (cellNumbers[0] - 1);
+						vec[0] = Index2DTo1D(cellNumbers[0] - 1, y);;
 						vec[1] = 0;
 						vec[2] = 1.0;
 						vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
@@ -184,7 +184,7 @@ private:
 					if (frontReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
-						vec[0] = x;
+						vec[0] = Index2DTo1D(x, 0);
 						vec[1] = 1;
 						vec[2] = -1.0;
 						vec[3] = frontLowerLeftCorner[1];
@@ -193,7 +193,7 @@ private:
 					if (backReflectiveBoundary) {
 						// temp variable
 						utils::Vector<double, 4> vec;
-						vec[0] = (cellNumbers[1] - 1) * cellNumbers[0] + x;
+						vec[0] = Index2DTo1D(x, cellNumbers[1] - 1);
 						vec[1] = 1;
 						vec[2] = 1.0;
 						vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
@@ -208,7 +208,7 @@ private:
 						if (leftReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + 0;
+							vec[0] = Index3DTo1D(0, y, z);
 							vec[1] = 0;
 							vec[2] = -1.0;
 							vec[3] = frontLowerLeftCorner[0];
@@ -217,7 +217,7 @@ private:
 						if (rightReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + (cellNumbers[0] - 1);
+							vec[0] = Index3DTo1D(cellNumbers[0] - 1, y, z);
 							vec[1] = 0;
 							vec[2] = 1.0;
 							vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
@@ -230,7 +230,7 @@ private:
 						if (frontReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = (z * cellNumbers[1] + 0) * cellNumbers[0] + x;
+							vec[0] = Index3DTo1D(x, 0, z);
 							vec[1] = 1;
 							vec[2] = -1.0;
 							vec[3] = frontLowerLeftCorner[1];
@@ -239,7 +239,7 @@ private:
 						if (backReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = (z * cellNumbers[1] + (cellNumbers[1] - 1)) * cellNumbers[0] + x;
+							vec[0] = Index3DTo1D(x, cellNumbers[1] - 1, z);
 							vec[1] = 1;
 							vec[2] = 1.0;
 							vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
@@ -252,7 +252,7 @@ private:
 						if (bottomReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = y * cellNumbers[0] + x;
+							vec[0] = Index3DTo1D(x, y, 0);
 							vec[1] = 2;
 							vec[2] = -1.0;
 							vec[3] = frontLowerLeftCorner[2];
@@ -261,7 +261,7 @@ private:
 						if (topReflectiveBoundary) {
 							// temp variable
 							utils::Vector<double, 4> vec;
-							vec[0] = ((cellNumbers[2] -1) * cellNumbers[1] + y) * cellNumbers[0] + x;
+							vec[0] = Index3DTo1D(x, y, cellNumbers[2] - 1);
 							vec[1] = 2;
 							vec[2] = 1.0;
 							vec[3] = frontLowerLeftCorner[2] + simulationAreaExtent[2];
@@ -470,15 +470,18 @@ public:
 	
 	/// applies the reflective boundary condition to all cells that apply
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
-		// TODO: iterate over all elements of reflectiveBoundaryCells. This depends on the data type of reflectiveBoundaryCells
-		for () {
-			std::vector<Particle> cell = cells[(int)(elem[0])];
+		for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
+		{
+			// TODO: this should obviously work by reference to the array, not copy it
+			// does it do that right now?
+			std::vector<Particle>& cell = cells[(int)(elem[0])];
 			int axis = (int)(elem[1]);
 			double direction = elem[2];
 			double border = elem[3];
 			for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
 				Particle& p = *it;
 				double dist = direction * (border - p.x[axis]);
+				// skip the particle if it is too far away from the border
 				if (dist > reflectiveBoundaryDistance)
 					continue;
 				// create a temporary, virtual Particle
