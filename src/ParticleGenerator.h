@@ -46,9 +46,9 @@ public:
 		Particle p;
 
 		// go through mesh grid...
-		for(int x = 0; x < dimensions[0]; x++)
-			for(int y = 0; y < dimensions[1]; y++)
-				for(int z = 0; z < dimensions[2]; z++)
+		for(unsigned int x = 0; x < dimensions[0]; x++)
+			for(unsigned int y = 0; y < dimensions[1]; y++)
+				for(unsigned int z = 0; z < dimensions[2]; z++)
 				{
 					p.x[0]	= vLowerLeftFrontCorner[0] + x * meshWidth;
 					p.x[1]	= vLowerLeftFrontCorner[1] + y * meshWidth;

@@ -27,8 +27,8 @@ Particle::Particle(const Particle& other) {
 }
 
 // Todo: maybe use initializater list instead of copy?
-Particle::Particle(	utils::Vector<double, 3> x_arg,
-	        utils::Vector<double, 3> v_arg,
+Particle::Particle(const	utils::Vector<double, 3>& x_arg,
+	        const utils::Vector<double, 3>& v_arg,
 	        double m_arg,
 	        int type_arg
 ) {

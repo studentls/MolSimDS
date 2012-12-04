@@ -58,6 +58,8 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
 
+	calculateV();
+
 	return S_OK;
 }
 
@@ -139,6 +141,7 @@ err_type Simulation::Release()
 void Simulation::calculateF() {
 	// call particles.Iterate() on forceResetter
 	particles->Iterate(forceResetter, (void*)&desc);
+
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
 

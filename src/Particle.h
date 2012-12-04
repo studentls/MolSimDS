@@ -32,8 +32,8 @@ public:
 	Particle(
 			/// for visualization, we need always 3 coordinates
 			/// -> in case of 2d, we use only the first and the second
-			utils::Vector<double, 3> x_arg,
-	        utils::Vector<double, 3> v_arg,
+			const utils::Vector<double, 3>& x_arg,
+	        const utils::Vector<double, 3>& v_arg,
 	        double m_arg,
 	        int type = 0
 	);

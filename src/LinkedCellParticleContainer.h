@@ -344,10 +344,6 @@ private:
 						else {
 							int index = Index2DTo1D(xIndex, yIndex);
 							Cells[index].push_back(p);
-							if(abs(index - i) > 100)
-							{
-								int shgjks = 0;
-							}
 						}
 
 						// remove particle from current cell (i-th cell)
@@ -401,7 +397,7 @@ public:
 		iterationCount = 0;
 		cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
-		iterationsPerParticleToCellReassignment = 1;
+		iterationsPerParticleToCellReassignment = 2;
 	}
 
 	/// destructor
@@ -588,6 +584,7 @@ public:
 
 			// are cells valid? - if not next iteration
 			// TODO: doesn't this problem resolve itself if it's ignored? This is an unnecessary check that just costs time
+			// Answer: no it doesn't! if we try to iterate over an empty vector, this will cause an error!
 			if(Cells[pair[0]].empty() || Cells[pair[1]].empty())continue;
 
 			// calc data for a pair (a, b) where a != b
@@ -600,9 +597,10 @@ public:
 							Particle& p2 = *it2;
 
 							//is distance squared less than cutoff radius squared?
-							if(p1.x.distanceSq(p2.x) < cutoffDistance*cutoffDistance)
+							if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
 								(*func)(data, p1, p2);
 						}
+			// calc data for a pair (a, a)
 			else
 				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
 					for (std::vector<Particle>::iterator it2 = it1 + 1 ; it2 < Cells[pair[1]].end(); it2++)
@@ -613,7 +611,7 @@ public:
 						Particle& p1 = *it1;
 						Particle& p2 = *it2;
 						//is distance squared less than cutoff radius squared?
-						if(p1.x.distanceSq(p2.x) < cutoffDistance*cutoffDistance)
+						if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
 							(*func)(data, p1, p2);
 					}
 		}
