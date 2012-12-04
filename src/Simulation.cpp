@@ -48,7 +48,8 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	//method
 	
 	// use LinkedCell
-	particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 1); 
+	particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 1,
+		true, true, true, true, true, true, 1.0); 
 
 	// use standard
 	//particles = new ListParticleContainer(PC.getParticles());
@@ -140,6 +141,12 @@ void Simulation::calculateF() {
 	particles->Iterate(forceResetter, (void*)&desc);
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
+
+	// also add forces from boundary conditions if necessary
+
+	// TODO: typechecking in c++? only do this if it's a linkedCell
+	if ()
+		particles->ApplyReflectiveBoundaryConditions();
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {

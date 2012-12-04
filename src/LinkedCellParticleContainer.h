@@ -71,6 +71,17 @@ private:
 	
 	/// count of iterations so far, note this variable is incremented every time Iterate or (!) IteratePairwise is called!
 	int	iterationCount;
+	
+	/// the distance below which reflective boundaries reflect
+	double reflectiveBoundaryDistance;
+
+	// each double in the Vector means something different
+	// 0, int: the cell
+	// 1, int: the axis
+	// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
+	// 3, double: the border's coordinate on the given axis, in the given direction
+	/// store what cells have reflective boundaries and of what type
+	std::vector<utils::Vector<double, 4>>	reflectiveBoundaryCells;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
@@ -137,6 +148,129 @@ private:
 										cellPairs.push_back(pair);
 									}
 		}
+	}
+	
+	/// define the reflective boundary cells
+	void	SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
+									bool frontReflectiveBoundary, bool backReflectiveBoundary,
+									// these two will be ignored in the two-dimensional case
+									bool bottomReflectiveBoundary, bool topReflectiveBoundary)
+	{
+		// TODO: testing and debugging
+		if (dim == 2) {
+			if (leftReflectiveBoundary || rightReflectiveBoundary)
+				for (int y = 0; y < cellNumbers[1]; y++) {
+					if (leftReflectiveBoundary) {
+						// temp variable
+						utils::Vector<double, 4> vec;
+						vec[0] = y * cellNumbers[0];
+						vec[1] = 0;
+						vec[2] = -1.0;
+						vec[3] = frontLowerLeftCorner[0];
+						reflectiveBoundaryCells.push_back(vec)
+					}
+					if (rightReflectiveBoundary) {
+						// temp variable
+						utils::Vector<double, 4> vec;
+						vec[0] = y * cellNumbers[0] + (cellNumbers[0] - 1);
+						vec[1] = 0;
+						vec[2] = 1.0;
+						vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
+						reflectiveBoundaryCells.push_back(vec)
+					}
+				}
+			if (frontReflectiveBoundary || backReflectiveBoundary)
+				for (int x = 0; x < cellNumbers[0]; x++) {
+					if (frontReflectiveBoundary) {
+						// temp variable
+						utils::Vector<double, 4> vec;
+						vec[0] = x;
+						vec[1] = 1;
+						vec[2] = -1.0;
+						vec[3] = frontLowerLeftCorner[1];
+						reflectiveBoundaryCells.push_back(vec)
+					}
+					if (backReflectiveBoundary) {
+						// temp variable
+						utils::Vector<double, 4> vec;
+						vec[0] = (cellNumbers[1] - 1) * cellNumbers[0] + x;
+						vec[1] = 1;
+						vec[2] = 1.0;
+						vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
+						reflectiveBoundaryCells.push_back(vec)
+					}
+				}
+		}
+	else if (dim == 3) {
+			if (leftReflectiveBoundary || rightReflectiveBoundary)
+				for (int y = 0; y < cellNumbers[1]; y++)
+					for (int z = 0; z < cellNumbers[2]; z++) {
+						if (leftReflectiveBoundary) {
+							// temp variable
+							utils::Vector<double, 4> vec;
+							vec[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + 0;
+							vec[1] = 0;
+							vec[2] = -1.0;
+							vec[3] = frontLowerLeftCorner[0];
+							reflectiveBoundaryCells.push_back(vec)
+						}
+						if (rightReflectiveBoundary) {
+							// temp variable
+							utils::Vector<double, 4> vec;
+							vec[0] = (z * cellNumbers[1] + y) * cellNumbers[0] + (cellNumbers[0] - 1);
+							vec[1] = 0;
+							vec[2] = 1.0;
+							vec[3] = frontLowerLeftCorner[0] + simulationAreaExtent[0];
+							reflectiveBoundaryCells.push_back(vec)
+						}
+					}
+		if (frontReflectiveBoundary || backReflectiveBoundary)
+				for (int x = 0; x < cellNumbers[0]; x++)
+					for (int z = 0; z < cellNumbers[2]; z++) {
+						if (frontReflectiveBoundary) {
+							// temp variable
+							utils::Vector<double, 4> vec;
+							vec[0] = (z * cellNumbers[1] + 0) * cellNumbers[0] + x;
+							vec[1] = 1;
+							vec[2] = -1.0;
+							vec[3] = frontLowerLeftCorner[1];
+							reflectiveBoundaryCells.push_back(vec)
+						}
+						if (backReflectiveBoundary) {
+							// temp variable
+							utils::Vector<double, 4> vec;
+							vec[0] = (z * cellNumbers[1] + (cellNumbers[1] - 1)) * cellNumbers[0] + x;
+							vec[1] = 1;
+							vec[2] = 1.0;
+							vec[3] = frontLowerLeftCorner[1] + simulationAreaExtent[1];
+							reflectiveBoundaryCells.push_back(vec)
+						}
+					}
+			if (bottomReflectiveBoundary || topReflectiveBoundary)
+				for (int x = 0; x < cellNumbers[0]; x++)
+					for (int y = 0; y < cellNumbers[1]; y++) {
+						if (bottomReflectiveBoundary) {
+							// temp variable
+							utils::Vector<double, 4> vec;
+							vec[0] = y * cellNumbers[0] + x;
+							vec[1] = 2;
+							vec[2] = -1.0;
+							vec[3] = frontLowerLeftCorner[2];
+							reflectiveBoundaryCells.push_back(vec)
+						}
+						if (topReflectiveBoundary) {
+							// temp variable
+							utils::Vector<double, 4> vec;
+							vec[0] = ((cellNumbers[2] -1) * cellNumbers[1] + y) * cellNumbers[0] + x;
+							vec[1] = 2;
+							vec[2] = 1.0;
+							vec[3] = frontLowerLeftCorner[2] + simulationAreaExtent[2];
+							reflectiveBoundaryCells.push_back(vec)
+						}
+					}
+		}
+		else
+			throw new Exception("Error setting the reflectiveBoundaries");
 	}
 
 
@@ -245,19 +379,6 @@ private:
 	//int iterationsToCellReassignmentLeft;
 
 
-	// Deprecated ...
-	// each double in the Vector means something different
-	// 0, int: the cell
-	// 1, int: the axis
-	// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
-	// 3, double: the border's coordinate on the given axis, in the given direction
-	// TODO: question: is it possible to save an int in a slot that takes a double without manual conversion? Works in c#, unsure about c++
-	///List<utils::Vector<double, 4>> reflectiveBoundaryCells;
-	
-	// TODO: initialize this
-	//double reflectiveBoundaryDistance;
-	// TODO: set reflectiveBoundaryCells; depends on how the value is taken as a constructor parameter
-
 	
 
 public:
@@ -267,6 +388,7 @@ public:
 		Cells = NULL;
 		iterationCount = 0;
 		cutoffDistance = 0.0;
+		reflectiveBoundaryDistance = 0;
 		iterationsPerParticleToCellReassignment = 1;
 	}
 
@@ -297,7 +419,12 @@ public:
 											 const double cutoffDistance,
 											 utils::Vector<double, dim> frontLowerLeftCorner,
 											 utils::Vector<double, dim> simulationAreaExtent,
-											 int iterationsPerParticleToCellReassignment
+											 int iterationsPerParticleToCellReassignmentbool,
+											 bool leftReflectiveBoundary, bool rightReflectiveBoundary,
+											 bool frontReflectiveBoundary, bool backReflectiveBoundary,
+											 // these two will be ignored in the two-dimensional case
+											 bool bottomReflectiveBoundary, bool topReflectiveBoundary,
+											 double sigma
 											 )
 	{
 		// member initialization
@@ -305,6 +432,7 @@ public:
 		this->cutoffDistance = cutoffDistance;
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->iterationsPerParticleToCellReassignment = iterationsPerParticleToCellReassignment;
+		this->reflectiveBoundaryDistance = sigma * 1.1225;
 
 
 		// calc number of cells in each dimension, note that we are rounding down
@@ -333,8 +461,14 @@ public:
 		
 		// assign the particles to their initial cells
 		AssignParticles(particles);
+
+		// set the reflective boundary conditions
+		SetReflectiveBoundaries(leftReflectiveBoundary, rightReflectiveBoundary,
+								frontReflectiveBoundary, backReflectiveBoundary,
+								bottomReflectiveBoundary, topReflectiveBoundary);
 	}
-	/*// applies the reflective boundary condition to all cells that apply
+	
+	/// applies the reflective boundary condition to all cells that apply
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
 		// TODO: iterate over all elements of reflectiveBoundaryCells. This depends on the data type of reflectiveBoundaryCells
 		for () {
@@ -355,7 +489,7 @@ public:
 			}
 		}
 	}
-	*/
+
 	/// a method to add a Particle to the LinkedCellParticleContainer
 	void AddParticle(const Particle& particle)
 	{
