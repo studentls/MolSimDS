@@ -309,6 +309,41 @@ private:
 
 	}
 
+	/// a method to check if all particles are properly assigned...
+	void CheckAssignment()
+	{
+		//only 2D!
+		if(dim != 2)return;
+
+		// go through all Cells
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			//go through every individual cell
+			if(Cells[i].empty())continue;
+
+			bool falseAssignment = false;
+
+			int xIndex = i % this->cellCount[0];
+			int yIndex = i / cellCount[0];
+			double xmin = this->frontLowerLeftCorner[0] + xIndex * cellSize[0];
+			double xmax = xmin + cellSize[1];
+			double ymin = this->frontLowerLeftCorner[1] + yIndex * cellSize[1];
+			double ymax = ymin + cellSize[1];
+
+			// go through particles and check if they are in boundaries
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
+			{
+				Particle p = *it;
+
+				if(p.x[0] < xmin)falseAssignment = true;
+				if(p.x[0] > xmax)falseAssignment = true;
+				if(p.x[1] < ymin)falseAssignment = true;
+				if(p.x[1] > ymax)falseAssignment = true;
+			}
+
+			if(falseAssignment)std::cout<<"Error:!!!! False Assignment"<<std::endl;
+		}
+	}
 	/// a method that reassigns the particles to the cells they belong to
 	/// note that this method should only be called every 'iterationsPerParticleToCellReassignment'th call
 	/// a good number for this must be determined experimentally for increased efficiency
@@ -380,6 +415,9 @@ private:
 				if(it != Cells[i].end())it++;
 			}
 		}
+
+		//test
+		this->CheckAssignment();
 	}
 
 	// Deprecated...
@@ -724,18 +762,24 @@ public:
 
 
 		// test wise
+		int filledCells = 0;
 
 		for(int i = 0; i < getCellCount(); i++)
 		{
-			if(!Cells[i].empty())for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			if(!Cells[i].empty())
 			{
-				//p.insert(p.end(), Cells[i].begin(), Cells[i].end());
-				Particle pt = *it;
-				pt.type = i % 16; //4 colors!
-				p.push_back(pt);
+					for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+					{
+						//p.insert(p.end(), Cells[i].begin(), Cells[i].end());
+						Particle pt = *it;
+						pt.type = i % 16; //4 colors!
+						p.push_back(pt);
+					}
+					filledCells++;
 			}
 		}
 
+		std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
 		return p;
 	}
 };

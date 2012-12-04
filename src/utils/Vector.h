@@ -46,6 +46,9 @@ private:
 public:
 	
 	Vector() {
+		for (int i = 0; i < length; i++) {
+			content[i] = 0;
+		}
 	}
 
 	Vector(type arg) {
