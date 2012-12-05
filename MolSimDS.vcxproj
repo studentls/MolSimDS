@@ -29,6 +29,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="$(ProgramFiles)\CodeSynthesis XSD 3.3\etc\vc-10.0\xsd-cxx-tree.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -40,6 +41,8 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <TargetName>molsym</TargetName>
+    <IncludePath>$(VCInstallDir)include;$(VCInstallDir)atlmfc\include;$(WindowsSdkDir)include;$(FrameworkSDKDir)\include</IncludePath>
+    <LibraryPath>$(VCInstallDir)lib;$(VCInstallDir)atlmfc\lib;$(WindowsSdkDir)lib;$(FrameworkSDKDir)\lib;C:\Program Files (x86)\CodeSynthesis XSD 3.3\lib\vc-10.0</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
@@ -52,7 +55,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\libxsd;%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -70,7 +73,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>.\libxsd;%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -101,6 +104,9 @@
     <ClInclude Include="src\utils\Timer.h" />
     <ClInclude Include="src\utils\utils.h" />
     <ClInclude Include="src\utils\Vector.h" />
+    <ClInclude Include="src\XMLFileReader.h" />
+    <ClInclude Include="src\XMLFileReaderTest.h" />
+    <ClInclude Include="src\XMLFile\simulationfile.hxx" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FileReader.cpp" />
@@ -117,8 +123,39 @@
     <ClCompile Include="src\outputWriter\XYZWriter.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
+    <ClCompile Include="src\XMLFileReader.cpp" />
+    <ClCompile Include="src\XMLFile\simulationfile.cxx" />
+  </ItemGroup>
+  <ItemGroup>
+    <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <FileType>XSD</FileType>
+      <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenInline>
+      <GenForward Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenForward>
+      <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenSerialization>
+      <GenOstream Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenOstream>
+      <RootElement Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </RootElement>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./src/XMLFile</OutDir>
+      <GenDoxygen Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenDoxygen>
+    </CXX_Tree_Mapping_Rule>
+    <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
+      <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenInline>
+      <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenSerialization>
+      <GenOstream Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenOstream>
+      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.h</HeaderSuffix>
+      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.cpp</SourceSuffix>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\src\outputWriter</OutDir>
+      <SubType>Designer</SubType>
+    </CXX_Tree_Mapping_Rule>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="example.xml" />
+    <None Include="listexample.xml" />
+    <None Include="sphereexample.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="$(ProgramFiles)\CodeSynthesis XSD 3.3\etc\vc-10.0\xsd-cxx-tree.targets" />
   </ImportGroup>
 </Project>

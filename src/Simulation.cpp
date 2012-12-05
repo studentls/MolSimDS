@@ -16,6 +16,8 @@
 #include "Simulation.h"
 #include "outputWriter/VTKWriter.h"
 #include "outputWriter/XYZWriter.h"
+#include "XMLFileReader.h"
+
 
 using namespace std;
 
@@ -25,69 +27,35 @@ err_type Simulation::Init(const SimulationDesc& desc)
 	this->desc = desc;
 
 	// clear particles if it is not already empty
-	if(particles)if(!particles->IsEmpty())particles->Clear();
+	Release();
+
 
 	return S_OK;
 }
 
-err_type Simulation::AddParticlesFromFile(const char *filename)
+err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 {
-	//assert(particles);
 
-	// read the file New !
-	//if(!particles->AddParticlesFromFileNew(filename))return E_FILEERROR;
+	XMLFileReader fr;
+
+	if(FAILED(fr.readFile(filename)))return E_FILEERROR;
+
+	this->desc = fr.getDescription();
+
+	// get container
+	Release(); // to free mem
+
+	fr.makeParticleContainer(&particles);
 	
-	// set up particles with some data...
-	utils::Vector<double, 3> extent;
-	extent[0] = 180;
-	extent[1] = 90;
+	// is particles a valid pointer? - If not file has not been parsed correctly...
+	if(!particles)return E_FILEERROR;
 
-	ListParticleContainer PC;
-	
-	//PC.AddParticlesFromFileNew(filename);
-	
-	
-	//test bench
-	utils::Vector<double, 3> start;
-	start[0] = 70.0;
-	start[1] = 60.0;
-	utils::Vector<double, 3> vel;
-	//vel[1] = -10.0;
-	utils::Vector<unsigned int, 3> dim;
-	dim[0] = 3;
-	dim[1] = 3;
-	dim[2] = 1;
-	ParticleGenerator::makeCuboid(PC, start, dim, 1.1125, 1.0, vel);
-
-	//method
-	
-	std::vector<Particle> temp = PC.getParticles();
-
-	//set id
-	int id = 0;
-	for(std::vector<Particle>::iterator it = temp.begin(); it != temp.end(); it++)
-	{
-
-		it->type = id;
-		id++;
-	}
-
-	// use LinkedCell
-	particles = new LinkedCellParticleContainer(2, temp, 3.0, utils::Vector<double,3>(0.0), extent, 2,	true, true, true, true, true, true, 1.0); 
-
-	// use standard
-	//particles = new ListParticleContainer(temp);
-
-
-	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
+	//calc initial forces...
 	calculateF();
 
-	temp = particles->getParticles();
-
-	calculateV();
-
 	return S_OK;
 }
+
 
 void Simulation::performStep()
 {
@@ -135,7 +103,7 @@ err_type Simulation::Run()
 		}
 		// TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
-		if (iteration % 10 == 0) {
+		if (iteration % desc.iterationsperoutput == 0) {
 			plotParticles(iteration);
 			
 #ifndef DEBUG
@@ -168,7 +136,7 @@ err_type Simulation::Run()
 err_type Simulation::Release()
 {
 	// delete Particle data
-	particles->Clear();
+	if(particles)particles->Clear();
 
 	SAFE_DELETE(particles);
 
@@ -181,12 +149,6 @@ void Simulation::calculateF() {
 
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
-
-	// also add forces from boundary conditions if necessary
-
-	// TODO: typechecking in c++? only do this if it's a linkedCell
-//	if ()
-	//	particles->ApplyReflectiveBoundaryConditions();
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
@@ -300,7 +262,6 @@ void Simulation::plotParticles(int iteration) {
 		{
 			// VTK Output
 			outputWriter::VTKWriter writer;
-			
 			writer.plotParticles(particles->getParticles(), out_name, iteration);
 			break;
 		}

@@ -81,7 +81,24 @@ namespace utils
 		return true;
 	}
 
+	/// gets file extension, e.g. for example.xml the string "xml" is returned
+	/// @param str input filename
+	/// @return file extension of str without dot
+	inline char*		getFileExtension(char *str)
+	{
+		int iLastDot = -1;
+		int	iChar = strlen(str);
 
+		//letzten Backslash suchen
+		while(iChar != 0)
+		{
+			if(str[iChar] == '.')iLastDot = iChar;
+			iChar--;
+		}
+
+		//String zurückgeben
+		return str + iLastDot + 1;
+	}
 
 }
 

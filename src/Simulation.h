@@ -38,15 +38,18 @@ enum SimulationOutputFormat
 /// @param end_time end time of simulation
 /// @param gravitational_constant the gravitational constant used in the Simulation
 /// @param output_fmt specify OutputFormat, use SOF_NONE for no output
+/// @param iterationsperoutput after iterationsperoutput iterations, the simulation will output data
 struct SimulationDesc
 {
-	double	delta_t;
-	double	start_time;
-	double	end_time;
+	double				delta_t;
+	double				start_time;
+	double				end_time;
 	
-	double	brownianMotionFactor;
-	double	epsilon;
-	double	sigma;
+	double				brownianMotionFactor;
+	double				epsilon;
+	double				sigma;
+
+	unsigned int		iterationsperoutput;
 
 	// DEPRECATED
 	// this value may be renamed appropriately in a later version
@@ -66,6 +69,8 @@ struct SimulationDesc
 	    brownianMotionFactor = 0.1;
 		epsilon = 5.0;
 		sigma = 1.0;
+
+		iterationsperoutput = 10;
 
 		// DEPRECATED
 		//gravitational_constant = 1.0;
@@ -101,14 +106,6 @@ private:
 	SimulationStatistics	statistics;
 
 	/// stores the particles used in this Simulation
-	
-	// old
-	// ListParticleContainer	particles;
-
-	// new
-	//LinkedCellParticleContainer<2>	particles;
-
-	/// the particle container
 	ParticleContainer		*particles;
 
 	/// performs one time step based on delta_t
@@ -149,10 +146,10 @@ public:
 	/// @return returns always S_OK, 
 	err_type				Init(const SimulationDesc& desc);
 
-	/// adds Particles to particle list from file
-	/// @param filename particle file, has to use .txt format
+	/// parses an .xml file according to simulationfile.xsd and creates based on this file a simulation with settings & data
+	/// @param filename xml file, must have .xml ending
 	/// @return returns S_OK if file could be loaded successfully, otherwise E_FILEERROR
-	err_type				AddParticlesFromFile(const char *filename);
+	err_type				CreateSimulationFromXMLFile(const char *filename);
 
 	/// runs Simulation according to settings given by Init
 	/// @return returns S_OK or E_NOTINITIALIZED if particle data is empty
@@ -165,12 +162,6 @@ public:
 	/// get statistics
 	/// @return statistical data about the simulation
 	SimulationStatistics&	getStatistics()	{return this->statistics;}
-
-
-	//ugly test 
-	void	Step();
-
-	std::vector<Particle> getParticles()	{return this->particles->getParticles();}
 };
 
 

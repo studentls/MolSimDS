@@ -738,7 +738,6 @@ public:
 		{
 			if(!Cells[i].empty())sum += Cells[i].size();
 		}
-
 		return sum;
 	}
 	

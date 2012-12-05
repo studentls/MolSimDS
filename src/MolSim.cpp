@@ -21,6 +21,7 @@ using namespace utils;
 
 //CPPUNIT's ugly static variable hiding concept...
 CPPUNIT_TEST_SUITE_REGISTRATION(ParticleContainerTest);
+CPPUNIT_TEST_SUITE_REGISTRATION(XMLFileReaderTest);
 
 err_type MolSim::Init(int argc, char *argsv[])
 {
@@ -47,42 +48,15 @@ err_type MolSim::Init(int argc, char *argsv[])
 	// just to make it look cool!
 	srand((unsigned int)timer.getElapsedTime() + 0x362f0824);
 
+	// the value desc should be later removed from Init!
+
 	// set desc
 	SimulationDesc desc;
-
-	desc.output_fmt = SOF_VTK;
-	desc.start_time = 0.0;
-	desc.end_time = atof(argsv[2]);
-	desc.delta_t = atof(argsv[3]);
-
-	// test if input values make sense...
-	int nSteps = (desc.end_time - desc.start_time) / desc.delta_t;
-
-	//if more than 1000000 steps warn user
-	if(nSteps > 1000000)
-	{
-		LOG4CXX_INFO(generalOutputLogger, " >> The Simulation will need approximately "<<nSteps<<" steps to finish");
-		LOG4CXX_INFO(generalOutputLogger, "    finishing calculation may take a very long time, proceed ? (y/n)");
-		std::string s;
-		cin>>s;
-		LOG4CXX_INFO(generalOutputLogger, "input: " << s);
-
-		if(s[0] == 'y') {
-			//...
-		}
-		else if(s[0] == 'n')return E_INVALIDPARAM;
-		else 
-		{
-			LOG4CXX_INFO(generalOutputLogger, " >> please enter next time (y/n)");
-			return E_INVALIDPARAM;
-		}
-		
-	}
-
 	
 	if(FAILED(sim->Init(desc)))return E_UNKNOWN;
 
-	if(FAILED(sim->AddParticlesFromFile(argsv[1])))return E_INVALIDPARAM;
+	// use xml file
+	if(FAILED(sim->CreateSimulationFromXMLFile(argsv[1])))return E_INVALIDPARAM;
 
 	return S_OK;
 }
@@ -138,9 +112,9 @@ err_type MolSim::Release()
 ///			returns E_FILENOTFOUND if no file exists
 err_type MolSim::parseLine(int argc, char *argsv[])
 {
-	// Syntax is molsim scene.txt t_end delta_t
+	// Syntax is molsim scene.xml
 	// where t_end and delta_t denote a floating point value
-	if(argc != 4 && argc != 2 && argc != 3)
+	if(argc != 2 && argc != 3)
 	{
 		LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid count of arguments");
 		printUsage();
@@ -158,9 +132,28 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_SHOWTESTS;
 		else
 		{
-			LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid argument");
-			printUsage();
-			return E_INVALIDPARAM;
+			// parse file
+
+			// check if file exists
+			if(!fileExists(argsv[1]))
+			{
+				LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
+				printUsage();
+				return E_FILENOTFOUND;
+			}
+
+			// has file correct ending?
+			if(strcmp(utils::getFileExtension(argsv[1]), "xml") != 0)
+			{
+				LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
+				printUsage();
+				return E_FILEERROR;
+			}
+
+			//everything ok...
+
+			//run Simulation
+			state = AS_SIMULATION;
 		}
 	}
 	else if(argc == 3)
@@ -177,35 +170,6 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			return E_INVALIDPARAM;
 		}
 	}
-	else
-	{
-		// check if endtime, delta are numbers and file exists
-		if(!fileExists(argsv[1]))
-		{
-			LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
-			printUsage();
-			return E_FILENOTFOUND;
-		}
-
-		if(!strIsNumber(argsv[2]))
-		{
-			LOG4CXX_ERROR(simulationInitializationLogger, "error: endtime not a valid number");
-			printUsage();
-			return E_INVALIDPARAM;
-		}
-
-		if(!strIsNumber(argsv[3]))
-		{
-			LOG4CXX_ERROR(simulationInitializationLogger, "error: delta_t not a valid number");
-			printUsage();
-			return E_INVALIDPARAM;
-		}
-
-		//run Simulation
-		state = AS_SIMULATION;
-	}
-	// parse args...
-
 
 	return S_OK;
 }
@@ -213,7 +177,7 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 void MolSim::showHelp()
 {
 	LOG4CXX_INFO(generalOutputLogger, " >> "<<"options\t\t\tdescription");
-	LOG4CXX_INFO(generalOutputLogger, "    "<<" <file> <endtime> <delta_t>"<<"\t"<<"run simulation according to file");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<" <file> "<<"\t"<<"run simulation according to <file>");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-help"<<"\t\t\t"<<"show help");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave\n\t\t\t\t<name> blank to run all tests");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name");
@@ -286,8 +250,8 @@ void MolSim::printHelloMessage()
 
 void MolSim::printUsage()
 {
-	LOG4CXX_INFO(generalOutputLogger, "   usage: molsim file endtime delta_t");
-	LOG4CXX_INFO(generalOutputLogger, "   usage: molsim -test");
+	LOG4CXX_INFO(generalOutputLogger, "   usage: molsim <file>");
+	LOG4CXX_INFO(generalOutputLogger, "          molsim -help");
 }
 
 void MolSim::RunTests()

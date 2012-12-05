@@ -25,6 +25,12 @@
     <Filter Include="Quelldateien\utils">
       <UniqueIdentifier>{309eb3ab-0f18-4891-ad4f-7e2551582fa1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Schemadateien">
+      <UniqueIdentifier>{c7fa2fa4-5f67-4cd9-afcd-da72f49f0c54}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="XML">
+      <UniqueIdentifier>{2fb0d546-09ef-4130-ba89-61ecb2de312e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\FileReader.h">
@@ -84,6 +90,15 @@
     <ClInclude Include="src\LinkedCellParticleContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\XMLFileReader.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLFileReaderTest.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLFile\simulationfile.hxx">
+      <Filter>Quelldateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -122,5 +137,30 @@
     <ClCompile Include="src\LinkedCellParticleContainer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="src\XMLFileReader.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLFile\simulationfile.cxx">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
+      <Filter>Schemadateien</Filter>
+    </CXX_Tree_Mapping_Rule>
+    <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">
+      <Filter>Schemadateien</Filter>
+    </CXX_Tree_Mapping_Rule>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="example.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="listexample.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="sphereexample.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>

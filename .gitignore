@@ -47,3 +47,9 @@ doc/
 *.so
 *.mk
 *.o
+
+#log4cxx file
+.1
+
+#test files
+test.xml

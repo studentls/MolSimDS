@@ -29,6 +29,7 @@
 
 //include tests
 #include "ParticleContainerTest.h"
+#include "XMLFileReaderTest.h"
 
 /// specifies in which state the application currently is
 enum ApplicationState
@@ -94,15 +95,6 @@ public:
 
 	/// cleans up
 	err_type			Release();	
-
-
-	/// for test reasons...
-	/// step one forward
-	void				Step() {
-		
-		if(sim)sim->Step();
-		}
-	std::vector<Particle> getParticles()	{if(sim)return sim->getParticles();}
 };
 
 #endif
