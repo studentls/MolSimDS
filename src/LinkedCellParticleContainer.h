@@ -56,6 +56,20 @@ public:
 	///returns ListParticleContainer's internal container
 	const std::vector<Particle>& getParticles();
 
+	/// included for use in XMLFileReader...
+	LinkedCellParticleContainer(const unsigned int dim,
+		const std::vector<Particle>& particles,
+		const double cutoffDistance,
+		utils::Vector<double, 3> frontLowerLeftCorner,
+		utils::Vector<double, 3> simulationAreaExtent,
+		int iterationsPerParticleToCellReassignment,
+		bool leftReflectiveBoundary, bool rightReflectiveBoundary,
+		bool frontReflectiveBoundary, bool backReflectiveBoundary, // these two will be ignored in the two-dimensional case		
+		bool bottomReflectiveBoundary, bool topReflectiveBoundary,			
+		double sigma)	
+	{
+	}
+
 };
 
 
