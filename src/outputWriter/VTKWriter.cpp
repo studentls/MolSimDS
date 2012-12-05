@@ -62,7 +62,7 @@ void VTKWriter::writeFile(const std::string& filename, int iteration) {
 	strstr << filename << "_" << (iteration < 10 ? "000" : (iteration < 100 ? "00" : ( iteration < 1000 ? "0" : "") )) << iteration << ".vtu";
 
 	std::ofstream file(strstr.str().c_str());
-	VTKFile (file, *vtkFile);
+	VTKFile(file, *vtkFile);
 	delete vtkFile;
 }
 

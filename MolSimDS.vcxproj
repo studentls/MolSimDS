@@ -147,6 +147,10 @@
       <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.cpp</SourceSuffix>
       <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\src\outputWriter</OutDir>
       <SubType>Designer</SubType>
+      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.h</HeaderSuffix>
+      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.cpp</SourceSuffix>
+      <GenInline Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenInline>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\src\outputWriter</OutDir>
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
