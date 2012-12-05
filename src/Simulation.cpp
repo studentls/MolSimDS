@@ -62,6 +62,9 @@ void Simulation::performStep()
 	// calculate new x
 	calculateX();
 
+	// reassign particles, if LinkedCell Algorithm is used...
+	if(particles->getType() == PCT_LINKEDCELL)
+		((LinkedCellParticleContainer*)particles)->ReassignParticles();
 	// calculate new f
 	calculateF();
 

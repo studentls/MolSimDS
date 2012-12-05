@@ -218,7 +218,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 
 		container = new LinkedCellParticleContainer(dim, particles, cutoffDistance, frontLowerLeftCorner,
-			simulationAreaExtent, 2, false, false, false, false, false, false, desc.sigma);
+			simulationAreaExtent, false, false, false, false, false, false, desc.sigma);
 		
 		(*out) = container;
 

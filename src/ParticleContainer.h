@@ -14,6 +14,14 @@
 #include "Logging.h"
 #include "Particle.h"
 
+/// used to identify ParticleContainer
+enum ParticleContainerType
+{
+	PCT_UNKOWN,
+	PCT_LIST,
+	PCT_LINKEDCELL
+};
+
 /// an abstract class that is used to store Particles and iterate over them
 class ParticleContainer {
 public:
@@ -46,9 +54,13 @@ public:
 	/// @return returns count of particles in this container
 	virtual unsigned int					getParticleCount() = 0;
 
-	// this method shall be later removed...
-	///returns ListParticleContainer's internal container
+	/// this method shall be later removed...
+	/// @return returns ListParticleContainer's internal container
 	virtual const std::vector<Particle>&	getParticles() = 0;
+
+	/// method to identify container
+	/// @return returns member of ParticleContainerType
+	virtual ParticleContainerType			getType() = 0;
 
 };
 

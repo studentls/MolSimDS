@@ -61,6 +61,11 @@ public:
 	///returns ListParticleContainer's internal container
 	const std::vector<Particle>& getParticles()	{return particles;}
 
+	/// method to identify container
+	/// @return returns PCT_LIST
+	ParticleContainerType			getType() {return PCT_LIST;}
+
+
 };
 
 #endif 

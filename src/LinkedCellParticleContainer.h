@@ -67,15 +67,7 @@ private:
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
 	std::vector<utils::Vector<unsigned int, 2>>	cellPairs;
-
-	/// updating cells every iteration is not very appropriate, better wait some
-	/// iterations and perform then update
-	/// this variable stores how many iterations the container should wait
-	int iterationsPerParticleToCellReassignment;
-	
-	/// count of iterations so far, note this variable is incremented every time Iterate or (!) IteratePairwise is called!
-	int	iterationCount;
-	
+		
 	/// the distance below which reflective boundaries reflect
 	double reflectiveBoundaryDistance;
 
@@ -352,81 +344,6 @@ private:
 			}
 		}
 	}
-	/// a method that reassigns the particles to the cells they belong to
-	/// note that this method should only be called every 'iterationsPerParticleToCellReassignment'th call
-	/// a good number for this must be determined experimentally for increased efficiency
-	/// the default value of this variable for the LinkedCellAlgorithm is one
-	void ReassignParticles()
-	{
-		int xIndex = 0, yIndex = 0, zIndex = 0;
-
-		// go through all Cells...
-		for(int i = 0; i < getCellCount(); i++)
-		{
-			// does cell contain any elements? - if not continue
-			if(Cells[i].empty())continue;
-			
-			// go through every cell's particles...
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
-			{
-				Particle p = *it;
-			
-				// 2D
-				if (dim == 2) {
-					// calc Index
-					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-
-					// is particle outside of its father cell?
-					if(Index2DTo1D(xIndex, yIndex) != i)
-					{
-						// is particle contained in grid or halo?
-						if (xIndex < 0 || yIndex < 0 ||
-							xIndex >= cellCount[0] || yIndex >= cellCount[1])
-							halo.push_back(p);
-						else {
-							int index = Index2DTo1D(xIndex, yIndex);
-							Cells[index].push_back(p);
-						}
-
-						// remove particle from current cell (i-th cell)
-						it = Cells[i].erase(it);
-
-					}
-				}
-				// 3D
-				else if (dim == 3) {
-					// calc Index
-					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-					zIndex = (int)((p.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
-
-					// is particle outside of its father cell?
-					if(Index3DTo1D(xIndex, yIndex, zIndex) != i)
-					{
-						// particle in halo?
-						if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
-							xIndex >= cellCount[0] || yIndex >= cellCount[1] || zIndex >= cellCount[2])
-							halo.push_back(p);
-						else {
-							int index = Index3DTo1D(xIndex, yIndex, zIndex);
-							Cells[index].push_back(p);
-						}
-					
-						// remove particle from current cell (i-th cell)
-						it = Cells[i].erase(it);
-
-					}
-				}
-
-				// manually increment iterator, as erase may delete last element, and therefore vector::iterator inc will cause an error
-				if(it != Cells[i].end())it++;
-			}
-		}
-
-		//test
-		this->CheckAssignment();
-	}
 	
 
 public:
@@ -434,10 +351,8 @@ public:
 	LinkedCellParticleContainer()
 	{
 		Cells = NULL;
-		iterationCount = 0;
 		cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
-		iterationsPerParticleToCellReassignment = 2;
 		dim = 0;
 	}
 
@@ -455,7 +370,6 @@ public:
 								const double cutoffDistance,
 								utils::Vector<double, 3> frontLowerLeftCorner,
 								utils::Vector<double, 3> simulationAreaExtent,
-								int iterationsPerParticleToCellReassignment,
 								bool leftReflectiveBoundary, bool rightReflectiveBoundary,
 								bool frontReflectiveBoundary, bool backReflectiveBoundary,
 								// these two will be ignored in the two-dimensional case
@@ -465,12 +379,10 @@ public:
 		// set to zero, so Init doesn't crash...
 		Cells = NULL;
 		this->dim = dim;
-		iterationCount = 0;
 		this->cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
-		iterationsPerParticleToCellReassignment = 2;
 
-		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, iterationsPerParticleToCellReassignment,
+		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, 
 			leftReflectiveBoundary, rightReflectiveBoundary,
 								frontReflectiveBoundary, backReflectiveBoundary,
 								bottomReflectiveBoundary, topReflectiveBoundary, sigma);		
@@ -481,18 +393,14 @@ public:
 											 const double cutoffDistance,
 											 utils::Vector<double, 3> frontLowerLeftCorner,
 											 utils::Vector<double, 3> simulationAreaExtent,
-											 const int iterationsPerParticleToCellReassignment,
 											 bool leftReflectiveBoundary, bool rightReflectiveBoundary,
 											 bool frontReflectiveBoundary, bool backReflectiveBoundary,
 											 // these two will be ignored in the two-dimensional case
 											 bool bottomReflectiveBoundary, bool topReflectiveBoundary,
 											 double sigma)
 	{
-		// member initialization
-		this->iterationCount = 0;
 		this->cutoffDistance = cutoffDistance;
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
-		this->iterationsPerParticleToCellReassignment = iterationsPerParticleToCellReassignment;
 		this->reflectiveBoundaryDistance = sigma * 1.1225;
 
 
@@ -611,14 +519,6 @@ public:
 				(*func)(data, p);				
 			}
 		}
-
-		// inc counter for iterations, if needed reassign particles in cells...
-		iterationCount++;
-		if(iterationCount > this->iterationsPerParticleToCellReassignment)
-		{
-			ReassignParticles();
-			iterationCount = 0;
-		}
 	}
 	/// a method that takes a void(*func)(void*, Particle, Particle) and
 	/// uses it to iterate over all pairs of Particles (each symmetrical pair is
@@ -668,13 +568,6 @@ public:
 					}
 		}
 
-		// inc counter for iterations, if needed reassign particles in cells...
-		iterationCount++;
-		if(iterationCount > this->iterationsPerParticleToCellReassignment)
-		{
-			ReassignParticles();
-			iterationCount = 0;
-		}
 	}
 
 	/// add particles from *.txt file
@@ -797,6 +690,86 @@ public:
 		std::cout<<"particles: "<<p.size()<<std::endl;
 		return p;
 	}
+
+	/// a method that reassigns the particles to the cells they belong to
+	/// note that this method should only be called every 'iterationsPerParticleToCellReassignment'th call
+	/// a good number for this must be determined experimentally for increased efficiency
+	/// the default value of this variable for the LinkedCellAlgorithm is one
+	void ReassignParticles()
+	{
+		int xIndex = 0, yIndex = 0, zIndex = 0;
+
+		// go through all Cells...
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			// does cell contain any elements? - if not continue
+			if(Cells[i].empty())continue;
+			
+			// go through every cell's particles...
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
+			{
+				Particle p = *it;
+			
+				// 2D
+				if (dim == 2) {
+					// calc Index
+					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
+					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
+
+					// is particle outside of its father cell?
+					if(Index2DTo1D(xIndex, yIndex) != i)
+					{
+						// is particle contained in grid or halo?
+						if (xIndex < 0 || yIndex < 0 ||
+							xIndex >= cellCount[0] || yIndex >= cellCount[1])
+							halo.push_back(p);
+						else {
+							int index = Index2DTo1D(xIndex, yIndex);
+							Cells[index].push_back(p);
+						}
+
+						// remove particle from current cell (i-th cell)
+						it = Cells[i].erase(it);
+
+					}
+				}
+				// 3D
+				else if (dim == 3) {
+					// calc Index
+					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
+					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
+					zIndex = (int)((p.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
+
+					// is particle outside of its father cell?
+					if(Index3DTo1D(xIndex, yIndex, zIndex) != i)
+					{
+						// particle in halo?
+						if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
+							xIndex >= cellCount[0] || yIndex >= cellCount[1] || zIndex >= cellCount[2])
+							halo.push_back(p);
+						else {
+							int index = Index3DTo1D(xIndex, yIndex, zIndex);
+							Cells[index].push_back(p);
+						}
+					
+						// remove particle from current cell (i-th cell)
+						it = Cells[i].erase(it);
+
+					}
+				}
+
+				// manually increment iterator, as erase may delete last element, and therefore vector::iterator inc will cause an error
+				if(it != Cells[i].end())it++;
+			}
+		}
+
+		//test
+		this->CheckAssignment();
+	}
+
+	/// method to identify container
+	/// @return returns PCT_LIST
+	ParticleContainerType			getType() {return PCT_LINKEDCELL;}
 };
 
 #endif 
