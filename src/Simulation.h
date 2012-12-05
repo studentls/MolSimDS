@@ -39,6 +39,7 @@ enum SimulationOutputFormat
 /// @param gravitational_constant the gravitational constant used in the Simulation
 /// @param output_fmt specify OutputFormat, use SOF_NONE for no output
 /// @param iterationsperoutput after iterationsperoutput iterations, the simulation will output data
+/// @param outname filename for output
 struct SimulationDesc
 {
 	double				delta_t;
@@ -50,6 +51,8 @@ struct SimulationDesc
 	double				sigma;
 
 	unsigned int		iterationsperoutput;
+
+	std::string			outname;
 
 	// DEPRECATED
 	// this value may be renamed appropriately in a later version
@@ -72,6 +75,7 @@ struct SimulationDesc
 
 		iterationsperoutput = 10;
 
+		outname = "out";
 		// DEPRECATED
 		//gravitational_constant = 1.0;
 	}

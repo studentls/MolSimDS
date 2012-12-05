@@ -57,6 +57,8 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	desc.start_time				= file->params().t_start();
 
 	desc.iterationsperoutput	= file->params().iterationsperoutput();
+
+	desc.outname				= file->params().output();
 	
 	//file parsed...
 	fileParsed = true;

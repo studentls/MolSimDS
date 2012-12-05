@@ -253,7 +253,6 @@ void Simulation::plotParticles(int iteration) {
 
 	assert(particles);
 	
-	string out_name("MD_vtk");
 	// switch between VTK and XYZ output
 	// depending on the value of desc.output_fmt
 	switch(desc.output_fmt)
@@ -262,14 +261,14 @@ void Simulation::plotParticles(int iteration) {
 		{
 			// VTK Output
 			outputWriter::VTKWriter writer;
-			writer.plotParticles(particles->getParticles(), out_name, iteration);
+			writer.plotParticles(particles->getParticles(), desc.outname, iteration);
 			break;
 		}
 	case SOF_XYZ:
 		{
 			// XYZ Output
 			outputWriter::XYZWriter writer;
-			writer.plotParticles(particles->getParticles(), out_name, iteration);
+			writer.plotParticles(particles->getParticles(), desc.outname, iteration);
 			break;
 		}
 	default:
