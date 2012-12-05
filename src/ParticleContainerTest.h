@@ -42,6 +42,7 @@
 
 #include "ParticleContainer.h"
 #include "ListParticleContainer.h"
+#include "LinkedCellParticleContainer.h"
 
 // see http://cppunit.sourceforge.net/doc/lastest/cppunit_cookbook.html for details
 
@@ -127,6 +128,22 @@ public:
 		double result = (double)(iParticleCount * (iParticleCount - 1) / 2);
 		CPPUNIT_ASSERT( -epsilon < (sum - result)  && (sum - result) < epsilon);
 	
+	}
+
+	void testLinkedCellParticleContainerAssignment()
+	{
+		// create 10x10 array of test particles
+		std::vector<Particle> particles;
+		int xcount = 10;
+		int ycount = 10;
+
+		for(int x = 0; x < xcount; x++)
+			for(int y = 0; y < ycount; y++)
+			{
+				Particle p;
+				p.x[0] = x;
+				p.x[1] = y;
+			}
 	}
 };
 

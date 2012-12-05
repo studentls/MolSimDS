@@ -42,11 +42,12 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	//if(!particles->AddParticlesFromFileNew(filename))return E_FILEERROR;
 	
 	// set up particles with some data...
-	utils::Vector<double, 2> extent;
+	utils::Vector<double, 3> extent;
 	extent[0] = 180;
 	extent[1] = 90;
 
 	ListParticleContainer PC;
+	
 	PC.AddParticlesFromFileNew(filename);
 	
 	
@@ -58,14 +59,14 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	vel[1] = -10.0;
 	utils::Vector<unsigned int, 3> dim;
 	dim[0] = 1;
-	dim[1] = 1;
+	dim[1] = 2;
 	dim[2] = 1;
 	//ParticleGenerator::makeCuboid(PC, start, dim, 1.1125, 1.0, vel);
 
 	//method
 	
 	// use LinkedCell
-	particles = new LinkedCellParticleContainer<2>(PC.getParticles(), 3.0, utils::Vector<double,2>(0.0), extent, 1,
+	particles = new LinkedCellParticleContainer(2, PC.getParticles(), 3.0, utils::Vector<double,3>(0.0), extent, 2,
 	true, true, true, true, true, true, 1.0); 
 
 	// use standard

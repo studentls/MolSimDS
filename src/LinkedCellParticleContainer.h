@@ -14,9 +14,10 @@
 #include "Logging.h"
 #include "Particle.h"
 #include "ParticleContainer.h"
+#include "utils/utils.h"
 
 /// a class that is used to store Particles and iterate over them
-template<int dim> class LinkedCellParticleContainer : public ParticleContainer {
+class LinkedCellParticleContainer : public ParticleContainer {
 
 private:
 
@@ -26,14 +27,17 @@ private:
 	// but in the case of this class, they also call additional functions to deal with the borders
 	// and to reassign the particles to cells
 
+	/// dimensions of the grid
+	unsigned int						dim;
+
 	/// Cutoff distance
 	double								cutoffDistance;
 
 	/// vector containing X, Y, (Z) size of each cell
-	utils::Vector<double, dim>			cellSize;
+	utils::Vector<double, 3>			cellSize;
 
 	/// vector containing count of cells in X, Y, (Z) direction
-	utils::Vector<unsigned int, dim>	cellCount;
+	utils::Vector<unsigned int, 3>	cellCount;
 
 	/// get total cell count
 	inline unsigned int					getCellCount()
@@ -51,7 +55,7 @@ private:
 	/// |-----|-----|-----|-----|-----|
 	/// |     |     |     |     |     |
 	/// v-----|-----|-----|-----|-----|
-	utils::Vector<double, dim>			frontLowerLeftCorner;
+	utils::Vector<double, 3>			frontLowerLeftCorner;
 
 	/// a dynamic array, containing all Cells encoded in a 1D array
 	std::vector<Particle>				*Cells;
@@ -331,7 +335,7 @@ private:
 			double ymax = ymin + cellSize[1];
 
 			// go through particles and check if they are in boundaries
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle p = *it;
 
@@ -341,7 +345,11 @@ private:
 				if(p.x[1] > ymax)falseAssignment = true;
 			}
 
-			if(falseAssignment)std::cout<<"Error:!!!! False Assignment"<<std::endl;
+			if(falseAssignment)
+			{
+					std::cout<<"Error:!!!! False Assignment"<<std::endl;
+					int a = 100;
+			}
 		}
 	}
 	/// a method that reassigns the particles to the cells they belong to
@@ -417,7 +425,7 @@ private:
 		}
 
 		//test
-		this->CheckAssignment();
+		//this->CheckAssignment();
 	}
 
 	// Deprecated...
@@ -436,6 +444,7 @@ public:
 		cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
 		iterationsPerParticleToCellReassignment = 2;
+		dim = 0;
 	}
 
 	/// destructor
@@ -447,10 +456,11 @@ public:
 	/// a constructor that takes quite a lot of arguments
 	/// @param particles
 	/// TODO: comment params...
-	LinkedCellParticleContainer(const std::vector<Particle>& particles,
+	LinkedCellParticleContainer(const unsigned int dim,
+								const std::vector<Particle>& particles,
 								const double cutoffDistance,
-								utils::Vector<double, dim> frontLowerLeftCorner,
-								utils::Vector<double, dim> simulationAreaExtent,
+								utils::Vector<double, 3> frontLowerLeftCorner,
+								utils::Vector<double, 3> simulationAreaExtent,
 								int iterationsPerParticleToCellReassignment,
 								bool leftReflectiveBoundary, bool rightReflectiveBoundary,
 								bool frontReflectiveBoundary, bool backReflectiveBoundary,
@@ -460,6 +470,11 @@ public:
 	{
 		// set to zero, so Init doesn't crash...
 		Cells = NULL;
+		this->dim = dim;
+		iterationCount = 0;
+		this->cutoffDistance = 0.0;
+		reflectiveBoundaryDistance = 0;
+		iterationsPerParticleToCellReassignment = 2;
 
 		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, iterationsPerParticleToCellReassignment,
 			leftReflectiveBoundary, rightReflectiveBoundary,
@@ -470,9 +485,9 @@ public:
 	/// init function taking a lot of arguments
 	void								Init(const std::vector<Particle>& particles,
 											 const double cutoffDistance,
-											 utils::Vector<double, dim> frontLowerLeftCorner,
-											 utils::Vector<double, dim> simulationAreaExtent,
-											 int iterationsPerParticleToCellReassignmentbool,
+											 utils::Vector<double, 3> frontLowerLeftCorner,
+											 utils::Vector<double, 3> simulationAreaExtent,
+											 const int iterationsPerParticleToCellReassignment,
 											 bool leftReflectiveBoundary, bool rightReflectiveBoundary,
 											 bool frontReflectiveBoundary, bool backReflectiveBoundary,
 											 // these two will be ignored in the two-dimensional case
@@ -520,30 +535,30 @@ public:
 								bottomReflectiveBoundary, topReflectiveBoundary);
 	}
 	
-	/// applies the reflective boundary condition to all cells that apply
-	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
-		for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
-		{
-			// TODO: this should obviously work by reference to the array, not copy it
-			// does it do that right now?
-			std::vector<Particle>& cell = cells[(int)(elem[0])];
-			int axis = (int)(elem[1]);
-			double direction = elem[2];
-			double border = elem[3];
-			for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
-				Particle& p = *it;
-				double dist = direction * (border - p.x[axis]);
-				// skip the particle if it is too far away from the border
-				if (dist > reflectiveBoundaryDistance)
-					continue;
-				// create a temporary, virtual Particle
-				Particle vp = new Particle(p);
-				vp.x[axis] = border;
-				(*func)(data, p, vp);
-				// TODO: delete vp manually?
-			}
-		}
-	}
+	///// applies the reflective boundary condition to all cells that apply
+	//void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
+	//	for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
+	//	{
+	//		// TODO: this should obviously work by reference to the array, not copy it
+	//		// does it do that right now?
+	//		std::vector<Particle>& cell = cells[(int)(elem[0])];
+	//		int axis = (int)(elem[1]);
+	//		double direction = elem[2];
+	//		double border = elem[3];
+	//		for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
+	//			Particle& p = *it;
+	//			double dist = direction * (border - p.x[axis]);
+	//			// skip the particle if it is too far away from the border
+	//			if (dist > reflectiveBoundaryDistance)
+	//				continue;
+	//			// create a temporary, virtual Particle
+	//			Particle vp = new Particle(p);
+	//			vp.x[axis] = border;
+	//			(*func)(data, p, vp);
+	//			// TODO: delete vp manually?
+	//		}
+	//	}
+	//}
 
 	/// a method to add a Particle to the LinkedCellParticleContainer
 	void AddParticle(const Particle& particle)
@@ -594,6 +609,8 @@ public:
 		// go through all Cells...
 		for(int i = 0; i < getCellCount(); i++)
 		{
+			if(Cells[i].empty())continue;
+
 			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle& p = *it;
@@ -779,7 +796,7 @@ public:
 			}
 		}
 
-		std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
+		//std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
 		return p;
 	}
 };
