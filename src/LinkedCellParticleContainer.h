@@ -425,14 +425,8 @@ private:
 		}
 
 		//test
-		//this->CheckAssignment();
+		this->CheckAssignment();
 	}
-
-	// Deprecated...
-	
-	//int iterationsToCellReassignmentLeft;
-
-
 	
 
 public:
@@ -651,9 +645,10 @@ public:
 							Particle& p1 = *it1;
 							Particle& p2 = *it2;
 
+							
 							//is distance squared less than cutoff radius squared?
-							if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
-								(*func)(data, p1, p2);
+							//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
+								(*func)(data, p2, p1);
 						}
 			// calc data for a pair (a, a)
 			else
@@ -665,8 +660,10 @@ public:
 						// call the function on the pair of Particles
 						Particle& p1 = *it1;
 						Particle& p2 = *it2;
+
+						
 						//is distance squared less than cutoff radius squared?
-						if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
+						//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
 							(*func)(data, p1, p2);
 					}
 		}
@@ -785,18 +782,20 @@ public:
 		{
 			if(!Cells[i].empty())
 			{
-					for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+					//p.insert(p.end(), Cells[i].begin(), Cells[i].end());
+				
+				for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 					{
-						//p.insert(p.end(), Cells[i].begin(), Cells[i].end());
+						
 						Particle pt = *it;
-						pt.type = i % 16; //4 colors!
 						p.push_back(pt);
 					}
 					filledCells++;
 			}
 		}
 
-		//std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
+		std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
+		std::cout<<"particles: "<<p.size()<<std::endl;
 		return p;
 	}
 };

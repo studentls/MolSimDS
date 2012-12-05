@@ -129,22 +129,6 @@ public:
 		CPPUNIT_ASSERT( -epsilon < (sum - result)  && (sum - result) < epsilon);
 	
 	}
-
-	void testLinkedCellParticleContainerAssignment()
-	{
-		// create 10x10 array of test particles
-		std::vector<Particle> particles;
-		int xcount = 10;
-		int ycount = 10;
-
-		for(int x = 0; x < xcount; x++)
-			for(int y = 0; y < ycount; y++)
-			{
-				Particle p;
-				p.x[0] = x;
-				p.x[1] = y;
-			}
-	}
 };
 
 

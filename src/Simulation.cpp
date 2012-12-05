@@ -19,8 +19,6 @@
 
 using namespace std;
 
-//ugly start
-int g_i;
 
 err_type Simulation::Init(const SimulationDesc& desc)
 {
@@ -28,8 +26,6 @@ err_type Simulation::Init(const SimulationDesc& desc)
 
 	// clear particles if it is not already empty
 	if(particles)if(!particles->IsEmpty())particles->Clear();
-
-	g_i = 0;
 
 	return S_OK;
 }
@@ -48,7 +44,7 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 
 	ListParticleContainer PC;
 	
-	PC.AddParticlesFromFileNew(filename);
+	//PC.AddParticlesFromFileNew(filename);
 	
 	
 	//test bench
@@ -56,25 +52,37 @@ err_type Simulation::AddParticlesFromFile(const char *filename)
 	start[0] = 70.0;
 	start[1] = 60.0;
 	utils::Vector<double, 3> vel;
-	vel[1] = -10.0;
+	//vel[1] = -10.0;
 	utils::Vector<unsigned int, 3> dim;
-	dim[0] = 1;
-	dim[1] = 2;
+	dim[0] = 3;
+	dim[1] = 3;
 	dim[2] = 1;
-	//ParticleGenerator::makeCuboid(PC, start, dim, 1.1125, 1.0, vel);
+	ParticleGenerator::makeCuboid(PC, start, dim, 1.1125, 1.0, vel);
 
 	//method
 	
+	std::vector<Particle> temp = PC.getParticles();
+
+	//set id
+	int id = 0;
+	for(std::vector<Particle>::iterator it = temp.begin(); it != temp.end(); it++)
+	{
+
+		it->type = id;
+		id++;
+	}
+
 	// use LinkedCell
-	particles = new LinkedCellParticleContainer(2, PC.getParticles(), 3.0, utils::Vector<double,3>(0.0), extent, 2,
-	true, true, true, true, true, true, 1.0); 
+	particles = new LinkedCellParticleContainer(2, temp, 3.0, utils::Vector<double,3>(0.0), extent, 2,	true, true, true, true, true, true, 1.0); 
 
 	// use standard
-	//particles = new ListParticleContainer(PC.getParticles());
+	//particles = new ListParticleContainer(temp);
 
 
 	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
 	calculateF();
+
+	temp = particles->getParticles();
 
 	calculateV();
 
@@ -93,32 +101,7 @@ void Simulation::performStep()
 	calculateV();
 }
 
-void Simulation::Step()
-{
-	if(g_i < (desc.end_time - desc.start_time) / desc.delta_t)
-	{
-		// set common statistical values...
-		statistics.particle_count = particles->getParticleCount();
-		statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
 
-		// output that calculation have started ("starting calculation...")
-		//LOG4CXX_TRACE(simulationLogger, "starting calculation...");
-
-		//start timer
-		utils::Timer timer;
-
-		// perform one iteration step
-			performStep();
-
-		//generate statistical data
-		statistics.time += timer.getElapsedTime();
-		statistics.timeperstep = statistics.time / statistics.step_count;
-			// output that an iteration has finished
-			if(g_i % 5 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << g_i << " finished.");
-		g_i++;
-	}
-}
 err_type Simulation::Run()
 {
 	assert(particles);
@@ -146,6 +129,10 @@ err_type Simulation::Run()
 		// perform one iteration step
 		performStep();
 
+		if(iteration == 495)
+		{
+			int x = 0;
+		}
 		// TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % 10 == 0) {
