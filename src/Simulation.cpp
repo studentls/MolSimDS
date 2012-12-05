@@ -104,7 +104,7 @@ err_type Simulation::Run()
 		performStep();
 		
 		// plot the particles on every hundredth iteration, beginning with the first
-		if (iteration % 10 == 0) {
+		if (iteration % desc.iterationsperoutput == 0) {
 			plotParticles(iteration);
 			
 			// output that an iteration has finished

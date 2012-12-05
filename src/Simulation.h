@@ -38,15 +38,18 @@ enum SimulationOutputFormat
 /// @param end_time end time of simulation
 /// @param gravitational_constant the gravitational constant used in the Simulation
 /// @param output_fmt specify OutputFormat, use SOF_NONE for no output
+/// @param iterationsperoutput after iterationsperoutput iterations, the simulation will output data
 struct SimulationDesc
 {
-	double	delta_t;
-	double	start_time;
-	double	end_time;
+	double				delta_t;
+	double				start_time;
+	double				end_time;
 	
-	double	brownianMotionFactor;
-	double	epsilon;
-	double	sigma;
+	double				brownianMotionFactor;
+	double				epsilon;
+	double				sigma;
+
+	unsigned int		iterationsperoutput;
 
 	// DEPRECATED
 	// this value may be renamed appropriately in a later version
@@ -66,6 +69,8 @@ struct SimulationDesc
 	    brownianMotionFactor = 0.1;
 		epsilon = 5.0;
 		sigma = 1.0;
+
+		iterationsperoutput = 10;
 
 		// DEPRECATED
 		//gravitational_constant = 1.0;

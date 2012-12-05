@@ -42,6 +42,8 @@ err_type XMLFileReader::readFile(const char *filename)
 
 	desc.sigma					= file->params().sigma();
 	desc.start_time				= file->params().t_start();
+
+	desc.iterationsperoutput	= file->params().iterationsperoutput();
 	
 	//file parsed...
 	fileParsed = true;
