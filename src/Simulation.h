@@ -101,7 +101,7 @@ private:
 	SimulationStatistics	statistics;
 
 	/// stores the particles used in this Simulation
-	ListParticleContainer	particles;
+	ParticleContainer		*particles;
 
 	/// performs one time step based on delta_t
 	void					performStep();
@@ -132,7 +132,7 @@ private:
 	void					plotParticles(int iteration);
 
 public:
-	Simulation()			{}
+	Simulation()			{particles = NULL;}
 
 	~Simulation()			{ Release(); }
 	
@@ -141,10 +141,10 @@ public:
 	/// @return returns always S_OK, 
 	err_type				Init(const SimulationDesc& desc);
 
-	/// adds Particles to particle list from file
-	/// @param filename particle file, has to use .txt format
+	/// parses an .xml file according to simulationfile.xsd and creates based on this file a simulation with settings & data
+	/// @param filename xml file, must have .xml ending
 	/// @return returns S_OK if file could be loaded successfully, otherwise E_FILEERROR
-	err_type				AddParticlesFromFile(const char *filename);
+	err_type				CreateSimulationFromXMLFile(const char *filename);
 
 	/// runs Simulation according to settings given by Init
 	/// @return returns S_OK or E_NOTINITIALIZED if particle data is empty

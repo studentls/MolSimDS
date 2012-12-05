@@ -16,6 +16,8 @@
 #include "Simulation.h"
 #include "outputWriter/VTKWriter.h"
 #include "outputWriter/XYZWriter.h"
+#include "XMLFileReader.h"
+
 
 using namespace std;
 
@@ -24,21 +26,43 @@ err_type Simulation::Init(const SimulationDesc& desc)
 	this->desc = desc;
 
 	// clear particles if it is not already empty
-	particles.Clear();
+	Release();
 
 	return S_OK;
 }
 
-err_type Simulation::AddParticlesFromFile(const char *filename)
+err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 {
-	// read the file New !
-	if(!particles.AddParticlesFromFileNew(filename))return E_FILEERROR;
-	
-	// call calculateF() because the forces are needed to calculate x, but are not given in the input file.
+	XMLFileReader fr;
+
+	// be aware of possible exceptions!
+	try
+	{
+		fr.readFile(filename);
+
+		this->desc = fr.getDescription();
+
+		// get container
+
+		Release(); // to free mem
+
+		fr.makeParticleContainer(&particles);
+	}
+	catch(const xml_schema::exception& e)
+	{
+	  LOG4CXX_ERROR(simulationLogger, e.what());
+	  return E_FILEERROR;
+	}
+
+	// is particles a valid pointer? - If not file has not been parsed correctly...
+	if(!particles)return E_FILEERROR;
+
+	//calc initial forces...
 	calculateF();
 
 	return S_OK;
 }
+
 
 void Simulation::performStep()
 {
@@ -54,15 +78,17 @@ void Simulation::performStep()
 
 err_type Simulation::Run()
 {
+	assert(particles);
+	
 	// check if the particles are valid
-	if(particles.IsEmpty())return E_NOTINITIALIZED;
+	if(particles->IsEmpty())return E_NOTINITIALIZED;
 
 	// initialize some values
 	double current_time = desc.start_time;
 	int iteration = 0;
 
 	// set common statistical values...
-	statistics.particle_count = particles.getParticleCount();
+	statistics.particle_count = particles->getParticleCount();
 	statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
 
 	// output that calculation have started ("starting calculation...")
@@ -105,16 +131,20 @@ err_type Simulation::Run()
 err_type Simulation::Release()
 {
 	// delete Particle data
-	particles.Clear();
+	if(particles)
+		if(!particles->IsEmpty())
+			particles->Clear();
+
+	SAFE_DELETE(particles);
 
 	return S_OK;
 }
 
 void Simulation::calculateF() {
 	// call particles.Iterate() on forceResetter
-	particles.Iterate(forceResetter, (void*)&desc);
+	particles->Iterate(forceResetter, (void*)&desc);
 	// call particles.IteratePairwise() on forceCalculator
-	particles.IteratePairwise(forceCalculator, (void*)&desc);
+	particles->IteratePairwise(forceCalculator, (void*)&desc);
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
@@ -167,7 +197,7 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 void Simulation::calculateX() {
 	
 	// call particles.Iterate() on posCalculator
-	particles.Iterate(posCalculator, (void*)&desc);
+	particles->Iterate(posCalculator, (void*)&desc);
 }
 
 void Simulation::posCalculator(void* data, Particle& p) {
@@ -190,7 +220,7 @@ void Simulation::posCalculator(void* data, Particle& p) {
 
 void Simulation::calculateV() {
 	// call particles.Iterate() on velCalculator
-	particles.Iterate(velCalculator, (void*)&desc);
+	particles->Iterate(velCalculator, (void*)&desc);
 }
 
 void Simulation::velCalculator(void* data, Particle& p) {
@@ -222,14 +252,14 @@ void Simulation::plotParticles(int iteration) {
 		{
 			// VTK Output
 			outputWriter::VTKWriter writer;
-			writer.plotParticles(particles.getParticles(), out_name, iteration);
+			writer.plotParticles(particles->getParticles(), out_name, iteration);
 			break;
 		}
 	case SOF_XYZ:
 		{
 			// XYZ Output
 			outputWriter::XYZWriter writer;
-			writer.plotParticles(particles.getParticles(), out_name, iteration);
+			writer.plotParticles(particles->getParticles(), out_name, iteration);
 			break;
 		}
 	default:
