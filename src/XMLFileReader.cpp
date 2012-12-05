@@ -152,6 +152,43 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 	
 	}
 
+	// go through spheres...
+	for(::data_t::sphere_const_iterator it = file->data().sphere().begin();
+		it != file->data().sphere().end(); it++)
+	{
+		ListParticleContainer pc;
+
+		// construct variables
+		utils::Vector<double, 3> center;
+		utils::Vector<double, 3> v;
+		double m;
+		double h;
+		unsigned int dim;
+		unsigned int radius;
+
+		center[0] = it->X().at(0);
+		center[1] = it->X().at(1);
+		center[2] = (it->X().size() > 2) ? it->X().at(2) : 0;
+
+		v[0] = it->V().at(0);
+		v[1] = it->V().at(1);
+		v[2] = (it->V().size() > 2) ? it->V().at(2) : 0;
+
+		m = it->m();
+
+		h = it->h();
+
+		dim = it->dimensions();
+
+		radius = it->r();
+
+		// make Cuboid and add to particle
+		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim, desc.brownianMotionFactor);
+		vector<Particle> temp = pc.getParticles();
+		particles.insert(particles.begin(), temp.begin(), temp.end());
+	
+	}
+
 
 	// now construct Particle Container...
 	ParticleContainer *container = NULL;

@@ -229,6 +229,7 @@ class Vec3_t;
 class dim3_t;
 class particle_t;
 class cuboid_t;
+class sphere_t;
 class data_t;
 class simulationfile_t;
 class outputfmt;
@@ -943,6 +944,139 @@ class cuboid_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< m_type > m_;
 };
 
+class sphere_t: public ::xml_schema::type
+{
+  public:
+  // X
+  // 
+  typedef ::Vec3_t X_type;
+  typedef ::xsd::cxx::tree::traits< X_type, char > X_traits;
+
+  const X_type&
+  X () const;
+
+  X_type&
+  X ();
+
+  void
+  X (const X_type& x);
+
+  void
+  X (::std::auto_ptr< X_type > p);
+
+  // V
+  // 
+  typedef ::Vec3_t V_type;
+  typedef ::xsd::cxx::tree::traits< V_type, char > V_traits;
+
+  const V_type&
+  V () const;
+
+  V_type&
+  V ();
+
+  void
+  V (const V_type& x);
+
+  void
+  V (::std::auto_ptr< V_type > p);
+
+  // r
+  // 
+  typedef ::xml_schema::decimal r_type;
+  typedef ::xsd::cxx::tree::traits< r_type, char, ::xsd::cxx::tree::schema_type::decimal > r_traits;
+
+  const r_type&
+  r () const;
+
+  r_type&
+  r ();
+
+  void
+  r (const r_type& x);
+
+  // h
+  // 
+  typedef ::xml_schema::decimal h_type;
+  typedef ::xsd::cxx::tree::traits< h_type, char, ::xsd::cxx::tree::schema_type::decimal > h_traits;
+
+  const h_type&
+  h () const;
+
+  h_type&
+  h ();
+
+  void
+  h (const h_type& x);
+
+  // m
+  // 
+  typedef ::xml_schema::decimal m_type;
+  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
+
+  const m_type&
+  m () const;
+
+  m_type&
+  m ();
+
+  void
+  m (const m_type& x);
+
+  // dimensions
+  // 
+  typedef ::xml_schema::integer dimensions_type;
+  typedef ::xsd::cxx::tree::traits< dimensions_type, char > dimensions_traits;
+
+  const dimensions_type&
+  dimensions () const;
+
+  dimensions_type&
+  dimensions ();
+
+  void
+  dimensions (const dimensions_type& x);
+
+  // Constructors.
+  //
+  sphere_t (const X_type&,
+            const V_type&,
+            const r_type&,
+            const h_type&,
+            const m_type&,
+            const dimensions_type&);
+
+  sphere_t (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0);
+
+  sphere_t (const sphere_t& x,
+            ::xml_schema::flags f = 0,
+            ::xml_schema::container* c = 0);
+
+  virtual sphere_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~sphere_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  ::xsd::cxx::tree::one< X_type > X_;
+  ::xsd::cxx::tree::one< V_type > V_;
+  ::xsd::cxx::tree::one< r_type > r_;
+  ::xsd::cxx::tree::one< h_type > h_;
+  ::xsd::cxx::tree::one< m_type > m_;
+  ::xsd::cxx::tree::one< dimensions_type > dimensions_;
+};
+
 class data_t: public ::xml_schema::type
 {
   public:
@@ -997,6 +1131,23 @@ class data_t: public ::xml_schema::type
   void
   cuboid (const cuboid_sequence& s);
 
+  // sphere
+  // 
+  typedef ::sphere_t sphere_type;
+  typedef ::xsd::cxx::tree::sequence< sphere_type > sphere_sequence;
+  typedef sphere_sequence::iterator sphere_iterator;
+  typedef sphere_sequence::const_iterator sphere_const_iterator;
+  typedef ::xsd::cxx::tree::traits< sphere_type, char > sphere_traits;
+
+  const sphere_sequence&
+  sphere () const;
+
+  sphere_sequence&
+  sphere ();
+
+  void
+  sphere (const sphere_sequence& s);
+
   // Constructors.
   //
   data_t ();
@@ -1027,6 +1178,7 @@ class data_t: public ::xml_schema::type
   particle_sequence particle_;
   inputfile_sequence inputfile_;
   cuboid_sequence cuboid_;
+  sphere_sequence sphere_;
 };
 
 class simulationfile_t: public ::xml_schema::type

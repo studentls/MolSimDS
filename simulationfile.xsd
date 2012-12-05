@@ -94,14 +94,24 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="m" type="xsd:decimal"></xsd:element>
     </xsd:all>
   </xsd:complexType>
-  
-  
+
+  <xsd:complexType name="sphere_t">
+    <xsd:all>
+      <xsd:element name="X" type="Vec3_t"></xsd:element>
+      <xsd:element name="V" type="Vec3_t"></xsd:element>
+      <xsd:element name="r" type="xsd:decimal"></xsd:element>
+      <xsd:element name="h" type="xsd:decimal"></xsd:element>
+      <xsd:element name="m" type="xsd:decimal"></xsd:element>
+      <xsd:element name="dimensions" type="xsd:integer"></xsd:element>
+    </xsd:all>
+  </xsd:complexType>
   
   <xsd:complexType name="data_t">
     <xsd:sequence>
       <xsd:element name="particle" type="particle_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
       <xsd:element name="inputfile" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
       <xsd:element name="cuboid" type="cuboid_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+      <xsd:element name="sphere" type="sphere_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
     </xsd:sequence>
   </xsd:complexType>
  

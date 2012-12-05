@@ -616,6 +616,130 @@ m (const m_type& x)
 }
 
 
+// sphere_t
+// 
+
+const sphere_t::X_type& sphere_t::
+X () const
+{
+  return this->X_.get ();
+}
+
+sphere_t::X_type& sphere_t::
+X ()
+{
+  return this->X_.get ();
+}
+
+void sphere_t::
+X (const X_type& x)
+{
+  this->X_.set (x);
+}
+
+void sphere_t::
+X (::std::auto_ptr< X_type > x)
+{
+  this->X_.set (x);
+}
+
+const sphere_t::V_type& sphere_t::
+V () const
+{
+  return this->V_.get ();
+}
+
+sphere_t::V_type& sphere_t::
+V ()
+{
+  return this->V_.get ();
+}
+
+void sphere_t::
+V (const V_type& x)
+{
+  this->V_.set (x);
+}
+
+void sphere_t::
+V (::std::auto_ptr< V_type > x)
+{
+  this->V_.set (x);
+}
+
+const sphere_t::r_type& sphere_t::
+r () const
+{
+  return this->r_.get ();
+}
+
+sphere_t::r_type& sphere_t::
+r ()
+{
+  return this->r_.get ();
+}
+
+void sphere_t::
+r (const r_type& x)
+{
+  this->r_.set (x);
+}
+
+const sphere_t::h_type& sphere_t::
+h () const
+{
+  return this->h_.get ();
+}
+
+sphere_t::h_type& sphere_t::
+h ()
+{
+  return this->h_.get ();
+}
+
+void sphere_t::
+h (const h_type& x)
+{
+  this->h_.set (x);
+}
+
+const sphere_t::m_type& sphere_t::
+m () const
+{
+  return this->m_.get ();
+}
+
+sphere_t::m_type& sphere_t::
+m ()
+{
+  return this->m_.get ();
+}
+
+void sphere_t::
+m (const m_type& x)
+{
+  this->m_.set (x);
+}
+
+const sphere_t::dimensions_type& sphere_t::
+dimensions () const
+{
+  return this->dimensions_.get ();
+}
+
+sphere_t::dimensions_type& sphere_t::
+dimensions ()
+{
+  return this->dimensions_.get ();
+}
+
+void sphere_t::
+dimensions (const dimensions_type& x)
+{
+  this->dimensions_.set (x);
+}
+
+
 // data_t
 // 
 
@@ -671,6 +795,24 @@ void data_t::
 cuboid (const cuboid_sequence& s)
 {
   this->cuboid_ = s;
+}
+
+const data_t::sphere_sequence& data_t::
+sphere () const
+{
+  return this->sphere_;
+}
+
+data_t::sphere_sequence& data_t::
+sphere ()
+{
+  return this->sphere_;
+}
+
+void data_t::
+sphere (const sphere_sequence& s)
+{
+  this->sphere_ = s;
 }
 
 
@@ -1756,6 +1898,199 @@ cuboid_t::
 {
 }
 
+// sphere_t
+//
+
+sphere_t::
+sphere_t (const X_type& X,
+          const V_type& V,
+          const r_type& r,
+          const h_type& h,
+          const m_type& m,
+          const dimensions_type& dimensions)
+: ::xml_schema::type (),
+  X_ (X, ::xml_schema::flags (), this),
+  V_ (V, ::xml_schema::flags (), this),
+  r_ (r, ::xml_schema::flags (), this),
+  h_ (h, ::xml_schema::flags (), this),
+  m_ (m, ::xml_schema::flags (), this),
+  dimensions_ (dimensions, ::xml_schema::flags (), this)
+{
+}
+
+sphere_t::
+sphere_t (const sphere_t& x,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  X_ (x.X_, f, this),
+  V_ (x.V_, f, this),
+  r_ (x.r_, f, this),
+  h_ (x.h_, f, this),
+  m_ (x.m_, f, this),
+  dimensions_ (x.dimensions_, f, this)
+{
+}
+
+sphere_t::
+sphere_t (const ::xercesc::DOMElement& e,
+          ::xml_schema::flags f,
+          ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  X_ (f, this),
+  V_ (f, this),
+  r_ (f, this),
+  h_ (f, this),
+  m_ (f, this),
+  dimensions_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void sphere_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // X
+    //
+    if (n.name () == "X" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< X_type > r (
+        X_traits::create (i, f, this));
+
+      if (!X_.present ())
+      {
+        this->X_.set (r);
+        continue;
+      }
+    }
+
+    // V
+    //
+    if (n.name () == "V" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< V_type > r (
+        V_traits::create (i, f, this));
+
+      if (!V_.present ())
+      {
+        this->V_.set (r);
+        continue;
+      }
+    }
+
+    // r
+    //
+    if (n.name () == "r" && n.namespace_ ().empty ())
+    {
+      if (!r_.present ())
+      {
+        this->r_.set (r_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // h
+    //
+    if (n.name () == "h" && n.namespace_ ().empty ())
+    {
+      if (!h_.present ())
+      {
+        this->h_.set (h_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // m
+    //
+    if (n.name () == "m" && n.namespace_ ().empty ())
+    {
+      if (!m_.present ())
+      {
+        this->m_.set (m_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // dimensions
+    //
+    if (n.name () == "dimensions" && n.namespace_ ().empty ())
+    {
+      if (!dimensions_.present ())
+      {
+        this->dimensions_.set (dimensions_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  if (!X_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "X",
+      "");
+  }
+
+  if (!V_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "V",
+      "");
+  }
+
+  if (!r_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "r",
+      "");
+  }
+
+  if (!h_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "h",
+      "");
+  }
+
+  if (!m_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "m",
+      "");
+  }
+
+  if (!dimensions_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "dimensions",
+      "");
+  }
+}
+
+sphere_t* sphere_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class sphere_t (*this, f, c);
+}
+
+sphere_t::
+~sphere_t ()
+{
+}
+
 // data_t
 //
 
@@ -1764,7 +2099,8 @@ data_t ()
 : ::xml_schema::type (),
   particle_ (::xml_schema::flags (), this),
   inputfile_ (::xml_schema::flags (), this),
-  cuboid_ (::xml_schema::flags (), this)
+  cuboid_ (::xml_schema::flags (), this),
+  sphere_ (::xml_schema::flags (), this)
 {
 }
 
@@ -1775,7 +2111,8 @@ data_t (const data_t& x,
 : ::xml_schema::type (x, f, c),
   particle_ (x.particle_, f, this),
   inputfile_ (x.inputfile_, f, this),
-  cuboid_ (x.cuboid_, f, this)
+  cuboid_ (x.cuboid_, f, this),
+  sphere_ (x.sphere_, f, this)
 {
 }
 
@@ -1786,7 +2123,8 @@ data_t (const ::xercesc::DOMElement& e,
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   particle_ (f, this),
   inputfile_ (f, this),
-  cuboid_ (f, this)
+  cuboid_ (f, this),
+  sphere_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1835,6 +2173,17 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
         cuboid_traits::create (i, f, this));
 
       this->cuboid_.push_back (r);
+      continue;
+    }
+
+    // sphere
+    //
+    if (n.name () == "sphere" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< sphere_type > r (
+        sphere_traits::create (i, f, this));
+
+      this->sphere_.push_back (r);
       continue;
     }
 

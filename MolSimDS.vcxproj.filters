@@ -93,11 +93,11 @@
     <ClInclude Include="src\XMLFileReader.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\XMLFile\simulationfile.hxx">
-      <Filter>Quelldateien</Filter>
-    </ClInclude>
     <ClInclude Include="src\XMLFileReaderTest.h">
       <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLFile\simulationfile.hxx">
+      <Filter>Quelldateien</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -160,5 +160,8 @@
       <Filter>XML</Filter>
     </None>
     <None Include="ClassDiagram1.cd" />
+    <None Include="sphereexample.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>
