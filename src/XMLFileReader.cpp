@@ -196,9 +196,29 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 	// is a LinkedCell Container present?
 	if(file->params().algorithm().LinkedCell().present())
 	{
-		// not yet supported...
-		LOG4CXX_ERROR(generalOutputLogger, ">> LinkedCell in XML file is not yet supported...");
-		return E_UNKNOWN;
+		LinkedCell_t& lc = file->params().algorithm().LinkedCell().get();
+
+		// set dimensions to 2D if z is set to zero
+		unsigned int dim = lc.sizeofdomainZ() == 0 ? 2 : 3;
+
+		double cutoffDistance = lc.cutoff_radius();
+
+		Vec3 frontLowerLeftCorner;
+		Vec3 simulationAreaExtent;
+		
+		frontLowerLeftCorner[0] = lc.offset().at(0);
+		frontLowerLeftCorner[1] = lc.offset().at(1);
+		frontLowerLeftCorner[2] = lc.offset().at(2);
+
+		simulationAreaExtent[0] = lc.sizeofdomainX();
+		simulationAreaExtent[1] = lc.sizeofdomainY();
+		simulationAreaExtent[2] = lc.sizeofdomainZ();
+
+
+		container = new LinkedCellParticleContainer(dim, particles, cutoffDistance, frontLowerLeftCorner,
+			simulationAreaExtent, 2, false, false, false, false, false, false, desc.sigma);
+		
+		(*out) = container;
 
 	}
 	else

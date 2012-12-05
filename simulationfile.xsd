@@ -8,6 +8,14 @@ author: Leonhard Spiegelberg & Florian Dietz
 
 <xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
 
+  <!-- simple vector, node that this should be later length-checked! -->
+  <xsd:simpleType name="Vec3_t">
+    <xsd:list itemType="xsd:decimal" ></xsd:list>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="dim3_t">
+    <xsd:list itemType="xsd:int"></xsd:list>
+  </xsd:simpleType>
 
   <!-- 
   types of algorithms
@@ -23,6 +31,8 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="sizeofdomainY" type="xsd:decimal"></xsd:element>
       <xsd:element name="sizeofdomainZ" type="xsd:decimal"></xsd:element>
       <xsd:element name="cutoff_radius" type="xsd:decimal"></xsd:element>
+      <!-- the front lower left corner -->
+      <xsd:element name="offset" type="Vec3_t"></xsd:element>
     </xsd:all>
   </xsd:complexType>
   
@@ -68,14 +78,6 @@ author: Leonhard Spiegelberg & Florian Dietz
   <!--
   data node stuff
   -->
-  <!-- simple vector, node that this should be later length-checked! -->
-  <xsd:simpleType name="Vec3_t">
-    <xsd:list itemType="xsd:decimal" ></xsd:list>  
-  </xsd:simpleType>
-
-  <xsd:simpleType name="dim3_t">
-    <xsd:list itemType="xsd:int"></xsd:list>
-  </xsd:simpleType>
   
   <xsd:complexType name="particle_t">
     <xsd:all>

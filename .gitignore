@@ -49,7 +49,7 @@ doc/
 *.o
 
 #log4cxx file
-.1
+molsim.log.1
 
 #test files
 test.xml

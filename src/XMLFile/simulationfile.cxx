@@ -40,6 +40,54 @@
 
 #include "simulationfile.hxx"
 
+// Vec3_t
+//
+
+Vec3_t::
+Vec3_t ()
+: ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > ( ::xml_schema::flags (0), this)
+{
+}
+
+Vec3_t::
+Vec3_t (size_type n, const ::xml_schema::decimal& x)
+: ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (n, x, this)
+{
+}
+
+Vec3_t::
+Vec3_t (const Vec3_t& o,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (o, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (o, f, this)
+{
+}
+
+// dim3_t
+//
+
+dim3_t::
+dim3_t ()
+: ::xsd::cxx::tree::list< ::xml_schema::int_, char > ( ::xml_schema::flags (0), this)
+{
+}
+
+dim3_t::
+dim3_t (size_type n, const ::xml_schema::int_& x)
+: ::xsd::cxx::tree::list< ::xml_schema::int_, char > (n, x, this)
+{
+}
+
+dim3_t::
+dim3_t (const dim3_t& o,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (o, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (o, f, this)
+{
+}
+
 // List_t
 // 
 
@@ -117,6 +165,30 @@ void LinkedCell_t::
 cutoff_radius (const cutoff_radius_type& x)
 {
   this->cutoff_radius_.set (x);
+}
+
+const LinkedCell_t::offset_type& LinkedCell_t::
+offset () const
+{
+  return this->offset_.get ();
+}
+
+LinkedCell_t::offset_type& LinkedCell_t::
+offset ()
+{
+  return this->offset_.get ();
+}
+
+void LinkedCell_t::
+offset (const offset_type& x)
+{
+  this->offset_.set (x);
+}
+
+void LinkedCell_t::
+offset (::std::auto_ptr< offset_type > x)
+{
+  this->offset_.set (x);
 }
 
 
@@ -385,54 +457,6 @@ algorithm (::std::auto_ptr< algorithm_type > x)
   this->algorithm_.set (x);
 }
 
-
-// Vec3_t
-//
-
-Vec3_t::
-Vec3_t ()
-: ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > ( ::xml_schema::flags (0), this)
-{
-}
-
-Vec3_t::
-Vec3_t (size_type n, const ::xml_schema::decimal& x)
-: ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (n, x, this)
-{
-}
-
-Vec3_t::
-Vec3_t (const Vec3_t& o,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (o, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (o, f, this)
-{
-}
-
-// dim3_t
-//
-
-dim3_t::
-dim3_t ()
-: ::xsd::cxx::tree::list< ::xml_schema::int_, char > ( ::xml_schema::flags (0), this)
-{
-}
-
-dim3_t::
-dim3_t (size_type n, const ::xml_schema::int_& x)
-: ::xsd::cxx::tree::list< ::xml_schema::int_, char > (n, x, this)
-{
-}
-
-dim3_t::
-dim3_t (const dim3_t& o,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (o, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (o, f, this)
-{
-}
 
 // particle_t
 // 
@@ -915,6 +939,92 @@ operator= (value v)
 
 #include <xsd/cxx/xml/dom/parsing-source.hxx>
 
+// Vec3_t
+//
+
+Vec3_t::
+Vec3_t (const ::xercesc::DOMElement& e,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (e, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (e, f, this)
+{
+}
+
+Vec3_t::
+Vec3_t (const ::xercesc::DOMAttr& a,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (a, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (a, f, this)
+{
+}
+
+Vec3_t::
+Vec3_t (const ::std::string& s,
+        const ::xercesc::DOMElement* e,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (s, e, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (s, e, f, this)
+{
+}
+
+Vec3_t* Vec3_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class Vec3_t (*this, f, c);
+}
+
+Vec3_t::
+~Vec3_t ()
+{
+}
+
+// dim3_t
+//
+
+dim3_t::
+dim3_t (const ::xercesc::DOMElement& e,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (e, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (e, f, this)
+{
+}
+
+dim3_t::
+dim3_t (const ::xercesc::DOMAttr& a,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (a, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (a, f, this)
+{
+}
+
+dim3_t::
+dim3_t (const ::std::string& s,
+        const ::xercesc::DOMElement* e,
+        ::xml_schema::flags f,
+        ::xml_schema::container* c)
+: ::xml_schema::simple_type (s, e, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (s, e, f, this)
+{
+}
+
+dim3_t* dim3_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class dim3_t (*this, f, c);
+}
+
+dim3_t::
+~dim3_t ()
+{
+}
+
 // List_t
 //
 
@@ -976,12 +1086,14 @@ LinkedCell_t::
 LinkedCell_t (const sizeofdomainX_type& sizeofdomainX,
               const sizeofdomainY_type& sizeofdomainY,
               const sizeofdomainZ_type& sizeofdomainZ,
-              const cutoff_radius_type& cutoff_radius)
+              const cutoff_radius_type& cutoff_radius,
+              const offset_type& offset)
 : ::xml_schema::type (),
   sizeofdomainX_ (sizeofdomainX, ::xml_schema::flags (), this),
   sizeofdomainY_ (sizeofdomainY, ::xml_schema::flags (), this),
   sizeofdomainZ_ (sizeofdomainZ, ::xml_schema::flags (), this),
-  cutoff_radius_ (cutoff_radius, ::xml_schema::flags (), this)
+  cutoff_radius_ (cutoff_radius, ::xml_schema::flags (), this),
+  offset_ (offset, ::xml_schema::flags (), this)
 {
 }
 
@@ -993,7 +1105,8 @@ LinkedCell_t (const LinkedCell_t& x,
   sizeofdomainX_ (x.sizeofdomainX_, f, this),
   sizeofdomainY_ (x.sizeofdomainY_, f, this),
   sizeofdomainZ_ (x.sizeofdomainZ_, f, this),
-  cutoff_radius_ (x.cutoff_radius_, f, this)
+  cutoff_radius_ (x.cutoff_radius_, f, this),
+  offset_ (x.offset_, f, this)
 {
 }
 
@@ -1005,7 +1118,8 @@ LinkedCell_t (const ::xercesc::DOMElement& e,
   sizeofdomainX_ (f, this),
   sizeofdomainY_ (f, this),
   sizeofdomainZ_ (f, this),
-  cutoff_radius_ (f, this)
+  cutoff_radius_ (f, this),
+  offset_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1068,6 +1182,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
+    // offset
+    //
+    if (n.name () == "offset" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< offset_type > r (
+        offset_traits::create (i, f, this));
+
+      if (!offset_.present ())
+      {
+        this->offset_.set (r);
+        continue;
+      }
+    }
+
     break;
   }
 
@@ -1096,6 +1224,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   {
     throw ::xsd::cxx::tree::expected_element< char > (
       "cutoff_radius",
+      "");
+  }
+
+  if (!offset_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "offset",
       "");
   }
 }
@@ -1508,92 +1643,6 @@ _clone (::xml_schema::flags f,
 
 params_t::
 ~params_t ()
-{
-}
-
-// Vec3_t
-//
-
-Vec3_t::
-Vec3_t (const ::xercesc::DOMElement& e,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (e, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (e, f, this)
-{
-}
-
-Vec3_t::
-Vec3_t (const ::xercesc::DOMAttr& a,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (a, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (a, f, this)
-{
-}
-
-Vec3_t::
-Vec3_t (const ::std::string& s,
-        const ::xercesc::DOMElement* e,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (s, e, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (s, e, f, this)
-{
-}
-
-Vec3_t* Vec3_t::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class Vec3_t (*this, f, c);
-}
-
-Vec3_t::
-~Vec3_t ()
-{
-}
-
-// dim3_t
-//
-
-dim3_t::
-dim3_t (const ::xercesc::DOMElement& e,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (e, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (e, f, this)
-{
-}
-
-dim3_t::
-dim3_t (const ::xercesc::DOMAttr& a,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (a, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (a, f, this)
-{
-}
-
-dim3_t::
-dim3_t (const ::std::string& s,
-        const ::xercesc::DOMElement* e,
-        ::xml_schema::flags f,
-        ::xml_schema::container* c)
-: ::xml_schema::simple_type (s, e, f, c),
-  ::xsd::cxx::tree::list< ::xml_schema::int_, char > (s, e, f, this)
-{
-}
-
-dim3_t* dim3_t::
-_clone (::xml_schema::flags f,
-        ::xml_schema::container* c) const
-{
-  return new class dim3_t (*this, f, c);
-}
-
-dim3_t::
-~dim3_t ()
 {
 }
 
