@@ -402,7 +402,7 @@ private:
 					zIndex = (int)((p.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
 
 					// is particle outside of its father cell?
-					if(Index2DTo1D(xIndex, yIndex) != i)
+					if(Index3DTo1D(xIndex, yIndex, zIndex) != i)
 					{
 						// particle in halo?
 						if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
