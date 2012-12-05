@@ -35,25 +35,15 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 {
 	XMLFileReader fr;
 
-	// be aware of possible exceptions!
-	try
-	{
-		fr.readFile(filename);
+	if(FAILED(fr.readFile(filename)))return E_FILEERROR;
 
-		this->desc = fr.getDescription();
+	this->desc = fr.getDescription();
 
-		// get container
+	// get container
+	Release(); // to free mem
 
-		Release(); // to free mem
-
-		fr.makeParticleContainer(&particles);
-	}
-	catch(const xml_schema::exception& e)
-	{
-	  LOG4CXX_ERROR(simulationLogger, e.what());
-	  return E_FILEERROR;
-	}
-
+	fr.makeParticleContainer(&particles);
+	
 	// is particles a valid pointer? - If not file has not been parsed correctly...
 	if(!particles)return E_FILEERROR;
 

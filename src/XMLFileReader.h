@@ -38,9 +38,12 @@ public:
 	XMLFileReader() : fileParsed(false)	{}
 
 	/// reads an XML file
+	/// @param filename filename of .xml file
+	/// @param validate if true, the file will be validated against simulationfile.xsd
 	/// @return returns S_OK on success or
 	/// E_FILENOTFOUND if the file is not avaliable
-	err_type readFile(const char *filename);
+	/// or E_FILEERROR if validation fails
+	err_type readFile(const char *filename, bool validate = false);
 
 	/// getter
 	/// @return returns description of simulation(all simulation params)

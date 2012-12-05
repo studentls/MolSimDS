@@ -19,15 +19,28 @@
 #include "ListParticleContainer.h"
 #include "ParticleGenerator.h"
 
-err_type XMLFileReader::readFile(const char *filename)
+err_type XMLFileReader::readFile(const char *filename, bool validate)
 {
 	// exists file?
 	if(!utils::fileExists(filename))return E_FILENOTFOUND;
 
 	// parse like in the Hello example from XSD
-	// maybe later check if the format is really ok, or any errors occur!
+	
+	// try - catch block to avoid mistakes...
+	try
+	{
+		::xml_schema::flags flags;
+		flags = !validate ? ::xml_schema::flags::dont_validate : 0;
 
-	file = std::auto_ptr<simulationfile_t>(simulationfile(filename,::xml_schema::flags::dont_validate));
+		file = std::auto_ptr<simulationfile_t>(simulationfile(filename, flags));
+	
+	}
+	catch(const xml_schema::exception& e)
+	{
+	  LOG4CXX_ERROR(generalOutputLogger, e.what());
+	  return E_FILEERROR;
+	}
+
 	
 	//set desc
 	desc.brownianMotionFactor	= file->params().brownianMotionFactor();
