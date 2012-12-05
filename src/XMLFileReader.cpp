@@ -129,7 +129,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 		dim[0] = it->N().at(0);
 		dim[1] = it->N().at(1);
-		dim[2] = (it->N().size() > 2) ? it->N().at(2) : 0;
+		dim[2] = (it->N().size() > 2) ? it->N().at(2) : 1;
 
 
 		// make Cuboid and add to particle

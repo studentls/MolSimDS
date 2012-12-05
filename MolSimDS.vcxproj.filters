@@ -96,6 +96,9 @@
     <ClInclude Include="src\XMLFile\simulationfile.hxx">
       <Filter>Quelldateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\XMLFileReaderTest.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -156,5 +159,6 @@
     <None Include="listexample.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="ClassDiagram1.cd" />
   </ItemGroup>
 </Project>

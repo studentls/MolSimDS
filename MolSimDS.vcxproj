@@ -101,6 +101,7 @@
     <ClInclude Include="src\utils\utils.h" />
     <ClInclude Include="src\utils\Vector.h" />
     <ClInclude Include="src\XMLFileReader.h" />
+    <ClInclude Include="src\XMLFileReaderTest.h" />
     <ClInclude Include="src\XMLFile\simulationfile.hxx" />
   </ItemGroup>
   <ItemGroup>
@@ -145,6 +146,7 @@
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
+    <None Include="ClassDiagram1.cd" />
     <None Include="example.xml" />
     <None Include="listexample.xml" />
   </ItemGroup>

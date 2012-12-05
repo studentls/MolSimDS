@@ -29,6 +29,7 @@
 
 //include tests
 #include "ParticleContainerTest.h"
+#include "XMLFileReaderTest.h"
 
 /// specifies in which state the application currently is
 enum ApplicationState
