@@ -65,6 +65,7 @@ void Simulation::performStep()
 	// reassign particles, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
 		((LinkedCellParticleContainer*)particles)->ReassignParticles();
+	
 	// calculate new f
 	calculateF();
 
@@ -100,10 +101,6 @@ err_type Simulation::Run()
 		// perform one iteration step
 		performStep();
 
-		if(iteration == 495)
-		{
-			int x = 0;
-		}
 		// TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % desc.iterationsperoutput == 0) {
