@@ -343,6 +343,15 @@ private:
 				if(p.x[0] > xmax)falseAssignment = true;
 				if(p.x[1] < ymin)falseAssignment = true;
 				if(p.x[1] > ymax)falseAssignment = true;
+
+				// for debugging
+				/*if ((p.getF() - p.getOldF()).L2Norm() > 100)
+				{
+					std::cout<<"EXTREME FORCE"<<std::endl;
+					std::cout<<(p.getF() - p.getOldF()).L2Norm()<<std::endl;
+					std::cout<< p.x[0]<<std::endl;
+					std::cout<< p.x[1]<<std::endl;
+				}*/
 			}
 
 			if(falseAssignment)
@@ -391,6 +400,7 @@ private:
 
 						// remove particle from current cell (i-th cell)
 						it = Cells[i].erase(it);
+						//std::cout<< "from "<<i<<": "<<Cells[i].size() << " to "<<Index2DTo1D(xIndex, yIndex)<<": "<<Cells[Index2DTo1D(xIndex, yIndex)].size()<<std::endl;
 
 					}
 				}
@@ -551,7 +561,10 @@ public:
 				Particle vp(p);
 				vp.x[axis] = border;
 				(*func)(data, p, vp);
-				// TODO: delete vp manually?
+				// TODO: delete vp manually in c++?
+				// I guess not? But I'm not sure.
+				// You don't have to delete primitive local variables, either.
+				// but this is a class
 			}
 		}
 	}
@@ -610,7 +623,21 @@ public:
 			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle& p = *it;
-				(*func)(data, p);				
+				(*func)(data, p);
+				
+				/*std::cout<<p.getF().L2Norm()<<std::endl;
+				std::cout<<p.v.L2Norm()<<std::endl;
+				std::cout<<p.x[0]<<std::endl;
+				std::cout<<p.x[1]<<std::endl;
+				std::cout<<i<<std::endl;
+				int xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
+				int yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
+				std::cout<<xIndex<<std::endl;
+				std::cout<<yIndex<<std::endl;
+				std::cout<<Index2DTo1D(xIndex, yIndex)<<std::endl;
+				if (Index2DTo1D(xIndex, yIndex) != i)
+					std::cin >> xIndex;
+				std::cout<<"-----"<<std::endl;*/
 			}
 		}
 
@@ -649,8 +676,10 @@ public:
 
 							
 							//is distance squared less than cutoff radius squared?
-							//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
+							if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
 								(*func)(data, p2, p1);
+									
+							//std::cout<<"-";
 						}
 			// calc data for a pair (a, a)
 			else
@@ -665,9 +694,13 @@ public:
 
 						
 						//is distance squared less than cutoff radius squared?
-						//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
+						if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
 							(*func)(data, p1, p2);
+									
+						//std::cout<<"-";
 					}
+									
+					//std::cout<<pair[0]<<" "<<pair[1]<<std::endl;
 		}
 
 		// TODO
@@ -749,10 +782,21 @@ public:
 		return sum;
 	}
 	
+	/// returns the halo particles
+	const std::vector<Particle>&	getHaloParticles()
+	{
+		return halo;
+	}
+	
+	/// deletes the halo particles
+	const std::vector<Particle>&	deleteHaloParticles()
+	{
+		halo.clear();
+	}
+	
 	
 	// Quick 'n' dirty hack
 	std::vector<Particle> p;
-	
 	
 	/// this method shall be later removed...
 	/// returns ListParticleContainer's internal container
@@ -797,7 +841,13 @@ public:
 						Particle pt = *it;
 						p.push_back(pt);
 					}
-					filledCells++;
+				filledCells++;
+
+				// print the size of each cell
+				// NOTE: a long time after an explosion, when the reflective boundaries are on and everything ha sstabilized,
+				// every cell seems to contain 1 particle, sometimes 2, rarely more
+				// NEVER zero. What gives?
+				std::cout<< Cells[i].size() << " ";
 			}
 		}
 
