@@ -670,6 +670,12 @@ public:
 					}
 		}
 
+		// TODO
+		// this should be in Simulation.performStep
+		// it works here just fine and efficient
+		// but the name of the function becomes nonsensical
+		ApplyReflectiveBoundaryConditions(func, data);
+
 		// inc counter for iterations, if needed reassign particles in cells...
 		iterationCount++;
 		if(iterationCount > this->iterationsPerParticleToCellReassignment)
