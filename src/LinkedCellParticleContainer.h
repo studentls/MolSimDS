@@ -208,6 +208,17 @@ public:
 		this->cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
 
+		// Deprecated test print
+		/*
+		this->dim = 2;
+		cellCount[0] = 3;
+		cellCount[1] = 3;
+
+		generatePairs();
+		for(std::vector<utils::Vector<unsigned int, 2> >::iterator it = cellPairs.begin(); it != cellPairs.end(); it++)
+			LOG4CXX_INFO(generalOutputLogger, "("<<(*it)[0]<<", "<<(*it)[1]<<")");
+			*/
+
 		// call init
 		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, 
 			boundaryConditions, sigma);		

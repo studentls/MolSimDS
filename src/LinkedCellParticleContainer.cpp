@@ -187,6 +187,7 @@ void	LinkedCellParticleContainer::generatePairs()
 	// for xd, yd € {1, ..., radius}
 	// note that for the last pair type, it doesn't matter if it is {(x, y + yd), (x + xd, y)} or like above
 	// where radius determines how many cells are possibly contained in the cutoff sphere
+	// for radius > 1 further work may be considered to prohibit doubled elements...
 
 	int radius = 1; // currently meshwidth is identical to cutoffradius
 
@@ -205,6 +206,21 @@ void	LinkedCellParticleContainer::generatePairs()
 						cellPairs.push_back(makePair(Index2DTo1D(x, y),			Index2DTo1D(x, y + yd)));
 						cellPairs.push_back(makePair(Index2DTo1D(x + xd, y),	Index2DTo1D(x, y + yd)));
 					}
+
+		// we repeat a pattern
+		// |-----
+		// |\   /
+		// |  x 
+		// | /  \
+		// this the bottom & right boundary has to be set manually
+		for(int x = 0; x < cellCount[0] - 1; x++)
+		{
+			cellPairs.push_back(makePair(Index2DTo1D(x, cellCount[1] - 1),			Index2DTo1D(x + 1, cellCount[1] - 1)));
+		}
+		for(int y = 0; y < cellCount[1] - 1; y++)
+		{
+			cellPairs.push_back(makePair(Index2DTo1D(cellCount[0] - 1, y),			Index2DTo1D(cellCount[0] - 1, y + 1)));
+		}
 	}
 
 	// 3D not yet supported
