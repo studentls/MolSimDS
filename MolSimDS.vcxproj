@@ -106,6 +106,7 @@
     <ClInclude Include="src\utils\Vector.h" />
     <ClInclude Include="src\XMLFileReader.h" />
     <ClInclude Include="src\XMLFileReaderTest.h" />
+    <ClInclude Include="src\XMLFile\simulationfile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\FileReader.cpp" />
@@ -123,6 +124,7 @@
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
     <ClCompile Include="src\XMLFileReader.cpp" />
+    <ClCompile Include="src\XMLFile\simulationfile.cpp" />
   </ItemGroup>
   <ItemGroup>
     <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">

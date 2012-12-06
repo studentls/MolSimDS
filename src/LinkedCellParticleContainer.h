@@ -79,6 +79,22 @@ private:
 	/// where 1, 2 are the index of the Cells array
 	/// note that here the space is very important, as g++ has problems otherwise parsing it
 	std::vector<utils::Vector<unsigned int, 2> >	cellPairs;
+
+	/// little helper function, to create fast a pair
+	/// @param i1 first index
+	/// @param i2 second index
+	utils::Vector<unsigned int, 2> makePair(unsigned int i1, unsigned int i2)
+	{
+		utils::Vector<unsigned int, 2> res;
+		res[0] = i1;
+		res[1] = i2;
+
+		return res;
+	}
+
+	/// function, which generates pairs for linkedcellalgorithm
+	void					generatePairs();
+
 		
 	/// the distance below which reflective boundaries reflect
 	double reflectiveBoundaryDistance;
@@ -191,7 +207,6 @@ public:
 		this->dim = dim;
 		this->cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
-
 
 		// call init
 		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, 
