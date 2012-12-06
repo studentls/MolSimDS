@@ -408,15 +408,14 @@ public:
 	/// @data optional data given to func
 	void Iterate(void(*func)(void*, Particle&), void *data);
 
-	/// helper function, to get neighbours
+	/// helper function, to get neighbours for a 2D grid
 	/// @param index 1D index of a grid cell
 	/// @return vector of neighbour cell indices...
-	inline std::vector<unsigned int> getNeighbours(unsigned int index)
+	inline std::vector<unsigned int> getNeighbours2D(unsigned int index)
 	{
 		std::vector<unsigned int> neighbours;
 
-		// only dim = 2 supported
-		if(dim != 2)return neighbours;
+		assert(dim == 2);
 
 		unsigned int x = index % cellCount[0];
 		unsigned int y = index / cellCount[0];
@@ -432,6 +431,35 @@ public:
 
 				neighbours.push_back(index);
 			}
+
+		return neighbours;
+	}
+
+	/// helper function, to get neighbours for a 3D grid
+	/// @param index 1D index of a grid cell
+	/// @return vector of neighbour cell indices...
+	inline std::vector<unsigned int> getNeighbours3D(unsigned int index)
+	{
+		std::vector<unsigned int> neighbours;
+
+		assert(dim == 3);
+
+		unsigned int x = index % cellCount[0];
+		unsigned int z = index / (cellCount[0] * cellCount[1]);
+		unsigned int y = (index - z * cellCount[0]*cellCount[1]) / cellCount[0];
+
+		//beware of special cases!
+		for(int xp = -1; xp <= 1; xp++)
+			for(int yp = -1; yp <= 1; yp++)
+				for(int zp = -1; zp <= 1; zp++)
+				{
+					int index = x +xp + (y + yp) * cellCount[0] + (z + zp) * cellCount[0] * cellCount[1];
+
+					//valid?
+					if(index < 0 || index >= getCellCount())continue;
+
+					neighbours.push_back(index);
+				}
 
 		return neighbours;
 	}

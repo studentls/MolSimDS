@@ -67,7 +67,10 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 		{
 
 			// get neighbours of cell_i with little helper function
-			std::vector<unsigned int> neighbours = getNeighbours(i);
+			std::vector<unsigned int> neighbours;
+			
+			if(dim == 2)neighbours = getNeighbours2D(i);
+			else if(dim == 3)neighbours = getNeighbours3D(i);
 
 			// go through neighbours
 			for(std::vector<unsigned int>::iterator nt = neighbours.begin(); nt != neighbours.end(); nt++)
@@ -113,7 +116,24 @@ std::vector<Particle> LinkedCellParticleContainer::getBoundaryParticles()
 			}
 	}
 
-	// 3D not yet supported...
+	// case 3D
+	if(dim == 3)
+	{
+		// |.........|
+		// |         |
+		// |.........|
+		for(int x = 0; x < cellCount[0]; x++)
+			for(int y = 0; y < cellCount[1]; y++)
+				for(int z = 0; z < cellCount[2]; z++)
+				{
+					// only boundaries are allowed
+					if(x != 0 && y != 0 && z != 0 && x != cellCount[0] && y != cellCount[1] && z != cellCount[2])continue;
+
+					// add to container
+					int index = Index3DTo1D(x, y, z);
+					particles.insert(particles.end(), Cells[index].begin(), Cells[index].end());
+				}
+	}
 
 	return particles;
 }
