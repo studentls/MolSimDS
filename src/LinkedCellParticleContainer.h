@@ -269,7 +269,7 @@ private:
 public:
 	/// default constructor, set everthing to good values
 	LinkedCellParticleContainer()
-	{
+	{index
 		Cells = NULL;
 		cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
@@ -647,7 +647,7 @@ public:
 	}
 
 	/// method to identify container
-	/// @return returns PCT_LIST
+	/// @return returns PCT_LINKEDCELL
 	ParticleContainerType			getType() {return PCT_LINKEDCELL;}
 
 	/// method to return halo particles
