@@ -96,9 +96,6 @@
     <ClInclude Include="src\XMLFileReaderTest.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="src\XMLFile\simulationfile.hxx">
-      <Filter>Quelldateien</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -138,9 +135,6 @@
       <Filter>Quelldateien</Filter>
     </ClCompile>
     <ClCompile Include="src\XMLFileReader.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\XMLFile\simulationfile.cxx">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
