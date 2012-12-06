@@ -19,7 +19,7 @@ LDFLAGS= -L/opt/lib -lxerces-c -lrt -llog4cxx -lcppunit
 
 
 
-INCLUDES= -I./src -I./libxsd
+INCLUDES= -I./src 
 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=molsim
