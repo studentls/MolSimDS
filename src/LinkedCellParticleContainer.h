@@ -357,33 +357,12 @@ public:
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
-	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
-		for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
-		{
-			// TODO: this should obviously work by reference to the array, not copy it
-			// does it do that right now?
-			utils::Vector<double, 4>& elem = *it;
-			std::vector<Particle>& cell = Cells[(int)(elem[0])];
-			int axis = (int)(elem[1]);
-			double direction = elem[2];
-			double border = elem[3];
-			for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
-				Particle& p = *it;
-				double dist = direction * (border - p.x[axis]);
-				// skip the particle if it is too far away from the border
-				if (dist > reflectiveBoundaryDistance)
-					continue;
-				// create a temporary, virtual Particle
-				// a copy of the current particle, but located at the border
-				Particle vp(p);
-				vp.x[axis] = border;
-				(*func)(data, p, vp);
-				// TODO: delete vp manually?
-			}
-		}
-	}
+	/// @param func function pointer, to calculate interaction with boundary particle
+	/// @data optional data given to func
+	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
 
 	/// a method to add a Particle to the LinkedCellParticleContainer
+	/// @param particle the particle to add
 	void AddParticle(const Particle& particle)
 	{
 		int xIndex = 0,yIndex = 0, zIndex = 0;
@@ -425,9 +404,12 @@ public:
 
 	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
 	/// @param data additional data given to func
+	/// @param func function pointer, to calculate interaction with boundary particle
+	/// @data optional data given to func
 	void Iterate(void(*func)(void*, Particle&), void *data);
 
 	/// helper function, to get neighbours
+	/// @param index 1D index of a grid cell
 	/// @return vector of neighbour cell indices...
 	inline std::vector<unsigned int> getNeighbours(unsigned int index)
 	{
@@ -458,6 +440,8 @@ public:
 	/// uses it to iterate over all pairs of Particles (each symmetrical pair is
 	/// only taken once to reduce redundancy)
 	/// @param data additional data given to func
+	/// @param func function pointer, to calculate interaction with boundary particle
+	/// @data optional data given to func
 	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
 
 	/// add particles from *.txt file
@@ -643,6 +627,7 @@ public:
 	void							clearHaloParticles()		{if(!halo.empty())halo.clear();}
 
 	/// get all boundary particles
+	/// @return new vector of boundary particles
 	std::vector<Particle>			getBoundaryParticles();
 };
 

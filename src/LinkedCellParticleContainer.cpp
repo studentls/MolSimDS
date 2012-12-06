@@ -117,3 +117,34 @@ std::vector<Particle> LinkedCellParticleContainer::getBoundaryParticles()
 
 	return particles;
 }
+
+void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
+{
+	// go through boundaries...
+	for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
+	{
+		// TODO: this should obviously work by reference to the array, not copy it
+		// does it do that right now?
+		utils::Vector<double, 4>& elem = *it;
+		std::vector<Particle>& cell = Cells[(int)(elem[0])];
+		int axis = (int)(elem[1]);
+		double direction = elem[2];
+		double border = elem[3];
+		for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
+			Particle& p = *it;
+			double dist = direction * (border - p.x[axis]);
+			// skip the particle if it is too far away from the border
+			if (dist > reflectiveBoundaryDistance)
+				continue;
+			// create a temporary, virtual Particle
+			// a copy of the current particle, but located at the border
+			Particle vp(p);
+			vp.x[axis] = border;
+			(*func)(data, p, vp);
+			// TODO: delete vp manually?
+		}
+	}
+
+	// if BC_OUTFLOW is set, delete halo particles
+	if(boundaryConditions & BC_OUTFLOW)clearHaloParticles();
+}
