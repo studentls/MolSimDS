@@ -425,7 +425,7 @@ private:
 		}
 
 		//test
-		this->CheckAssignment();
+		//this->CheckAssignment();
 	}
 	
 
