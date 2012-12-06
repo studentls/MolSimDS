@@ -18,7 +18,102 @@
 
 #include "LinkedCellParticleContainer.h"
 
-// ...
-// program in header file, as LinkedCell is a template class
+void LinkedCellParticleContainer::Iterate(void(*func)(void*, Particle&), void *data)
+{		
+	assert(Cells);
+
+	// go through all Cells...
+	for(int i = 0; i < getCellCount(); i++)
+	{
+		if(Cells[i].empty())continue;
+
+		for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+		{
+			Particle& p = *it;
+			(*func)(data, p);				
+		}
+	}
+}
+
+void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data)
+{
+	// Step 1: calc pairwise force between particles for each cell
+
+	// go through cells
+	for(unsigned int i = 0; i < getCellCount(); i++)
+	{
+		// for all particles in cell_i, calc forces in cell_i
+		for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
+		{
+			for(std::vector<Particle>::iterator it2 = it1 + 1; it2 != Cells[i].end(); it2++)
+			{
+				Particle& p1 = *it1;
+				Particle& p2 = *it2;
+
+				func(data, p1, p2);
+			}
+		}
+	}
 
 
+
+	// Step 2: calc force with neighbouring cells
+
+	// go through cells
+	for(unsigned int i = 0; i < getCellCount(); i++)
+	{
+		// for all particles in cell_i, calc forces with neighbours
+		for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
+		{
+
+			// get neighbours of cell_i with little helper function
+			std::vector<unsigned int> neighbours = getNeighbours(i);
+
+			// go through neighbours
+			for(std::vector<unsigned int>::iterator nt = neighbours.begin(); nt != neighbours.end(); nt++)
+			{
+				unsigned int j = *nt;
+
+				// calc force, based on actio / reaction between cell_i and cell_j
+				for(std::vector<Particle>::iterator it2 = Cells[j].begin(); it2 != Cells[j].end(); it2++)
+				{
+					// only for one combination
+					if(i < j)
+					{
+						Particle& p1 = *it1;
+						Particle& p2 = *it2;
+
+						func(data, p1, p2);
+					}
+				}
+			}
+		}
+	}
+}
+
+std::vector<Particle> LinkedCellParticleContainer::getBoundaryParticles()
+{
+	std::vector<Particle> particles;
+
+	// case 2D
+	if(dim == 2)
+	{
+		// |.........|
+		// |         |
+		// |.........|
+		for(int x = 0; x < cellCount[0]; x++)
+			for(int y = 0; y < cellCount[1]; y++)
+			{
+				// only boundaries are allowed
+				if(x != 0 && y != 0 && x != cellCount[0] && y != cellCount[1])continue;
+
+				// add to container
+				int index = Index2DTo1D(x, y);
+				particles.insert(particles.end(), Cells[index].begin(), Cells[index].end());
+			}
+	}
+
+	// 3D not yet supported...
+
+	return particles;
+}

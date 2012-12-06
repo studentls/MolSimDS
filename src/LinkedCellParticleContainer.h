@@ -466,26 +466,11 @@ public:
 
 	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
 	/// @param data additional data given to func
-	void Iterate(void(*func)(void*, Particle&), void *data) {
-		
-		assert(Cells);
-
-		// go through all Cells...
-		for(int i = 0; i < getCellCount(); i++)
-		{
-			if(Cells[i].empty())continue;
-
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
-			{
-				Particle& p = *it;
-				(*func)(data, p);				
-			}
-		}
-	}
+	void Iterate(void(*func)(void*, Particle&), void *data);
 
 	/// helper function, to get neighbours
 	/// @return vector of neighbour cell indices...
-	std::vector<unsigned int> getNeighbours(unsigned int index)
+	inline std::vector<unsigned int> getNeighbours(unsigned int index)
 	{
 		std::vector<unsigned int> neighbours;
 
@@ -514,65 +499,7 @@ public:
 	/// uses it to iterate over all pairs of Particles (each symmetrical pair is
 	/// only taken once to reduce redundancy)
 	/// @param data additional data given to func
-	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {
-		
-		// new func without pairs...
-
-
-
-		// Step 1: calc pairwise force between particles for each cell
-
-		// go through cells
-		for(unsigned int i = 0; i < getCellCount(); i++)
-		{
-			// for all particles in cell_i, calc forces in cell_i
-			for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
-			{
-				for(std::vector<Particle>::iterator it2 = it1 + 1; it2 != Cells[i].end(); it2++)
-				{
-					Particle& p1 = *it1;
-					Particle& p2 = *it2;
-
-					func(data, p1, p2);
-				}
-			}
-		}
-
-
-
-		// Step 2: calc force with neighbouring cells
-
-		// go through cells
-		for(unsigned int i = 0; i < getCellCount(); i++)
-		{
-			// for all particles in cell_i, calc forces with neighbours
-			for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
-			{
-
-				// get neighbours of cell_i with little helper function
-				std::vector<unsigned int> neighbours = getNeighbours(i);
-
-				// go through neighbours
-				for(std::vector<unsigned int>::iterator nt = neighbours.begin(); nt != neighbours.end(); nt++)
-				{
-					unsigned int j = *nt;
-
-					// calc force, based on actio / reaction between cell_i and cell_j
-					for(std::vector<Particle>::iterator it2 = Cells[j].begin(); it2 != Cells[j].end(); it2++)
-					{
-						// only for one combination
-						if(i < j)
-						{
-							Particle& p1 = *it1;
-							Particle& p2 = *it2;
-
-							func(data, p1, p2);
-						}
-					}
-				}
-			}
-		}
-	}
+	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
 
 	/// add particles from *.txt file
 	void							AddParticlesFromFile(const char *filename)
@@ -748,6 +675,16 @@ public:
 	/// method to identify container
 	/// @return returns PCT_LIST
 	ParticleContainerType			getType() {return PCT_LINKEDCELL;}
+
+	/// method to return halo particles
+	/// @return returns reference to halo particle vector
+	std::vector<Particle>&			getHaloParticles()	{return this->halo;}
+
+	/// method to clear halo
+	void							clearHaloParticles()		{if(!halo.empty())halo.clear();}
+
+	/// get all boundary particles
+	std::vector<Particle>			getBoundaryParticles();
 };
 
 #endif 
