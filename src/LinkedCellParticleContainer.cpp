@@ -145,6 +145,11 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 		}
 	}
 
+	// Annotation:
+	// In Task 3 it is mentioned that each boundary shall specified if it reflects or outflows the particle
+	// as there is currently no interaction with halo at all, the particles will be simply deleted if a global
+	// outflow flag is set
+
 	// if BC_OUTFLOW is set, delete halo particles
 	if(boundaryConditions & BC_OUTFLOW)clearHaloParticles();
 }
