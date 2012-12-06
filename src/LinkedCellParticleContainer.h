@@ -572,14 +572,6 @@ public:
 				}
 			}
 		}
-
-		// TODO
-		// this should be in Simulation.performStep
-		// it works here just fine and efficient
-		// but the name of the function becomes nonsensical
-		ApplyReflectiveBoundaryConditions(func, data);
-
-		//Reassign should be in Simulation.performStep
 	}
 
 	/// add particles from *.txt file

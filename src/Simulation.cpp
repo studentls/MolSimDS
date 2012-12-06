@@ -61,10 +61,6 @@ void Simulation::performStep()
 {
 	// calculate new x
 	calculateX();
-
-	// reassign particles, if LinkedCell Algorithm is used...
-	if(particles->getType() == PCT_LINKEDCELL)
-		((LinkedCellParticleContainer*)particles)->ReassignParticles();
 	
 	// calculate new f
 	calculateF();
@@ -144,11 +140,20 @@ err_type Simulation::Release()
 }
 
 void Simulation::calculateF() {
+
+	// reassign particles, if LinkedCell Algorithm is used...
+	if(particles->getType() == PCT_LINKEDCELL)
+		((LinkedCellParticleContainer*)particles)->ReassignParticles();
+
 	// call particles.Iterate() on forceResetter
 	particles->Iterate(forceResetter, (void*)&desc);
 
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
+
+	// apply Boundary conditions, if LinkedCell Algorithm is used...
+	if(particles->getType() == PCT_LINKEDCELL)
+		((LinkedCellParticleContainer*)particles)->ApplyReflectiveBoundaryConditions(forceCalculator, (void*)&desc);
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
