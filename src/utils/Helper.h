@@ -18,6 +18,8 @@
 #include <iostream>
 #include <cstdio>
 #include <cassert>
+#include <cstdlib>
+#include <cstring>
 
 /// specifies line width used by line(...)
 static const int g_linewidth = 40;

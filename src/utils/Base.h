@@ -98,6 +98,7 @@ typedef unsigned char	byte;
 #define E_INDEXOUTOFRANGE	-4
 #define E_FILENOTFOUND		-5
 #define E_NOTINITIALIZED	-6
+#define E_FILEERROR		-7
 #define S_OK				1
 
 #else

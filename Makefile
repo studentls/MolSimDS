@@ -19,7 +19,7 @@ LDFLAGS= -L/opt/lib -lxerces-c -lrt -llog4cxx -lcppunit
 
 
 
-INCLUDES= -I./src -I./libxsd
+INCLUDES= -I./src 
 
 OBJECTS=$(SOURCES:.cpp=.o)
 EXECUTABLE=molsim
@@ -28,6 +28,7 @@ all: $(SOURCES) $(EXECUTABLE)
 
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ 
+
 
 clean:
 	rm $(OBJECTS)

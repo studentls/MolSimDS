@@ -28,7 +28,11 @@
 #define BC_BOTTOM		0x8
 #define BC_FRONT		0x10
 #define BC_BACK			0x20
+
 /// a class that is used to store Particles and iterate over them
+/// utilizes Linked-Cell algorithm for improved performance (O(n) instead of O(n^2))
+/// see this graph which compares LinkedCell with a brute-force algorithm:
+/// \image html LinkedCellPerformance.png
 class LinkedCellParticleContainer : public ParticleContainer {
 
 private:
@@ -73,7 +77,8 @@ private:
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
-	std::vector<utils::Vector<unsigned int, 2>>	cellPairs;
+	/// note that here the space is very important, as g++ has problems otherwise parsing it
+	std::vector<utils::Vector<unsigned int, 2> >	cellPairs;
 		
 	/// the distance below which reflective boundaries reflect
 	double reflectiveBoundaryDistance;
@@ -87,7 +92,7 @@ private:
 	// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
 	// 3, double: the border's coordinate on the given axis, in the given direction
 	/// store what cells have reflective boundaries and of what type
-	std::vector<utils::Vector<double, 4>>	reflectiveBoundaryCells;
+	std::vector<utils::Vector<double, 4> >	reflectiveBoundaryCells;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
@@ -119,125 +124,10 @@ private:
 	}
 	
 	/// define the reflective boundary cells
-	void	SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-									bool frontReflectiveBoundary, bool backReflectiveBoundary,
-									// these two will be ignored in the two-dimensional case
-									bool bottomReflectiveBoundary, bool topReflectiveBoundary)
-	{
-		// TODO: testing and debugging
-		if (dim == 2) {
-			if (leftReflectiveBoundary || rightReflectiveBoundary)
-				for (int y = 0; y < cellCount[1]; y++) {
-					if (leftReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index2DTo1D(0, y);
-						vec[1] = 0;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[0];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-					if (rightReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index2DTo1D(cellCount[0] - 1, y);;
-						vec[1] = 0;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-			if (frontReflectiveBoundary || backReflectiveBoundary)
-				for (int x = 0; x < cellCount[0]; x++) {
-					if (frontReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index2DTo1D(x, 0);
-						vec[1] = 1;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[1];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-					if (backReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index2DTo1D(x, cellCount[1] - 1);
-						vec[1] = 1;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-		}
-	else if (dim == 3) {
-			if (leftReflectiveBoundary || rightReflectiveBoundary)
-				for (int y = 0; y < cellCount[1]; y++)
-					for (int z = 0; z < cellCount[2]; z++) {
-						if (leftReflectiveBoundary) {
-							// temp variable
-							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(0, y, z);
-							vec[1] = 0;
-							vec[2] = -1.0;
-							vec[3] = frontLowerLeftCorner[0];
-							reflectiveBoundaryCells.push_back(vec);
-						}
-						if (rightReflectiveBoundary) {
-							// temp variable
-							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(cellCount[0] - 1, y, z);
-							vec[1] = 0;
-							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
-							reflectiveBoundaryCells.push_back(vec);
-						}
-					}
-		if (frontReflectiveBoundary || backReflectiveBoundary)
-				for (int x = 0; x < cellCount[0]; x++)
-					for (int z = 0; z < cellCount[2]; z++) {
-						if (frontReflectiveBoundary) {
-							// temp variable
-							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(x, 0, z);
-							vec[1] = 1;
-							vec[2] = -1.0;
-							vec[3] = frontLowerLeftCorner[1];
-							reflectiveBoundaryCells.push_back(vec);
-						}
-						if (backReflectiveBoundary) {
-							// temp variable
-							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(x, cellCount[1] - 1, z);
-							vec[1] = 1;
-							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
-							reflectiveBoundaryCells.push_back(vec);
-						}
-					}
-			if (bottomReflectiveBoundary || topReflectiveBoundary)
-				for (int x = 0; x < cellCount[0]; x++)
-					for (int y = 0; y < cellCount[1]; y++) {
-						if (bottomReflectiveBoundary) {
-							// temp variable
-							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(x, y, 0);
-							vec[1] = 2;
-							vec[2] = -1.0;
-							vec[3] = frontLowerLeftCorner[2];
-							reflectiveBoundaryCells.push_back(vec);
-						}
-						if (topReflectiveBoundary) {
-							// temp variable
-							utils::Vector<double, 4> vec;
-							vec[0] = Index3DTo1D(x, y, cellCount[2] - 1);
-							vec[1] = 2;
-							vec[2] = 1.0;
-							vec[3] = frontLowerLeftCorner[2] + calcSimulationAreaExtent()[2];
-							reflectiveBoundaryCells.push_back(vec);
-						}
-					}
-		}
-	}
+	void SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
+					bool frontReflectiveBoundary, bool backReflectiveBoundary,
+					// these two will be ignored in the two-dimensional case
+					bool bottomReflectiveBoundary, bool topReflectiveBoundary);
 
 
 	/// function to assign a vector of particles to formerly properly initialized cells
@@ -644,7 +534,7 @@ public:
 	}
 
 	/// method to identify container
-	/// @return returns PCT_LIST
+	/// @return returns PCT_LINKEDCELL
 	ParticleContainerType			getType() {return PCT_LINKEDCELL;}
 
 	/// method to return halo particles
