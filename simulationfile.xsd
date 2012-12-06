@@ -33,12 +33,6 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="cutoff_radius" type="xsd:decimal"></xsd:element>
       <!-- the front lower left corner -->
       <xsd:element name="offset" type="Vec3_t"></xsd:element>
-      <xsd:element name="leftReflectiveBoundary" type="xsd:boolean"></xsd:element>
-      <xsd:element name="rightReflectiveBoundary" type="xsd:boolean"></xsd:element>
-      <xsd:element name="frontReflectiveBoundary" type="xsd:boolean"></xsd:element>
-      <xsd:element name="backReflectiveBoundary" type="xsd:boolean"></xsd:element>
-      <xsd:element name="bottomReflectiveBoundary" type="xsd:boolean"></xsd:element>
-      <xsd:element name="topReflectiveBoundary" type="xsd:boolean"></xsd:element>
     </xsd:all>
   </xsd:complexType>
   

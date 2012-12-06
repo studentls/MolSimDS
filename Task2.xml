@@ -31,12 +31,6 @@ author: F.Dietz & L.Spiegelberg
         <sizeofdomainY>90.0</sizeofdomainY>
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
-        <leftReflectiveBoundary>true</leftReflectiveBoundary>
-        <rightReflectiveBoundary>true</rightReflectiveBoundary>
-        <fronReflectiveBoundary>true</frontReflectiveBoundary>
-        <backReflectiveBoundary>true</backReflectiveBoundary>
-        <bottomReflectiveBoundary>true</bottomReflectiveBoundary>
-        <topReflectiveBoundary>true</topReflectiveBoundary>
       </LinkedCell>
     </algorithm>
     
@@ -51,7 +45,7 @@ author: F.Dietz & L.Spiegelberg
       <V>0.0 0.0 0.0</V>
       <X>20.0 20.0 0.0</X>
     </cuboid>
-
+    
     <!-- C2 -->
     <cuboid>
       <h>1.1225</h>
@@ -60,7 +54,6 @@ author: F.Dietz & L.Spiegelberg
       <V>0.0 -10.0 0.0</V>
       <X>70.0 60.0 0.0</X>
     </cuboid>
-
   </data>
 
 </simulationfile>

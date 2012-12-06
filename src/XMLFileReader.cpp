@@ -211,16 +211,14 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		frontLowerLeftCorner[0] = lc.offset().at(0);
 		frontLowerLeftCorner[1] = lc.offset().at(1);
 		frontLowerLeftCorner[2] = lc.offset().at(2);
-		
+
 		simulationAreaExtent[0] = lc.sizeofdomainX();
 		simulationAreaExtent[1] = lc.sizeofdomainY();
 		simulationAreaExtent[2] = lc.sizeofdomainZ();
 
 
 		container = new LinkedCellParticleContainer(dim, particles, cutoffDistance, frontLowerLeftCorner,
-			simulationAreaExtent, 2, lc.leftReflectiveBoundary(), lc.rightReflectiveBoundary(),
-									lc.fronReflectiveBoundary(), lc.backReflectiveBoundary(),
-									lc.bottomReflectiveBoundary(), lc.topReflectiveBoundary(), desc.sigma);
+			simulationAreaExtent, 2, true, true, true, true, true, true, desc.sigma);
 		
 		(*out) = container;
 
