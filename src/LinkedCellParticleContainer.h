@@ -11,6 +11,7 @@
 #define LINKEDCELL_PARTICLE_CONTAINER_H_
 
 #include <vector>
+#include <list>
 #include "Logging.h"
 #include "Particle.h"
 #include "ParticleContainer.h"
@@ -37,7 +38,7 @@ private:
 	utils::Vector<double, 3>			cellSize;
 
 	/// vector containing count of cells in X, Y, (Z) direction
-	utils::Vector<unsigned int, 3>	cellCount;
+	utils::Vector<unsigned int, 3>		cellCount;
 
 	/// get total cell count
 	inline unsigned int					getCellCount()
@@ -58,11 +59,11 @@ private:
 	utils::Vector<double, 3>			frontLowerLeftCorner;
 
 	/// a dynamic array, containing all Cells encoded in a 1D array
-	std::vector<Particle>				*Cells;
+	std::list<Particle>				*Cells;
 	
 	/// ???
 	// Note that the halo acts only as a storage for the sake of completeness. The field could be dropped as well
-	std::vector<Particle> halo;
+	std::list<Particle> halo;
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
@@ -322,12 +323,12 @@ private:
 			int xIndex = i % this->cellCount[0];
 			int yIndex = i / cellCount[0];
 			double xmin = this->frontLowerLeftCorner[0] + xIndex * cellSize[0];
-			double xmax = xmin + cellSize[1];
+			double xmax = xmin + cellSize[0];
 			double ymin = this->frontLowerLeftCorner[1] + yIndex * cellSize[1];
 			double ymax = ymin + cellSize[1];
 
 			// go through particles and check if they are in boundaries
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			for(std::list<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle p = *it;
 
@@ -335,6 +336,11 @@ private:
 				if(p.x[0] > xmax)falseAssignment = true;
 				if(p.x[1] < ymin)falseAssignment = true;
 				if(p.x[1] > ymax)falseAssignment = true;
+
+				if(falseAssignment)
+				{
+					break;
+				}
 			}
 
 			if(falseAssignment)
@@ -423,7 +429,7 @@ public:
 		SAFE_DELETE_A(Cells);
 
 		// alloc mem
-		Cells = new std::vector<Particle>[getCellCount()];
+		Cells = new std::list<Particle>[getCellCount()];
 
 		// generate pairs
 		generatePairs();
@@ -513,7 +519,7 @@ public:
 		{
 			if(Cells[i].empty())continue;
 
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			for(std::list<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle& p = *it;
 				(*func)(data, p);				
@@ -538,8 +544,8 @@ public:
 
 			// calc data for a pair (a, b) where a != b
 			if(pair[0] != pair[1])
-				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
-					for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 < Cells[pair[1]].end(); it2++)
+				for (std::list<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
+					for (std::list<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 != Cells[pair[1]].end(); it2++)
 						{
 							// call the function on the pair of Particles
 							Particle& p1 = *it1;
@@ -552,20 +558,24 @@ public:
 						}
 			// calc data for a pair (a, a)
 			else
-				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 < Cells[pair[0]].end(); it1++)
-					for (std::vector<Particle>::iterator it2 = it1 + 1 ; it2 < Cells[pair[1]].end(); it2++)
-					// make sure that a Particle is not paired with itself
-					if (it1 != it2)			
+			{
+				for (std::list<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
+				{
+					std::list<Particle>::iterator it2 = it1;
+					it2++;
+					for (; it2 != Cells[pair[1]].end(); it2++)
 					{
 						// call the function on the pair of Particles
 						Particle& p1 = *it1;
 						Particle& p2 = *it2;
 
-						
 						//is distance squared less than cutoff radius squared?
 						//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
-							(*func)(data, p1, p2);
+								(*func)(data, p1, p2);
+					
 					}
+				}
+			}
 		}
 
 	}
@@ -646,13 +656,9 @@ public:
 		// this method is only a quick hack, to test the algorithm...
 		// for this reason we need a static variable to secure, the reference is valid
 
-		
-
 		// clear if necessary
 		if(!p.empty())p.clear();
 
-		
-		/*
 		// add halo...
 		//p.insert(p.end(), halo.begin(), halo.end());
 
@@ -661,33 +667,14 @@ public:
 		//go through cells
 		for(int i = 0; i < getCellCount(); i++)
 		{
-			p.insert(p.end(), Cells[i].begin(), Cells[i].end());
-		}
-
-		*/
-
-
-		// test wise
-		int filledCells = 0;
-
-		for(int i = 0; i < getCellCount(); i++)
-		{
-			if(!Cells[i].empty())
+			//empty cell?
+			if(Cells[i].empty())continue;
+			
+			for(std::list<Particle>::const_iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
-					//p.insert(p.end(), Cells[i].begin(), Cells[i].end());
-				
-				for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
-					{
-						
-						Particle pt = *it;
-						p.push_back(pt);
-					}
-					filledCells++;
+				p.push_back(*it);
 			}
 		}
-
-		std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
-		std::cout<<"particles: "<<p.size()<<std::endl;
 		return p;
 	}
 
@@ -706,7 +693,7 @@ public:
 			if(Cells[i].empty())continue;
 			
 			// go through every cell's particles...
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
+			for(std::list<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
 			{
 				Particle p = *it;
 			
