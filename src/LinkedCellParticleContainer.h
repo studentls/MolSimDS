@@ -843,12 +843,10 @@ public:
 					}
 				filledCells++;
 
-				// print the size of each cell
-				// NOTE: a long time after an explosion, when the reflective boundaries are on and everything ha sstabilized,
-				// every cell seems to contain 1 particle, sometimes 2, rarely more
-				// NEVER zero. What gives?
-				std::cout<< Cells[i].size() << " ";
 			}
+
+			// print the size of each cell
+			std::cout<< Cells[i].size() << " ";
 		}
 
 		std::cout<<"filled cells: "<<filledCells<<" / "<<getCellCount()<<std::endl;
