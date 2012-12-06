@@ -31,7 +31,7 @@
 /// a class that is used to store Particles and iterate over them
 /// utilizes Linked-Cell algorithm for improved performance (O(n) instead of O(n^2))
 /// see this graph which compares LinkedCell with a brute-force algorithm:
-/// \image html performanceLinkedCell.jpg
+/// \image html LinkedCellPerformance.png
 class LinkedCellParticleContainer : public ParticleContainer {
 
 private:
