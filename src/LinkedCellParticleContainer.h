@@ -306,51 +306,6 @@ private:
 
 	}
 
-	/// a method to check if all particles are properly assigned...
-	void CheckAssignment()
-	{
-		//only 2D!
-		if(dim != 2)return;
-
-		// go through all Cells
-		for(int i = 0; i < getCellCount(); i++)
-		{
-			//go through every individual cell
-			if(Cells[i].empty())continue;
-
-			bool falseAssignment = false;
-
-			int xIndex = i % this->cellCount[0];
-			int yIndex = i / cellCount[0];
-			double xmin = this->frontLowerLeftCorner[0] + xIndex * cellSize[0];
-			double xmax = xmin + cellSize[0];
-			double ymin = this->frontLowerLeftCorner[1] + yIndex * cellSize[1];
-			double ymax = ymin + cellSize[1];
-
-			// go through particles and check if they are in boundaries
-			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
-			{
-				Particle p = *it;
-
-				if(p.x[0] < xmin)falseAssignment = true;
-				if(p.x[0] > xmax)falseAssignment = true;
-				if(p.x[1] < ymin)falseAssignment = true;
-				if(p.x[1] > ymax)falseAssignment = true;
-
-				if(falseAssignment)
-				{
-					break;
-				}
-			}
-
-			if(falseAssignment)
-			{
-					std::cout<<"Error:!!!! False Assignment"<<std::endl;
-					int a = 100;
-			}
-		}
-	}
-
 public:
 	/// default constructor, set everthing to good values
 	LinkedCellParticleContainer()
@@ -527,53 +482,92 @@ public:
 			}
 		}
 	}
+
+	/// helper function, to get neighbours
+	/// @return vector of neighbour cell indices...
+	std::vector<unsigned int> getNeighbours(unsigned int index)
+	{
+		std::vector<unsigned int> neighbours;
+
+		// only dim = 2 supported
+		if(dim != 2)return neighbours;
+
+		unsigned int x = index % cellCount[0];
+		unsigned int y = index / cellCount[0];
+
+		//beware of special cases!
+		for(int xp = -1; xp <= 1; xp++)
+			for(int yp = -1; yp <= 1; yp++)
+			{
+				int index = x +xp + (y + yp) * cellCount[0];
+
+				//valid?
+				if(index < 0 || index >= getCellCount())continue;
+
+				neighbours.push_back(index);
+			}
+
+		return neighbours;
+	}
+
 	/// a method that takes a void(*func)(void*, Particle, Particle) and
 	/// uses it to iterate over all pairs of Particles (each symmetrical pair is
 	/// only taken once to reduce redundancy)
 	/// @param data additional data given to func
 	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) {
 		
-		// iterate over all elements of cellPairs. 
-		for (std::vector<utils::Vector<unsigned int, 2>>::iterator it = cellPairs.begin(); it != cellPairs.end(); it++)
+		// new func without pairs...
+
+
+
+		// Step 1: calc pairwise force between particles for each cell
+
+		// go through cells
+		for(unsigned int i = 0; i < getCellCount(); i++)
 		{
-			utils::Vector<unsigned int, 2> pair = *it;
+			// for all particles in cell_i, calc forces in cell_i
+			for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
+			{
+				for(std::vector<Particle>::iterator it2 = it1 + 1; it2 != Cells[i].end(); it2++)
+				{
+					Particle& p1 = *it1;
+					Particle& p2 = *it2;
 
-			// are cells valid? - if not next iteration
-			// TODO: doesn't this problem resolve itself if it's ignored? This is an unnecessary check that just costs time
-			// Answer: no it doesn't! if we try to iterate over an empty vector, this will cause an error!
-			if(Cells[pair[0]].empty() || Cells[pair[1]].empty())continue;
+					func(data, p1, p2);
+				}
+			}
+		}
 
-			// calc data for a pair (a, b) where a != b
-			if(pair[0] != pair[1])
-				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
-					for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 != Cells[pair[1]].end(); it2++)
+
+
+		// Step 2: calc force with neighbouring cells
+
+		// go through cells
+		for(unsigned int i = 0; i < getCellCount(); i++)
+		{
+			// for all particles in cell_i, calc forces with neighbours
+			for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
+			{
+
+				// get neighbours of cell_i with little helper function
+				std::vector<unsigned int> neighbours = getNeighbours(i);
+
+				// go through neighbours
+				for(std::vector<unsigned int>::iterator nt = neighbours.begin(); nt != neighbours.end(); nt++)
+				{
+					unsigned int j = *nt;
+
+					// calc force, based on actio / reaction between cell_i and cell_j
+					for(std::vector<Particle>::iterator it2 = Cells[j].begin(); it2 != Cells[j].end(); it2++)
+					{
+						// only for one combination
+						if(i < j)
 						{
-							// call the function on the pair of Particles
 							Particle& p1 = *it1;
 							Particle& p2 = *it2;
 
-							
-							//is distance squared less than cutoff radius squared?
-							//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
-								(*func)(data, p2, p1);
+							func(data, p1, p2);
 						}
-			// calc data for a pair (a, a)
-			else
-			{
-				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
-				{
-					std::vector<Particle>::iterator it2 = it1;
-					it2++;
-					for (; it2 != Cells[pair[1]].end(); it2++)
-					{
-						// call the function on the pair of Particles
-						Particle& p1 = *it1;
-						Particle& p2 = *it2;
-
-						//is distance squared less than cutoff radius squared?
-						//if(p1.x.distanceSq(p2.x) < cutoffDistance * cutoffDistance)
-								(*func)(data, p1, p2);
-					
 					}
 				}
 			}
@@ -757,9 +751,6 @@ public:
 				if(it != Cells[i].end())it++;
 			}
 		}
-
-		//test
-		this->CheckAssignment();
 	}
 
 	/// method to identify container
