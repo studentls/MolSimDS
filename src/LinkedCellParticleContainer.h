@@ -59,11 +59,11 @@ private:
 	utils::Vector<double, 3>			frontLowerLeftCorner;
 
 	/// a dynamic array, containing all Cells encoded in a 1D array
-	std::list<Particle>				*Cells;
+	std::vector<Particle>				*Cells;
 	
 	/// ???
 	// Note that the halo acts only as a storage for the sake of completeness. The field could be dropped as well
-	std::list<Particle> halo;
+	std::vector<Particle>				halo;
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
@@ -328,7 +328,7 @@ private:
 			double ymax = ymin + cellSize[1];
 
 			// go through particles and check if they are in boundaries
-			for(std::list<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle p = *it;
 
@@ -350,7 +350,6 @@ private:
 			}
 		}
 	}
-	
 
 public:
 	/// default constructor, set everthing to good values
@@ -429,7 +428,7 @@ public:
 		SAFE_DELETE_A(Cells);
 
 		// alloc mem
-		Cells = new std::list<Particle>[getCellCount()];
+		Cells = new std::vector<Particle>[getCellCount()];
 
 		// generate pairs
 		generatePairs();
@@ -443,30 +442,32 @@ public:
 								bottomReflectiveBoundary, topReflectiveBoundary);
 	}
 	
-	///// applies the reflective boundary condition to all cells that apply
-	//void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
-	//	for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
-	//	{
-	//		// TODO: this should obviously work by reference to the array, not copy it
-	//		// does it do that right now?
-	//		std::vector<Particle>& cell = cells[(int)(elem[0])];
-	//		int axis = (int)(elem[1]);
-	//		double direction = elem[2];
-	//		double border = elem[3];
-	//		for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
-	//			Particle& p = *it;
-	//			double dist = direction * (border - p.x[axis]);
-	//			// skip the particle if it is too far away from the border
-	//			if (dist > reflectiveBoundaryDistance)
-	//				continue;
-	//			// create a temporary, virtual Particle
-	//			Particle vp = new Particle(p);
-	//			vp.x[axis] = border;
-	//			(*func)(data, p, vp);
-	//			// TODO: delete vp manually?
-	//		}
-	//	}
-	//}
+	/// applies the reflective boundary condition to all cells that apply
+	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data) {
+		for (std::vector<utils::Vector<double, 4>>::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
+		{
+			// TODO: this should obviously work by reference to the array, not copy it
+			// does it do that right now?
+			utils::Vector<double, 4>& elem = *it;
+			std::vector<Particle>& cell = Cells[(int)(elem[0])];
+			int axis = (int)(elem[1]);
+			double direction = elem[2];
+			double border = elem[3];
+			for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
+				Particle& p = *it;
+				double dist = direction * (border - p.x[axis]);
+				// skip the particle if it is too far away from the border
+				if (dist > reflectiveBoundaryDistance)
+					continue;
+				// create a temporary, virtual Particle
+				// a copy of the current particle, but located at the border
+				Particle vp(p);
+				vp.x[axis] = border;
+				(*func)(data, p, vp);
+				// TODO: delete vp manually?
+			}
+		}
+	}
 
 	/// a method to add a Particle to the LinkedCellParticleContainer
 	void AddParticle(const Particle& particle)
@@ -519,7 +520,7 @@ public:
 		{
 			if(Cells[i].empty())continue;
 
-			for(std::list<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				Particle& p = *it;
 				(*func)(data, p);				
@@ -544,8 +545,8 @@ public:
 
 			// calc data for a pair (a, b) where a != b
 			if(pair[0] != pair[1])
-				for (std::list<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
-					for (std::list<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 != Cells[pair[1]].end(); it2++)
+				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
+					for (std::vector<Particle>::iterator it2 = Cells[pair[1]].begin() ; it2 != Cells[pair[1]].end(); it2++)
 						{
 							// call the function on the pair of Particles
 							Particle& p1 = *it1;
@@ -559,9 +560,9 @@ public:
 			// calc data for a pair (a, a)
 			else
 			{
-				for (std::list<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
+				for (std::vector<Particle>::iterator it1 = Cells[pair[0]].begin() ; it1 != Cells[pair[0]].end(); it1++)
 				{
-					std::list<Particle>::iterator it2 = it1;
+					std::vector<Particle>::iterator it2 = it1;
 					it2++;
 					for (; it2 != Cells[pair[1]].end(); it2++)
 					{
@@ -578,6 +579,13 @@ public:
 			}
 		}
 
+		// TODO
+		// this should be in Simulation.performStep
+		// it works here just fine and efficient
+		// but the name of the function becomes nonsensical
+		ApplyReflectiveBoundaryConditions(func, data);
+
+		//Reassign should be in Simulation.performStep
 	}
 
 	/// add particles from *.txt file
@@ -670,7 +678,7 @@ public:
 			//empty cell?
 			if(Cells[i].empty())continue;
 			
-			for(std::list<Particle>::const_iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+			for(std::vector<Particle>::const_iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
 			{
 				p.push_back(*it);
 			}
@@ -693,7 +701,7 @@ public:
 			if(Cells[i].empty())continue;
 			
 			// go through every cell's particles...
-			for(std::list<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
+			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
 			{
 				Particle p = *it;
 			
