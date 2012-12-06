@@ -22,7 +22,7 @@
 #include "ParticleContainer.h"
 
 // generated definitions
-#include "XMLFile/simulationfile.hxx"
+#include "XMLFile/simulationfile.h"
 #include <memory>
 #include <iostream>
 

@@ -29,6 +29,7 @@ all: $(SOURCES) $(EXECUTABLE)
 $(EXECUTABLE): $(OBJECTS)
 	$(CC) $(OBJECTS) $(LDFLAGS) -o $@ 
 
+
 clean:
 	rm $(OBJECTS)
 
