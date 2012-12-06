@@ -92,6 +92,28 @@ dim3_t (const dim3_t& o,
 // 
 
 
+// conditions_t
+// 
+
+const conditions_t::condition_sequence& conditions_t::
+condition () const
+{
+  return this->condition_;
+}
+
+conditions_t::condition_sequence& conditions_t::
+condition ()
+{
+  return this->condition_;
+}
+
+void conditions_t::
+condition (const condition_sequence& s)
+{
+  this->condition_ = s;
+}
+
+
 // LinkedCell_t
 // 
 
@@ -189,6 +211,36 @@ void LinkedCell_t::
 offset (::std::auto_ptr< offset_type > x)
 {
   this->offset_.set (x);
+}
+
+const LinkedCell_t::conditions_optional& LinkedCell_t::
+conditions () const
+{
+  return this->conditions_;
+}
+
+LinkedCell_t::conditions_optional& LinkedCell_t::
+conditions ()
+{
+  return this->conditions_;
+}
+
+void LinkedCell_t::
+conditions (const conditions_type& x)
+{
+  this->conditions_.set (x);
+}
+
+void LinkedCell_t::
+conditions (const conditions_optional& x)
+{
+  this->conditions_ = x;
+}
+
+void LinkedCell_t::
+conditions (::std::auto_ptr< conditions_type > x)
+{
+  this->conditions_.set (x);
 }
 
 
@@ -892,6 +944,40 @@ data (::std::auto_ptr< data_type > x)
 }
 
 
+// condition
+// 
+
+const condition::value_optional& condition::
+value () const
+{
+  return this->value_;
+}
+
+condition::value_optional& condition::
+value ()
+{
+  return this->value_;
+}
+
+void condition::
+value (const value_type& x)
+{
+  this->value_.set (x);
+}
+
+void condition::
+value (const value_optional& x)
+{
+  this->value_ = x;
+}
+
+void condition::
+value (::std::auto_ptr< value_type > x)
+{
+  this->value_.set (x);
+}
+
+
 // outputfmt
 // 
 
@@ -1079,6 +1165,76 @@ List_t::
 {
 }
 
+// conditions_t
+//
+
+conditions_t::
+conditions_t ()
+: ::xml_schema::type (),
+  condition_ (::xml_schema::flags (), this)
+{
+}
+
+conditions_t::
+conditions_t (const conditions_t& x,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  condition_ (x.condition_, f, this)
+{
+}
+
+conditions_t::
+conditions_t (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f,
+              ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  condition_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void conditions_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // condition
+    //
+    if (n.name () == "condition" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< condition_type > r (
+        condition_traits::create (i, f, this));
+
+      this->condition_.push_back (r);
+      continue;
+    }
+
+    break;
+  }
+}
+
+conditions_t* conditions_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class conditions_t (*this, f, c);
+}
+
+conditions_t::
+~conditions_t ()
+{
+}
+
 // LinkedCell_t
 //
 
@@ -1093,7 +1249,8 @@ LinkedCell_t (const sizeofdomainX_type& sizeofdomainX,
   sizeofdomainY_ (sizeofdomainY, ::xml_schema::flags (), this),
   sizeofdomainZ_ (sizeofdomainZ, ::xml_schema::flags (), this),
   cutoff_radius_ (cutoff_radius, ::xml_schema::flags (), this),
-  offset_ (offset, ::xml_schema::flags (), this)
+  offset_ (offset, ::xml_schema::flags (), this),
+  conditions_ (::xml_schema::flags (), this)
 {
 }
 
@@ -1106,7 +1263,8 @@ LinkedCell_t (const LinkedCell_t& x,
   sizeofdomainY_ (x.sizeofdomainY_, f, this),
   sizeofdomainZ_ (x.sizeofdomainZ_, f, this),
   cutoff_radius_ (x.cutoff_radius_, f, this),
-  offset_ (x.offset_, f, this)
+  offset_ (x.offset_, f, this),
+  conditions_ (x.conditions_, f, this)
 {
 }
 
@@ -1119,7 +1277,8 @@ LinkedCell_t (const ::xercesc::DOMElement& e,
   sizeofdomainY_ (f, this),
   sizeofdomainZ_ (f, this),
   cutoff_radius_ (f, this),
-  offset_ (f, this)
+  offset_ (f, this),
+  conditions_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1192,6 +1351,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!offset_.present ())
       {
         this->offset_.set (r);
+        continue;
+      }
+    }
+
+    // conditions
+    //
+    if (n.name () == "conditions" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< conditions_type > r (
+        conditions_traits::create (i, f, this));
+
+      if (!this->conditions_)
+      {
+        this->conditions_.set (r);
         continue;
       }
     }
@@ -2363,6 +2536,93 @@ _clone (::xml_schema::flags f,
 
 simulationfile_t::
 ~simulationfile_t ()
+{
+}
+
+// condition
+//
+
+condition::
+condition ()
+: ::xml_schema::string (),
+  value_ (::xml_schema::flags (), this)
+{
+}
+
+condition::
+condition (const char* _xsd_string_base)
+: ::xml_schema::string (_xsd_string_base),
+  value_ (::xml_schema::flags (), this)
+{
+}
+
+condition::
+condition (const ::std::string& _xsd_string_base)
+: ::xml_schema::string (_xsd_string_base),
+  value_ (::xml_schema::flags (), this)
+{
+}
+
+condition::
+condition (const ::xml_schema::string& _xsd_string_base)
+: ::xml_schema::string (_xsd_string_base),
+  value_ (::xml_schema::flags (), this)
+{
+}
+
+condition::
+condition (const condition& x,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+: ::xml_schema::string (x, f, c),
+  value_ (x.value_, f, this)
+{
+}
+
+condition::
+condition (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f,
+           ::xml_schema::container* c)
+: ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
+  value_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+    this->parse (p, f);
+  }
+}
+
+void condition::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  while (p.more_attributes ())
+  {
+    const ::xercesc::DOMAttr& i (p.next_attribute ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    if (n.name () == "value" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< value_type > r (
+        value_traits::create (i, f, this));
+
+      this->value_.set (r);
+      continue;
+    }
+  }
+}
+
+condition* condition::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class condition (*this, f, c);
+}
+
+condition::
+~condition ()
 {
 }
 

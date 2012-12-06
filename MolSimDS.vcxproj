@@ -158,6 +158,7 @@
     <None Include="listexample.xml" />
     <None Include="sphereexample.xml" />
     <None Include="Task2.xml" />
+    <None Include="Task3.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

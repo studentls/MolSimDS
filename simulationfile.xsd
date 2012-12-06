@@ -23,7 +23,28 @@ author: Leonhard Spiegelberg & Florian Dietz
   <xsd:complexType name="List_t">
   
   </xsd:complexType>
+
+  <xsd:complexType name="conditions_t">
+    <xsd:sequence>
+      <xsd:element name="condition" minOccurs="0" maxOccurs="6">
+        <xsd:complexType>
+          <xsd:simpleContent>
+           <xsd:extension base="xsd:string">
+             <!--
+             possible values are: left, right, top, bottom, front, back, all, outflow, none
+             note that if a condition with value "all", "outflow" or "none" appears, all left, right,... 
+             conditions will be ignored!
+             -->
+            <xsd:attribute name="value" type="xsd:string"></xsd:attribute>
+           </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>        
+      </xsd:element>
+    </xsd:sequence>
+    
+    
   
+  </xsd:complexType>
   
   <xsd:complexType name="LinkedCell_t">
     <xsd:all>
@@ -31,9 +52,15 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="sizeofdomainY" type="xsd:decimal"></xsd:element>
       <xsd:element name="sizeofdomainZ" type="xsd:decimal"></xsd:element>
       <xsd:element name="cutoff_radius" type="xsd:decimal"></xsd:element>
+      
       <!-- the front lower left corner -->
       <xsd:element name="offset" type="Vec3_t"></xsd:element>
+      
+      <!-- boundary conditions -->
+      <xsd:element name="conditions" type="conditions_t" minOccurs="0" maxOccurs="1"></xsd:element>
+      
     </xsd:all>
+    
   </xsd:complexType>
   
   <!--

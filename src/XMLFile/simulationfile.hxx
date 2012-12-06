@@ -224,6 +224,7 @@ namespace xml_schema
 class Vec3_t;
 class dim3_t;
 class List_t;
+class conditions_t;
 class LinkedCell_t;
 class algorithm_t;
 class params_t;
@@ -232,6 +233,7 @@ class cuboid_t;
 class sphere_t;
 class data_t;
 class simulationfile_t;
+class condition;
 class outputfmt;
 
 #include <memory>    // std::auto_ptr
@@ -357,6 +359,56 @@ class List_t: public ::xml_schema::type
   ~List_t ();
 };
 
+class conditions_t: public ::xml_schema::type
+{
+  public:
+  // condition
+  // 
+  typedef ::condition condition_type;
+  typedef ::xsd::cxx::tree::sequence< condition_type > condition_sequence;
+  typedef condition_sequence::iterator condition_iterator;
+  typedef condition_sequence::const_iterator condition_const_iterator;
+  typedef ::xsd::cxx::tree::traits< condition_type, char > condition_traits;
+
+  const condition_sequence&
+  condition () const;
+
+  condition_sequence&
+  condition ();
+
+  void
+  condition (const condition_sequence& s);
+
+  // Constructors.
+  //
+  conditions_t ();
+
+  conditions_t (const ::xercesc::DOMElement& e,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+  conditions_t (const conditions_t& x,
+                ::xml_schema::flags f = 0,
+                ::xml_schema::container* c = 0);
+
+  virtual conditions_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~conditions_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  condition_sequence condition_;
+};
+
 class LinkedCell_t: public ::xml_schema::type
 {
   public:
@@ -433,6 +485,27 @@ class LinkedCell_t: public ::xml_schema::type
   void
   offset (::std::auto_ptr< offset_type > p);
 
+  // conditions
+  // 
+  typedef ::conditions_t conditions_type;
+  typedef ::xsd::cxx::tree::optional< conditions_type > conditions_optional;
+  typedef ::xsd::cxx::tree::traits< conditions_type, char > conditions_traits;
+
+  const conditions_optional&
+  conditions () const;
+
+  conditions_optional&
+  conditions ();
+
+  void
+  conditions (const conditions_type& x);
+
+  void
+  conditions (const conditions_optional& x);
+
+  void
+  conditions (::std::auto_ptr< conditions_type > p);
+
   // Constructors.
   //
   LinkedCell_t (const sizeofdomainX_type&,
@@ -469,6 +542,7 @@ class LinkedCell_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< sizeofdomainZ_type > sizeofdomainZ_;
   ::xsd::cxx::tree::one< cutoff_radius_type > cutoff_radius_;
   ::xsd::cxx::tree::one< offset_type > offset_;
+  conditions_optional conditions_;
 };
 
 class algorithm_t: public ::xml_schema::type
@@ -1270,6 +1344,66 @@ class simulationfile_t: public ::xml_schema::type
   protected:
   ::xsd::cxx::tree::one< params_type > params_;
   ::xsd::cxx::tree::one< data_type > data_;
+};
+
+class condition: public ::xml_schema::string
+{
+  public:
+  // value
+  // 
+  typedef ::xml_schema::string value_type;
+  typedef ::xsd::cxx::tree::optional< value_type > value_optional;
+  typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
+
+  const value_optional&
+  value () const;
+
+  value_optional&
+  value ();
+
+  void
+  value (const value_type& x);
+
+  void
+  value (const value_optional& x);
+
+  void
+  value (::std::auto_ptr< value_type > p);
+
+  // Constructors.
+  //
+  condition ();
+
+  condition (const char*);
+
+  condition (const ::std::string&);
+
+  condition (const ::xml_schema::string&);
+
+  condition (const ::xercesc::DOMElement& e,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
+
+  condition (const condition& x,
+             ::xml_schema::flags f = 0,
+             ::xml_schema::container* c = 0);
+
+  virtual condition*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~condition ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  value_optional value_;
 };
 
 class outputfmt: public ::xml_schema::string

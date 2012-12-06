@@ -217,8 +217,34 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		simulationAreaExtent[2] = lc.sizeofdomainZ();
 
 
+		// for LinkedCell, optional boundary conditions can be specified
+		unsigned int bc = BC_NONE;
+
+		// are any conditions contained?
+		if(lc.conditions().present())
+		{
+			// go through conditions...
+			for(::conditions_t::condition_const_iterator it = lc.conditions().get().condition().begin();
+				it != lc.conditions().get().condition().end(); it++)
+			{
+				// set flags
+				if(strcmp(it->value().get().c_str(), "left")		== 0)bc	|= BC_LEFT;
+				if(strcmp(it->value().get().c_str(), "right")		== 0)bc	|= BC_RIGHT;
+				if(strcmp(it->value().get().c_str(), "top")		== 0)bc	|= BC_TOP;
+				if(strcmp(it->value().get().c_str(), "bottom")	== 0)bc	|= BC_BOTTOM;
+				if(strcmp(it->value().get().c_str(), "front")		== 0)bc	|= BC_FRONT;				
+				if(strcmp(it->value().get().c_str(), "back")		== 0)bc	|= BC_BACK;
+							
+				// special cases
+				if(strcmp(it->value().get().c_str(), "all")		== 0)bc	= BC_ALL;
+				if(strcmp(it->value().get().c_str(), "none")		== 0)bc	= BC_NONE;
+				if(strcmp(it->value().get().c_str(), "outflow")		== 0)bc	= BC_OUTFLOW;
+			}
+
+		}
+
 		container = new LinkedCellParticleContainer(dim, particles, cutoffDistance, frontLowerLeftCorner,
-			simulationAreaExtent, true, true, true, true, true, true, desc.sigma);
+			simulationAreaExtent, bc, desc.sigma);
 		
 		(*out) = container;
 

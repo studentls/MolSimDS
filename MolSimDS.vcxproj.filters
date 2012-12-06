@@ -165,5 +165,8 @@
     <None Include="Task2.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="Task3.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>

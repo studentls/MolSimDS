@@ -17,18 +17,23 @@
 #include "ParticleContainer.h"
 #include "utils/utils.h"
 
+// use flag System for Boundaries
+// to combine flags use e.g. BC_RIGHT | BC_LEFT
+#define BC_NONE			0
+#define BC_OUTFLOW		0x1000
+#define BC_ALL			0x3F		// right | left |...|back
+#define BC_RIGHT		0x1
+#define BC_LEFT			0x2
+#define BC_TOP			0x4
+#define BC_BOTTOM		0x8
+#define BC_FRONT		0x10
+#define BC_BACK			0x20
 /// a class that is used to store Particles and iterate over them
 class LinkedCellParticleContainer : public ParticleContainer {
 
 private:
-
-	// TODO:
-	// let's add the methods applyVelocity(...) and applyForce(...) as well (to the general interface ParticleContainer)
-	// they do the same thing and take the same parameters as iterate and iteratePairwaise,
-	// but in the case of this class, they also call additional functions to deal with the borders
-	// and to reassign the particles to cells
-
-	/// dimensions of the grid
+	
+	/// dimension of the grid
 	unsigned int						dim;
 
 	/// Cutoff distance
@@ -61,8 +66,9 @@ private:
 	/// a dynamic array, containing all Cells encoded in a 1D array
 	std::vector<Particle>				*Cells;
 	
-	/// ???
-	// Note that the halo acts only as a storage for the sake of completeness. The field could be dropped as well
+	/// halo particle
+	/// Note that the halo acts only as a storage for the sake of completeness.
+	/// The field could be dropped as well, as no interaction with cells occurs
 	std::vector<Particle>				halo;
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
@@ -71,6 +77,9 @@ private:
 		
 	/// the distance below which reflective boundaries reflect
 	double reflectiveBoundaryDistance;
+
+	/// boundary conditions encoded as flags
+	unsigned int boundaryConditions;
 
 	// each double in the Vector means something different
 	// 0, int: the cell
@@ -107,58 +116,6 @@ private:
 		}
 
 		return res;
-	}
-
-	/// generate Index Pairs according to cellCount
-	// TODO: write a testcase about this function
-	void		generatePairs()	
-	{
-		// temp pair variable
-		utils::Vector<unsigned int, 2> pair;
-		
-		// empty array?
-		if(!cellPairs.empty())cellPairs.clear();
-
-		// 2D neighborhood
-		if (dim == 2)
-		{
-			// go through all x, y
-			for (int x = 0; x < cellCount[0]; x++)
-				for (int y = 0; y < cellCount[1]; y++)
-
-					// TODO: comment
-					for (int xp = 0; xp < 2; xp++)
-						for (int yp = 0; yp < 2; yp++)
-							if (x + xp < cellCount[0] && y + yp < cellCount[1])
-							{
-							
-								// make pairs ((x,y), (x + xp, y + yp))
-								pair[0] = Index2DTo1D(x, y);
-								pair[1] = Index2DTo1D(x + xp, y + yp);
-								
-								cellPairs.push_back(pair);
-							}
-		}
-		// 3D neighborhood
-		else if (dim == 3)
-		{
-			//go through all x, y, z
-			for (int x = 0; x < cellCount[0]; x++)
-				for (int y = 0; y < cellCount[1]; y++)
-					for (int z = 0; z < cellCount[2]; z++)
-
-						// TODO: comment
-						for (int xp = 0; xp < 2; xp++)
-							for (int yp = 0; yp < 2; yp++)
-								for (int zp = 0; zp < 2; zp++)
-									if (x + xp < cellCount[0] && y + yp < cellCount[1] && z + zp < cellCount[2])
-									{										
-										// make pairs ((x,y,z), (x + xp, y + yp, z + zp))
-										pair[0] = Index3DTo1D(x, y, z);
-										pair[1] = Index3DTo1D(x + xp, y + yp, z + zp);
-										cellPairs.push_back(pair);
-									}
-		}
 	}
 	
 	/// define the reflective boundary cells
@@ -323,17 +280,20 @@ public:
 	}
 
 	/// a constructor that takes quite a lot of arguments
-	/// @param particles
+	/// @param dim dimension of the grid, shall be 2 or 3
+	/// @param particles from which the grid will be constructed
+	/// @param cutoffDistance in this simple implementation, essentially the grid meshwidth
+	/// @param frontLowerLeftCorner offset of the grid
+	/// @param simulationAreaExtent extent of the grid
+	/// @param boundaryconditions use to specify flags like BC_LEFT, ...
+	/// @param sigma used to calculate reflective Boundary distance
 	/// TODO: comment params...
 	LinkedCellParticleContainer(const unsigned int dim,
 								const std::vector<Particle>& particles,
 								const double cutoffDistance,
 								utils::Vector<double, 3> frontLowerLeftCorner,
 								utils::Vector<double, 3> simulationAreaExtent,
-								bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-								bool frontReflectiveBoundary, bool backReflectiveBoundary,
-								// these two will be ignored in the two-dimensional case
-								bool bottomReflectiveBoundary, bool topReflectiveBoundary,
+								const unsigned int boundaryConditions,
 								double sigma)
 	{
 		// set to zero, so Init doesn't crash...
@@ -342,10 +302,10 @@ public:
 		this->cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
 
+
+		// call init
 		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, 
-			leftReflectiveBoundary, rightReflectiveBoundary,
-								frontReflectiveBoundary, backReflectiveBoundary,
-								bottomReflectiveBoundary, topReflectiveBoundary, sigma);		
+			boundaryConditions, sigma);		
 	}
 
 	/// init function taking a lot of arguments
@@ -353,16 +313,13 @@ public:
 											 const double cutoffDistance,
 											 utils::Vector<double, 3> frontLowerLeftCorner,
 											 utils::Vector<double, 3> simulationAreaExtent,
-											 bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-											 bool frontReflectiveBoundary, bool backReflectiveBoundary,
-											 // these two will be ignored in the two-dimensional case
-											 bool bottomReflectiveBoundary, bool topReflectiveBoundary,
+											 const unsigned int boundaryConditions,
 											 double sigma)
 	{
 		this->cutoffDistance = cutoffDistance;
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->reflectiveBoundaryDistance = sigma * 1.1225;
-
+		this->boundaryConditions = boundaryConditions;
 
 		// calc number of cells in each dimension, note that we are rounding down
 		// this is done because the number of cells that fit in the designated area may not be a natural number
@@ -385,16 +342,18 @@ public:
 		// alloc mem
 		Cells = new std::vector<Particle>[getCellCount()];
 
-		// generate pairs
-		generatePairs();
+		if(!Cells)LOG4CXX_ERROR(generalOutputLogger, "memory allocation for cells failed!");
 		
 		// assign the particles to their initial cells
 		AssignParticles(particles);
 
 		// set the reflective boundary conditions
-		SetReflectiveBoundaries(leftReflectiveBoundary, rightReflectiveBoundary,
-								frontReflectiveBoundary, backReflectiveBoundary,
-								bottomReflectiveBoundary, topReflectiveBoundary);
+		SetReflectiveBoundaries(boundaryConditions & BC_LEFT,
+								boundaryConditions & BC_RIGHT,
+								boundaryConditions & BC_FRONT,
+								boundaryConditions & BC_BACK,
+								boundaryConditions & BC_BOTTOM,
+								boundaryConditions & BC_TOP);
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
