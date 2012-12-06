@@ -33,7 +33,7 @@ author: F.Dietz & L.Spiegelberg
         <offset>0.0 0.0 0.0</offset>
         <leftReflectiveBoundary>true</leftReflectiveBoundary>
         <rightReflectiveBoundary>true</rightReflectiveBoundary>
-        <fronReflectiveBoundary>true</frontReflectiveBoundary>
+        <frontReflectiveBoundary>true</frontReflectiveBoundary>
         <backReflectiveBoundary>true</backReflectiveBoundary>
         <bottomReflectiveBoundary>true</bottomReflectiveBoundary>
         <topReflectiveBoundary>true</topReflectiveBoundary>
