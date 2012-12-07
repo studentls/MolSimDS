@@ -55,41 +55,34 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 		}
 	}
 
-
-
 	// Step 2: calc force with neighbouring cells
+	// use stored pairs to iterate, these may be ordered to increase performance in a special way
+	// ramaining an unsolved problem for simulations yet
+	
+	// pairs should exist!
+	assert(!cellPairs.empty());
 
-	// go through cells
-	for(unsigned int i = 0; i < getCellCount(); i++)
+	for(std::vector<utils::Vector<unsigned int, 2> >::iterator it = cellPairs.begin(); it != cellPairs.end(); it++)
 	{
-		// for all particles in cell_i, calc forces with neighbours
+		int i = (*it)[0];
+		int j = (*it)[1];
+		
+		// only for one combination
+		assert(i < j);
+		
+		//interact cell_i and cell_j
+
+		// for all particles in cell_i
 		for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
-		{
-
-			// get neighbours of cell_i with little helper function
-			std::vector<unsigned int> neighbours;
-			
-			if(dim == 2)neighbours = getNeighbours2D(i);
-			else if(dim == 3)neighbours = getNeighbours3D(i);
-
-			// go through neighbours
-			for(std::vector<unsigned int>::iterator nt = neighbours.begin(); nt != neighbours.end(); nt++)
+		{		
+			// calc force, based on actio / reaction between cell_i and cell_j
+			for(std::vector<Particle>::iterator it2 = Cells[j].begin(); it2 != Cells[j].end(); it2++)
 			{
-				unsigned int j = *nt;
+				Particle& p1 = *it1;
+				Particle& p2 = *it2;
 
-				// calc force, based on actio / reaction between cell_i and cell_j
-				for(std::vector<Particle>::iterator it2 = Cells[j].begin(); it2 != Cells[j].end(); it2++)
-				{
-					// only for one combination
-					if(i < j)
-					{
-						Particle& p1 = *it1;
-						Particle& p2 = *it2;
-
-						func(data, p1, p2);
-					}
-				}
-			}
+				func(data, p1, p2);
+			}			
 		}
 	}
 }

@@ -153,6 +153,8 @@
       <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.cpp</SourceSuffix>
       <GenInline Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</GenInline>
       <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.\src\outputWriter</OutDir>
+      <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenSerialization>
+      <GenOstream Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenOstream>
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
@@ -160,7 +162,9 @@
     <None Include="listexample.xml" />
     <None Include="sphereexample.xml" />
     <None Include="Task2.xml" />
-    <None Include="Task3.xml" />
+    <None Include="Task3.xml">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
