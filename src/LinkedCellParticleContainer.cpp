@@ -172,51 +172,66 @@ void	LinkedCellParticleContainer::generatePairs()
 	// if necessary, delete pair container
 	if(!cellPairs.empty())cellPairs.clear();
 
-	// to generate cells, we add for each point (x, y) in the grid the following pairs
-	// { (x, y), (x + xd, y + yd) }
-	// { (x, y), (x, y + yd}
-	// { (x, y), (x + xd, yd) }
-	// { (x + xd, y), (x, y + yd)}   
-	// for xd, yd € {1, ..., radius}
-	// note that for the last pair type, it doesn't matter if it is {(x, y + yd), (x + xd, y)} or like above
-	// where radius determines how many cells are possibly contained in the cutoff sphere
-	// for radius > 1 further work may be considered to prohibit doubled elements...
-
-	int radius = 1; // currently meshwidth is identical to cutoffradius
-
-	if(dim == 2)
+	// to create pairs, we go through all points in the grid and determine possible neighbours
+	// let i1 be the 1D-index of the current point, and i2 a index of a possible neighbour
+	// if i1 < i2 the pair will be added
+	// note that boundaries shall be treated properly
+	switch(dim)
 	{
-		// - radius, to stay in the grid
-		for(int x = 0; x < cellCount[0] - radius; x++)
-			for(int y = 0; y < cellCount[1] - radius; y++)
-				for(int xd = 1; xd <= radius; xd++)
-					for(int yd = 1; yd <= radius; yd++)
+	case 2:
+		{
+			// go through grid points x, y
+			for(int x = 0; x < cellCount[0]; x++)
+				for(int y = 0; y < cellCount[1]; y++)
+				{
+					// calc index for point (x,y)
+					unsigned int i1 = Index2DTo1D(x, y);
+
+					// get neighbours
+					std::vector<unsigned int> neighbours = getNeighbours2D(i1);
+
+					// go through neighbours
+					assert(!neighbours.empty());
+					for(std::vector<unsigned int>::iterator it = neighbours.begin(); it < neighbours.end(); it++)
 					{
-						// note that through this creational process,
-						// the pairs are automatically in the right order
-						cellPairs.push_back(makePair(Index2DTo1D(x, y),			Index2DTo1D(x + xd, y + yd)));
-						cellPairs.push_back(makePair(Index2DTo1D(x, y),			Index2DTo1D(x + xd, y)));
-						cellPairs.push_back(makePair(Index2DTo1D(x, y),			Index2DTo1D(x, y + yd)));
-						cellPairs.push_back(makePair(Index2DTo1D(x + xd, y),	Index2DTo1D(x, y + yd)));
+						unsigned int i2 = *it;
+
+						// add pair if i1 < i2
+						if(i1 < i2)cellPairs.push_back(makePair(i1, i2));
+					}
+				}
+
+			break;
+		}
+	case 3:
+		{
+			// go through grid points x, y, z
+			for(int x = 0; x < cellCount[0]; x++)
+				for(int y = 0; y < cellCount[1]; y++)
+					for(int z = 0; z < cellCount[2]; z++)
+					{
+						// calc index for point (x,y, z)
+						unsigned int i1 = Index3DTo1D(x, y, z);
+
+						// get neighbours
+						std::vector<unsigned int> neighbours = getNeighbours3D(i1);
+
+						// go through neighbours
+						assert(!neighbours.empty());
+						for(std::vector<unsigned int>::iterator it = neighbours.begin(); it < neighbours.end(); it++)
+						{
+							unsigned int i2 = *it;
+
+							// add pair if i1 < i2
+							if(i1 < i2)cellPairs.push_back(makePair(i1, i2));
+						}
 					}
 
-		// we repeat a pattern
-		// |-----
-		// |\   /
-		// |  x 
-		// | /  \
-		// this the bottom & right boundary has to be set manually
-		for(int x = 0; x < cellCount[0] - 1; x++)
-		{
-			cellPairs.push_back(makePair(Index2DTo1D(x, cellCount[1] - 1),			Index2DTo1D(x + 1, cellCount[1] - 1)));
+			break;
 		}
-		for(int y = 0; y < cellCount[1] - 1; y++)
-		{
-			cellPairs.push_back(makePair(Index2DTo1D(cellCount[0] - 1, y),			Index2DTo1D(cellCount[0] - 1, y + 1)));
-		}
+	default:
+		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
 	}
-
-	// 3D not yet supported
 }
 
 

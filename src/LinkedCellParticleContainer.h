@@ -260,6 +260,9 @@ public:
 
 		if(!Cells)LOG4CXX_ERROR(generalOutputLogger, "memory allocation for cells failed!");
 		
+		// generate pairs
+		generatePairs();
+
 		// assign the particles to their initial cells
 		AssignParticles(particles);
 
