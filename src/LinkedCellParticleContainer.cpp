@@ -72,6 +72,9 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 		
 		//interact cell_i and cell_j
 
+		// if one cell is empty go to next pair
+		if(Cells[i].empty() || Cells[j].empty())continue;
+
 		// for all particles in cell_i
 		for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
 		{		
@@ -352,5 +355,285 @@ else if (dim == 3) {
 						reflectiveBoundaryCells.push_back(vec);
 					}
 				}
+	}
+}
+
+
+std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
+{
+	std::vector<Particle> halo;
+
+	// the halo particles are the ones where indices are extreme values
+	switch(dim)
+	{
+	case 2:
+		{
+			// grid |------------|
+			//      |            |
+			//      |------------|
+			// note that construction ensures, that halo layer has at least 3 cells in each direction!
+
+			// ------- upper
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0), cellCount[1], AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0), cellCount[1], AXIS_Y);
+
+			break;
+		}
+	case 3:
+		{
+			// do it the same way as in 2D
+
+			// first two 2D planes
+
+			//front plane
+
+			// ------- upper
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0), cellCount[1], AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0), cellCount[1], AXIS_Y);
+
+			//back plane
+
+			// ------- upper
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, cellCount[2] - 1), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, cellCount[2] - 1), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, cellCount[2] - 1), cellCount[1], AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, cellCount[2] - 1), cellCount[1], AXIS_Y);
+
+			// sides...
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 1, 0), cellCount[2] - 2, AXIS_Z);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 1, 0), cellCount[2] - 2, AXIS_Z);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0), cellCount[2] - 2, AXIS_Z);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, cellCount[1] - 1, 0), cellCount[2] - 2, AXIS_Z);
+
+			break;
+		}
+	default:
+		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
+	}
+
+	return halo;
+}
+
+void	LinkedCellParticleContainer::getParticlesOfCellsAlongLine(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, unsigned int count, unsigned int axis)
+{
+	// assert values
+	if(dim == 2)assert(axis == AXIS_X || axis == AXIS_Y);
+	if(dim == 3)assert(axis == AXIS_X || axis == AXIS_Y || axis == AXIS_Z);
+
+	
+	// short, because values of AXIS_X, AXIS_Y, AXIS_Z are 0, 1, 2!
+	// maybe better write it long to avoid errors
+	for(int i = 0; i < dim; i++)
+	{
+		assert(count <= cellCount[i]);
+		assert(start[i] < cellCount[i]);
+	}
+
+
+	// now get particles
+	switch(axis)
+	{
+	case AXIS_X:
+		{
+			for(int i = start[0]; i < count; i++)
+			{
+				int index = dim == 2 ? Index2DTo1D(start[0] + i, start[1]) : Index3DTo1D(start[0] + i, start[1], start[2]);
+
+				if(Cells[index].empty())continue;
+
+				out.insert(out.end(), Cells[index].begin(), Cells[index].end());
+			}
+			break;
+		}
+	case AXIS_Y:
+		{
+			for(int i = start[1]; i < count; i++)
+			{
+				int index = dim == 2 ? Index2DTo1D(start[0], start[1] + i) : Index3DTo1D(start[0], start[1] + i, start[2]);
+
+				if(Cells[index].empty())continue;
+				
+				out.insert(out.end(), Cells[index].begin(), Cells[index].end());
+			}
+			break;
+		}
+	case AXIS_Z:
+		{
+			for(int i = start[2]; i < count; i++)
+			{
+				int index = Index3DTo1D(start[0], start[1], start[2] + i);
+
+				if(Cells[index].empty())continue;
+				
+				out.insert(out.end(), Cells[index].begin(), Cells[index].end());
+			}
+			break;
+		}
+	default:
+		LOG4CXX_ERROR(generalOutputLogger, "unknown axis");
+
+	}
+}
+
+void	LinkedCellParticleContainer::clearParticlesOfCellsAlongLine(const utils::Vector<unsigned int, 3> start, const unsigned int count, const unsigned int axis)
+{
+	// assert values
+	if(dim == 2)assert(axis == AXIS_X || axis == AXIS_Y);
+	if(dim == 3)assert(axis == AXIS_X || axis == AXIS_Y || axis == AXIS_Z);
+
+	
+	// short, because values of AXIS_X, AXIS_Y, AXIS_Z are 0, 1, 2!
+	// maybe better write it long to avoid errors
+	for(int i = 0; i < dim; i++)
+	{
+		assert(count <= cellCount[i]);
+		assert(start[i] < cellCount[i]);
+	}
+
+
+	// now get particles
+	switch(axis)
+	{
+	case AXIS_X:
+		{
+			for(int i = start[0]; i < count; i++)
+			{
+				int index = dim == 2 ? Index2DTo1D(start[0] + i, start[1]) : Index3DTo1D(start[0] + i, start[1], start[2]);
+
+				if(Cells[index].empty())continue;
+
+				Cells[index].clear();
+			}
+			break;
+		}
+	case AXIS_Y:
+		{
+			for(int i = start[1]; i < count; i++)
+			{
+				int index = dim == 2 ? Index2DTo1D(start[0], start[1] + i) : Index3DTo1D(start[0], start[1] + i, start[2]);
+
+				if(Cells[index].empty())continue;
+				
+				Cells[index].clear();
+			}
+			break;
+		}
+	case AXIS_Z:
+		{
+			for(int i = start[2]; i < count; i++)
+			{
+				int index = Index3DTo1D(start[0], start[1], start[2] + i);
+
+				if(Cells[index].empty())continue;
+				
+				Cells[index].clear();
+			}
+			break;
+		}
+	default:
+		LOG4CXX_ERROR(generalOutputLogger, "unknown axis");
+
+	}
+}
+
+
+void LinkedCellParticleContainer::clearHaloParticles()
+{
+	// the halo particles are the ones where indices are extreme values
+	switch(dim)
+	{
+	case 2:
+		{
+			// grid |------------|
+			//      |            |
+			//      |------------|
+			// note that construction ensures, that halo layer has at least 3 cells in each direction!
+
+			// ------- upper
+			clearParticlesOfCellsAlongLine(makeTriple(1, 0, 0), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			clearParticlesOfCellsAlongLine(makeTriple(1, cellCount[1] - 1, 0), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			clearParticlesOfCellsAlongLine(makeTriple(0, 0, 0), cellCount[1], AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			clearParticlesOfCellsAlongLine(makeTriple(cellCount[0] - 1, 0, 0), cellCount[1], AXIS_Y);
+
+			break;
+		}
+	case 3:
+		{
+			// do it the same way as in 2D
+
+			// first two 2D planes
+
+			//front plane
+
+			// ------- upper
+			clearParticlesOfCellsAlongLine(makeTriple(1, 0, 0), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			clearParticlesOfCellsAlongLine(makeTriple(1, cellCount[1] - 1, 0), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			clearParticlesOfCellsAlongLine(makeTriple(0, 0, 0), cellCount[1], AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			clearParticlesOfCellsAlongLine(makeTriple(cellCount[0] - 1, 0, 0), cellCount[1], AXIS_Y);
+
+			//back plane
+
+			// ------- upper
+			clearParticlesOfCellsAlongLine(makeTriple(1, 0, cellCount[2] - 1), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			clearParticlesOfCellsAlongLine(makeTriple(1, cellCount[1] - 1, cellCount[2] - 1), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			clearParticlesOfCellsAlongLine(makeTriple(0, 0, cellCount[2] - 1), cellCount[1], AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			clearParticlesOfCellsAlongLine(makeTriple(cellCount[0] - 1, 0, cellCount[2] - 1), cellCount[1], AXIS_Y);
+
+			// sides...
+			clearParticlesOfCellsAlongLine(makeTriple(1, 1, 0), cellCount[2] - 2, AXIS_Z);
+			clearParticlesOfCellsAlongLine(makeTriple(cellCount[0] - 1, 1, 0), cellCount[2] - 2, AXIS_Z);
+			clearParticlesOfCellsAlongLine(makeTriple(1, cellCount[1] - 1, 0), cellCount[2] - 2, AXIS_Z);
+			clearParticlesOfCellsAlongLine(makeTriple(cellCount[0] - 1, cellCount[1] - 1, 0), cellCount[2] - 2, AXIS_Z);
+
+			break;
+		}
+	default:
+		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
 	}
 }

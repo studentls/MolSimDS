@@ -14,6 +14,12 @@
 #include <sstream>
 #include <cassert> 
 
+
+// defines for axises
+#define AXIS_X		0
+#define AXIS_Y		1
+#define AXIS_Z		2
+
 //fixed issue, namespace was used inapproriately
 namespace utils {
 

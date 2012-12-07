@@ -68,12 +68,10 @@ private:
 	utils::Vector<double, 3>			frontLowerLeftCorner;
 
 	/// a dynamic array, containing all Cells encoded in a 1D array
+	/// note that we will encode in this array also a halo cell frame
+	/// so the grid has size (x+2)(y+2)(z+2) after construction
 	std::vector<Particle>				*Cells;
 	
-	/// halo particle
-	/// Note that the halo acts only as a storage for the sake of completeness.
-	/// The field could be dropped as well, as no interaction with cells occurs
-	std::vector<Particle>				halo;
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
@@ -83,11 +81,25 @@ private:
 	/// little helper function, to create fast a pair
 	/// @param i1 first index
 	/// @param i2 second index
-	utils::Vector<unsigned int, 2> makePair(unsigned int i1, unsigned int i2)
+	utils::Vector<unsigned int, 2> makePair(const unsigned int i1, const unsigned int i2)
 	{
 		utils::Vector<unsigned int, 2> res;
 		res[0] = i1;
 		res[1] = i2;
+
+		return res;
+	}
+
+	/// little helper function, to create fast a triple
+	/// @param i1 first index
+	/// @param i2 second index
+	/// @param i3 third index
+	utils::Vector<unsigned int, 3> makeTriple(const unsigned int i1, const unsigned int i2, const unsigned int i3)
+	{
+		utils::Vector<unsigned int, 3> res;
+		res[0] = i1;
+		res[1] = i2;
+		res[2] = i3;
 
 		return res;
 	}
@@ -169,6 +181,22 @@ private:
 
 	}
 
+	/// function to get particles along a line of cells in direction of an axis in the grid
+	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
+	/// @param start point of start of the cells' line segment
+	/// @param count how many cells shall be visited?
+	/// @param axis axis, can be AXIS_X, AXIS_Y, AXIS_Z
+	///				note that if AXIS_Z is used for dim = 2 there will be an error
+	void	getParticlesOfCellsAlongLine(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, unsigned int count, unsigned int axis);
+
+	/// function to clear particles along a line of cells in direction of an axis in the grid
+	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
+	/// @param start point of start of the cells' line segment
+	/// @param count how many cells shall be visited?
+	/// @param axis axis, can be AXIS_X, AXIS_Y, AXIS_Z
+	///				note that if AXIS_Z is used for dim = 2 there will be an error
+	void	clearParticlesOfCellsAlongLine(const utils::Vector<unsigned int, 3> start, const unsigned int count, const unsigned int axis);
+
 public:
 	/// default constructor, set everthing to good values
 	LinkedCellParticleContainer()
@@ -208,17 +236,6 @@ public:
 		this->cutoffDistance = 0.0;
 		reflectiveBoundaryDistance = 0;
 
-		// Deprecated test print
-		/*
-		this->dim = 2;
-		cellCount[0] = 3;
-		cellCount[1] = 3;
-
-		generatePairs();
-		for(std::vector<utils::Vector<unsigned int, 2> >::iterator it = cellPairs.begin(); it != cellPairs.end(); it++)
-			LOG4CXX_INFO(generalOutputLogger, "("<<(*it)[0]<<", "<<(*it)[1]<<")");
-			*/
-
 		// call init
 		Init(particles, cutoffDistance, frontLowerLeftCorner, simulationAreaExtent, 
 			boundaryConditions, sigma);		
@@ -252,6 +269,10 @@ public:
 		// into the the area precisely and have to be enlarged, as just mentioned above
 		for(int i = 0; i < dim; i++)cellSize[i] = (double)(simulationAreaExtent[i] / cellCount[i]);
 		
+
+		// add +2 for every direction to create halo layer...
+		for(int i = 0; i < dim; i++)cellCount[i] += 2;
+
 		//delete if necessary
 		SAFE_DELETE_A(Cells);
 
@@ -295,13 +316,23 @@ public:
 				yIndex = (int)((particle.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
 
 				// is particle contained in grid or halo?
-				if (xIndex < 0 || yIndex < 0 ||
-					xIndex >= cellCount[0] || yIndex >= cellCount[1])
-					halo.push_back(particle);
-				else {
-					int index = Index2DTo1D(xIndex, yIndex);
-					Cells[index].push_back(particle);
+				// note that the regular grid starts with (1, 1)
+				// and goes then till point (cellCount[0] - 2, cellCount[1] - 2)
+				if (xIndex < 1 || yIndex < 1 ||
+					xIndex >= cellCount[0] - 2 || yIndex >= cellCount[1] - 2)
+				{
+					// sort into correct halo cell
+					if(xIndex < 1)xIndex = 0;
+					if(yIndex < 1)yIndex = 0;
+					if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
+					if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
+
+
 				}
+				
+				// make index
+				int index = Index2DTo1D(xIndex, yIndex);
+				Cells[index].push_back(particle);
 			}
 		// 3D
 		else if(dim == 3) {
@@ -310,14 +341,24 @@ public:
 			yIndex = (int)((particle.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
 			zIndex = (int)((particle.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
 
-			// particle in halo?
-			if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
-				xIndex >= cellCount[0] || yIndex >= cellCount[1] || zIndex >= cellCount[2])
-				halo.push_back(particle);
-			else {
-				int index = Index3DTo1D(xIndex, yIndex, zIndex);
-				Cells[index].push_back(particle);
+			// is particle contained in grid or halo?
+			// note that the regular grid starts with (1, 1)
+			// and goes then till point (cellCount[0] - 2, cellCount[1] - 2)
+			if (xIndex < 1 || yIndex < 1 || zIndex < 1 ||
+				xIndex >= cellCount[0] - 2|| yIndex >= cellCount[1] - 2|| zIndex >= cellCount[2] - 2)
+			{
+				// sort into correct halo cell
+				if(xIndex < 1)xIndex = 0;
+				if(yIndex < 1)yIndex = 0;
+				if(zIndex < 1)zIndex = 0;
+				if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
+				if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
+				if(zIndex >= cellCount[2] - 2)zIndex = cellCount[2] - 2;
 			}
+			
+			// make index
+			int index = Index3DTo1D(xIndex, yIndex, zIndex);
+			Cells[index].push_back(particle);
 		}
 	}
 
@@ -409,12 +450,9 @@ public:
 	/// removes all particles
 	void							Clear()
 	{
-		// delete halo's particles
-		if(!halo.empty())halo.clear();
-
 		assert(Cells);
 
-		// go through all Cells
+		// go through all Cells and delete if necessary
 		for(int i = 0; i < getCellCount(); i++)
 		{
 			if(!Cells[i].empty())Cells[i].clear();
@@ -424,10 +462,7 @@ public:
 	/// are any particles contained?
 	bool							IsEmpty()
 	{
-		// any particles in halo contained?
-		if(!halo.empty())return false;
-
-		// any cells contained?
+		// any cells exist?
 		if(!Cells)return true;
 
 		// go through all Cells
@@ -514,18 +549,19 @@ public:
 					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
 					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
 
+					// sort into correct halo cell if necessary
+					if(xIndex < 1)xIndex = 0;
+					if(yIndex < 1)yIndex = 0;
+					if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
+					if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
+					
 					// is particle outside of its father cell?
 					if(Index2DTo1D(xIndex, yIndex) != i)
 					{
-						// is particle contained in grid or halo?
-						if (xIndex < 0 || yIndex < 0 ||
-							xIndex >= cellCount[0] || yIndex >= cellCount[1])
-							halo.push_back(p);
-						else {
-							int index = Index2DTo1D(xIndex, yIndex);
-							Cells[index].push_back(p);
-						}
-
+						// reassign
+						int index = Index2DTo1D(xIndex, yIndex);
+						Cells[index].push_back(p);
+						
 						// remove particle from current cell (i-th cell)
 						it = Cells[i].erase(it);
 
@@ -538,18 +574,20 @@ public:
 					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
 					zIndex = (int)((p.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
 
+					// sort into correct halo cell if necessary
+					if(xIndex < 1)xIndex = 0;
+					if(yIndex < 1)yIndex = 0;
+					if(zIndex < 1)zIndex = 0;
+					if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
+					if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
+					if(zIndex >= cellCount[2] - 2)zIndex = cellCount[2] - 2;
+
 					// is particle outside of its father cell?
 					if(Index3DTo1D(xIndex, yIndex, zIndex) != i)
 					{
-						// particle in halo?
-						if (xIndex < 0 || yIndex < 0 || zIndex < 0 ||
-							xIndex >= cellCount[0] || yIndex >= cellCount[1] || zIndex >= cellCount[2])
-							halo.push_back(p);
-						else {
-							int index = Index3DTo1D(xIndex, yIndex, zIndex);
-							Cells[index].push_back(p);
-						}
-					
+						// reassign			
+						int index = Index3DTo1D(xIndex, yIndex, zIndex);
+						Cells[index].push_back(p);
 						// remove particle from current cell (i-th cell)
 						it = Cells[i].erase(it);
 
@@ -567,11 +605,11 @@ public:
 	ParticleContainerType			getType() {return PCT_LINKEDCELL;}
 
 	/// method to return halo particles
-	/// @return returns reference to halo particle vector
-	std::vector<Particle>&			getHaloParticles()	{return this->halo;}
+	/// @return returns a vector containing all halo particles
+	std::vector<Particle>			getHaloParticles();
 
 	/// method to clear halo
-	void							clearHaloParticles()		{if(!halo.empty())halo.clear();}
+	void							clearHaloParticles();
 
 	/// get all boundary particles
 	/// @return new vector of boundary particles
