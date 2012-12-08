@@ -65,18 +65,24 @@ private:
 	/// |-----|-----|-----|-----|-----|
 	/// |     |     |     |     |     |
 	/// v-----|-----|-----|-----|-----|
-	utils::Vector<double, 3>			frontLowerLeftCorner;
+	utils::Vector<double, 3>						frontLowerLeftCorner;
 
 	/// a dynamic array, containing all Cells encoded in a 1D array
 	/// note that we will encode in this array also a halo cell frame
 	/// so the grid has size (x+2)(y+2)(z+2) after construction
-	std::vector<Particle>				*Cells;
+	std::vector<Particle>							*Cells;
 	
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
 	/// note that here the space is very important, as g++ has problems otherwise parsing it
 	std::vector<utils::Vector<unsigned int, 2> >	cellPairs;
+
+	/// array of indices of halo cells
+	std::vector<unsigned int>						haloIndices;
+
+	/// array of indices of boundary cells
+	std::vector<unsigned int>						boundaryIndices;
 
 	/// little helper function, to create fast a pair
 	/// @param i1 first index
@@ -181,28 +187,16 @@ private:
 
 	}
 
-	/// function to get particles along a line of cells in direction of an axis in the grid
-	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
-	/// @param start point of start of the cells' line segment
-	/// @param count how many cells shall be visited?
-	/// @param axis axis, can be AXIS_X, AXIS_Y, AXIS_Z
-	///				note that if AXIS_Z is used for dim = 2 there will be an error
-	void	getParticlesOfCellsAlongLine(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, unsigned int count, unsigned int axis);
+	/// function which will calculate all necessary index array
+	void	calcIndices();
 
-	/// function to get particles along a line of cells in direction of an axis in the grid
-	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
-	/// @param start point of start of the cells' line segment, note that if you use e.g. AXIS_XZ the start vector should have form (x, 0, z)
-	/// @param count how many cells shall be visited? (vector pair)
-	/// @param axis axis, can be AXIS_XY, AXIS_XZ, AXIS_YZ
-	void	getParticlesOfCellsAlongRectangle(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, const utils::Vector<unsigned int, 2> count, unsigned int axis);
+	/// function to calculate indices of the r-th frame from the outside
+	/// e.g. r = 0 will return indices of the halo frame
+	///		 r = 1 the indices of the boundary cells
+	/// @param r the r-th frame from the outside(starting by zero)
+	/// @param out index conatiner where indices will be stored
+	void	calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r);
 
-	/// function to clear particles along a line of cells in direction of an axis in the grid
-	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
-	/// @param start point of start of the cells' line segment
-	/// @param count how many cells shall be visited?
-	/// @param axis axis, can be AXIS_X, AXIS_Y, AXIS_Z
-	///				note that if AXIS_Z is used for dim = 2 there will be an error
-	void	clearParticlesOfCellsAlongLine(const utils::Vector<unsigned int, 3> start, const unsigned int count, const unsigned int axis);
 
 public:
 	/// default constructor, set everthing to good values
@@ -288,8 +282,8 @@ public:
 
 		if(!Cells)LOG4CXX_ERROR(generalOutputLogger, "memory allocation for cells failed!");
 		
-		// generate pairs
-		generatePairs();
+		// calc Indices (pairs, halo, boundary)
+		calcIndices();
 
 		// assign the particles to their initial cells
 		AssignParticles(particles);

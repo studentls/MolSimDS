@@ -55,6 +55,7 @@ class ParticleContainerTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testListParticleContainerIteration);
 	CPPUNIT_TEST(testListParticleContainerIterationPairwise);
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo);	
+	CPPUNIT_TEST(testLinkedCellParticleContainerGetBoundary);	
 	CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -225,6 +226,91 @@ public:
 				CPPUNIT_ASSERT(sum == calcsum);		
 			}
 		}
+	}
+
+
+	void testLinkedCellParticleContainerGetBoundary()
+	{
+		
+		utils::Vector<unsigned int, 3> N;
+
+		// set as you want, it should work fine :)
+		int n = 10;
+
+		
+
+		// construct particles
+		std::vector<Particle> particles;
+		utils::Vector<double, 3> corner;
+		utils::Vector<double, 3> lowercorner;
+		utils::Vector<double, 3> extent;
+		utils::Vector<double, 3> vel;
+
+		// for 2D and 3D (i = 0 => 2D, i = 1 => 3D)
+		for(int i = 1; i < 2; i++)
+		{
+			int dim = 2 + i;
+
+			lowercorner[0] = -0.5;
+			lowercorner[1] = -0.5;
+			lowercorner[2] = -0.5 * i; // set according to used func
+			
+			N[0] = n;
+			N[1] = n;
+			N[2] = 1 + (n-1) * i;
+			
+			// set simulation area
+			// we will place a cuboid over all cells
+			for(int i = 0; i < dim; i++)
+			{
+				corner[i] = 0;
+				extent[i] = N[i] - 2;
+			}
+
+			ListParticleContainer lpc;
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+
+			lowercorner[0] = 0.0;
+			lowercorner[1] = 0.0;
+			lowercorner[2] = 0.0; 
+
+			//construct container...
+			LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(dim, lpc.getParticles(), 1.0, lowercorner, extent, BC_NONE, 1.0);
+
+			// get halo particles
+			std::vector<Particle> boundary = pc->getBoundaryParticles();
+
+			CPPUNIT_ASSERT(!boundary.empty());
+
+			int sum = 0;
+			// perform sum check
+			for(std::vector<Particle>::iterator it = boundary.begin(); it != boundary.end(); it++)
+			{
+				sum += it->type;
+			}
+
+			SAFE_DELETE(pc);
+
+			// number of boundary particles should be (N_0 - 2) * (N_1 - 2) - (N_0 - 4) * (N_1 - 4)
+			// note that it is only ensured, that N_i >= 3
+			// so special case has to be regarded
+			// analog in 3D
+			if( i == 0)
+			{
+				
+				int calcsum = (N[0] - 2)*(N[1] - 2);			
+				if(N[0] > 3 && N[1] > 3)calcsum -= (N[0] - 4)*(N[1] - 4);
+
+				CPPUNIT_ASSERT(sum == calcsum);		
+			}
+			else
+			{
+				int calcsum = (N[0] - 2)*(N[1] - 2)*(N[2] - 2);	
+				if(N[0] > 3 && N[1] > 3 && N[2] > 3)calcsum -= (N[0] - 4)*(N[1] - 4)*(N[2] - 4);
+				CPPUNIT_ASSERT(sum == calcsum);		
+			}
+		}
+
 	}
 };
 
