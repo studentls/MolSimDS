@@ -43,6 +43,7 @@
 #include "ParticleContainer.h"
 #include "ListParticleContainer.h"
 #include "LinkedCellParticleContainer.h"
+#include "ParticleGenerator.h"
 
 // see http://cppunit.sourceforge.net/doc/lastest/cppunit_cookbook.html for details
 
@@ -52,9 +53,10 @@ class ParticleContainerTest : public CppUnit::TestFixture
 	//fast setup macros
 	CPPUNIT_TEST_SUITE(ParticleContainerTest);
 	CPPUNIT_TEST(testListParticleContainerIteration);
-	CPPUNIT_TEST(testListParticleContainerIterationPairwise);
+	CPPUNIT_TEST(testListParticleContainerIterationPairwise);/*
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo2D);	
-	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo3D);
+	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo3D);*/
+	CPPUNIT_TEST(testLinkedCellParticleContainerGetHaloBig);	
 	CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -161,7 +163,8 @@ public:
 		//set 1x1 simulation area
 		for(int i = 0; i < 2; i++)
 		{
-			corner[i] = extent[i] = i;
+			corner[i] = 0;
+			extent[i] = 1;
 		}
 
 		// place 8 halo particles, in each of the 8 possible halo regions!
@@ -211,7 +214,8 @@ public:
 		//set 1x1x1 simulation area
 		for(int i = 0; i < 3; i++)
 		{
-			corner[i] = extent[i] = i;
+			corner[i] = 0;
+			extent[i] = 1;
 		}
 
 		// place 8 halo particles, in each of the 8 possible halo regions!
@@ -259,6 +263,83 @@ public:
 
 		// there shall be 26 ( = 9 + 8 + 9 particles contained
 		CPPUNIT_ASSERT(sum == 26);		
+	}
+
+	void testLinkedCellParticleContainerGetHaloBig()
+	{
+		
+		utils::Vector<unsigned int, 3> N;
+
+		int n = 3;
+
+		
+
+		// construct particles
+		std::vector<Particle> particles;
+		utils::Vector<double, 3> corner;
+		utils::Vector<double, 3> lowercorner;
+		utils::Vector<double, 3> extent;
+		utils::Vector<double, 3> vel;
+
+		// for 2D and 3D (i = 0 => 2D, i = 1 => 3D)
+		for(int i = 0; i < 2; i++)
+		{
+			int dim = 2 + i;
+
+			lowercorner[0] = -0.5;
+			lowercorner[1] = -0.5;
+			lowercorner[2] = -0.5 * i; // set according to used func
+			
+			N[0] = n;
+			N[1] = n;
+			N[2] = 1 + (n-1) * i;
+			
+			// set simulation area
+			// we will place a cuboid over all cells
+			for(int i = 0; i < dim; i++)
+			{
+				corner[i] = 0;
+				extent[i] = N[i] - 2;
+			}
+
+			ListParticleContainer lpc;
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+
+			lowercorner[0] = 0.0;
+			lowercorner[1] = 0.0;
+			lowercorner[2] = 0.0; 
+
+			//construct container...
+			LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(dim, lpc.getParticles(), 1.0, lowercorner, extent, BC_NONE, 1.0);
+
+			// get halo particles
+			std::vector<Particle> halo = pc->getHaloParticles();
+
+			CPPUNIT_ASSERT(!halo.empty());
+
+			int sum = 0;
+			// perform sum check
+			for(std::vector<Particle>::iterator it = halo.begin(); it != halo.end(); it++)
+			{
+				sum += it->type;
+			}
+
+			SAFE_DELETE(pc);
+
+			// number of halo particles should be N_0 * N_1 - (N_0 - 2) * (N_1 - 2)
+			// analog in 3D
+			if( i == 0)
+			{
+				
+				int calcsum = N[0] * N[1] - (N[0] - 2)*(N[1] - 2);			
+				CPPUNIT_ASSERT(sum == calcsum);		
+			}
+			else
+			{
+				int calcsum = N[0] * N[1] * N[2] - (N[0] - 2)*(N[1] - 2)*(N[2] - 2);			
+				CPPUNIT_ASSERT(sum == calcsum);		
+			}
+		}
 	}
 };
 

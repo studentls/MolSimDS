@@ -92,46 +92,83 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 
 std::vector<Particle> LinkedCellParticleContainer::getBoundaryParticles()
 {
-	std::vector<Particle> particles;
+	std::vector<Particle> boundary;
 
-	// case 2D
-	if(dim == 2)
+
+	// the halo particles are the ones where indices are extreme values
+	switch(dim)
 	{
-		// |.........|
-		// |         |
-		// |.........|
-		for(int x = 0; x < cellCount[0]; x++)
-			for(int y = 0; y < cellCount[1]; y++)
-			{
-				// only boundaries are allowed
-				if(x != 0 && y != 0 && x != cellCount[0] && y != cellCount[1])continue;
+	case 2:
+		{
+			// grid |------------|
+			//      |            |
+			//      |------------|
+			// note that construction ensures, that halo layer has at least 3 cells in each direction!
 
-				// add to container
-				int index = Index2DTo1D(x, y);
-				particles.insert(particles.end(), Cells[index].begin(), Cells[index].end());
-			}
+			// ------- upper
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, 0), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 2, 0), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 2, 0), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 2, 1, 0), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
+
+			break;
+		}
+	case 3:
+		{
+			// do it the same way as in 2D
+
+			// first two 2D planes
+
+			//front plane
+
+			// ------- upper
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, 1), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 2, 1), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 2, 1), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 2, 1, 1), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
+
+			//back plane
+
+			// ------- upper
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, cellCount[2] - 2), cellCount[0] - 2, AXIS_X);
+			// ------- lower
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 2, cellCount[2] - 2), cellCount[0] - 2, AXIS_X);
+			// |
+			// |
+			// | left
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 2, cellCount[2] - 2), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
+			//        |
+			//        |
+			// right  | 
+			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 2, 1, cellCount[2] - 2), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
+
+			// sides...
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
+			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 1, 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
+			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
+			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 1, cellCount[1] - 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
+
+			break;
+		}
+	default:
+		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
 	}
 
-	// case 3D
-	if(dim == 3)
-	{
-		// |.........|
-		// |         |
-		// |.........|
-		for(int x = 0; x < cellCount[0]; x++)
-			for(int y = 0; y < cellCount[1]; y++)
-				for(int z = 0; z < cellCount[2]; z++)
-				{
-					// only boundaries are allowed
-					if(x != 0 && y != 0 && z != 0 && x != cellCount[0] && y != cellCount[1] && z != cellCount[2])continue;
-
-					// add to container
-					int index = Index3DTo1D(x, y, z);
-					particles.insert(particles.end(), Cells[index].begin(), Cells[index].end());
-				}
-	}
-
-	return particles;
+	return boundary;
 }
 
 void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
@@ -374,17 +411,17 @@ std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
 			// note that construction ensures, that halo layer has at least 3 cells in each direction!
 
 			// ------- upper
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0), cellCount[0] - 2, AXIS_X);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0),					cellCount[0] - 2, AXIS_X);
 			// ------- lower
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0), cellCount[0] - 2, AXIS_X);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0),	cellCount[0] - 2, AXIS_X);
 			// |
 			// |
 			// | left
-			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0), cellCount[1], AXIS_Y);
+			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0),					cellCount[1], AXIS_Y);
 			//        |
 			//        |
 			// right  | 
-			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0), cellCount[1], AXIS_Y);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0),	cellCount[1], AXIS_Y);
 
 			break;
 		}
@@ -397,39 +434,39 @@ std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
 			//front plane
 
 			// ------- upper
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0), cellCount[0] - 2, AXIS_X);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0),					cellCount[0] - 2, AXIS_X);
 			// ------- lower
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0), cellCount[0] - 2, AXIS_X);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0),	cellCount[0] - 2, AXIS_X);
 			// |
 			// |
 			// | left
-			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0), cellCount[1], AXIS_Y);
+			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0),					cellCount[1], AXIS_Y);
 			//        |
 			//        |
 			// right  | 
-			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0), cellCount[1], AXIS_Y);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0),	cellCount[1], AXIS_Y);
 
 			//back plane
 
 			// ------- upper
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, cellCount[2] - 1), cellCount[0] - 2, AXIS_X);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0,					cellCount[2] - 1),	cellCount[0] - 2,	AXIS_X);
 			// ------- lower
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, cellCount[2] - 1), cellCount[0] - 2, AXIS_X);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1,	cellCount[2] - 1),	cellCount[0] - 2,	AXIS_X);
 			// |
 			// |
 			// | left
-			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, cellCount[2] - 1), cellCount[1], AXIS_Y);
+			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0,					cellCount[2] - 1),	cellCount[1],		AXIS_Y);
 			//        |
 			//        |
 			// right  | 
-			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, cellCount[2] - 1), cellCount[1], AXIS_Y);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0,	cellCount[2] - 1),	cellCount[1],		AXIS_Y);
 
 			// sides...
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, 1, 0), cellCount[2] - 2, AXIS_Z);
-			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 1, 0), cellCount[2] - 2, AXIS_Z);
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0), cellCount[2] - 2, AXIS_Z);
-			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, cellCount[1] - 1, 0), cellCount[2] - 2, AXIS_Z);
-
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, 1,					0),					cellCount[2] - 2,	AXIS_Z);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 1,	0),					cellCount[2] - 2,	AXIS_Z);
+			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1,	0),					cellCount[2] - 2,	AXIS_Z);
+			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1,		cellCount[1] - 1, 0), cellCount[2] - 2,	AXIS_Z);
+			
 			break;
 		}
 	default:
@@ -454,13 +491,12 @@ void	LinkedCellParticleContainer::getParticlesOfCellsAlongLine(std::vector<Parti
 		assert(start[i] < cellCount[i]);
 	}
 
-
 	// now get particles
 	switch(axis)
 	{
 	case AXIS_X:
 		{
-			for(int i = start[0]; i < count; i++)
+			for(int i = 0; i < count; i++)
 			{
 				int index = dim == 2 ? Index2DTo1D(start[0] + i, start[1]) : Index3DTo1D(start[0] + i, start[1], start[2]);
 
@@ -472,7 +508,7 @@ void	LinkedCellParticleContainer::getParticlesOfCellsAlongLine(std::vector<Parti
 		}
 	case AXIS_Y:
 		{
-			for(int i = start[1]; i < count; i++)
+			for(int i = 0; i < count; i++)
 			{
 				int index = dim == 2 ? Index2DTo1D(start[0], start[1] + i) : Index3DTo1D(start[0], start[1] + i, start[2]);
 
@@ -484,7 +520,7 @@ void	LinkedCellParticleContainer::getParticlesOfCellsAlongLine(std::vector<Parti
 		}
 	case AXIS_Z:
 		{
-			for(int i = start[2]; i < count; i++)
+			for(int i = 0; i < count; i++)
 			{
 				int index = Index3DTo1D(start[0], start[1], start[2] + i);
 
@@ -521,7 +557,7 @@ void	LinkedCellParticleContainer::clearParticlesOfCellsAlongLine(const utils::Ve
 	{
 	case AXIS_X:
 		{
-			for(int i = start[0]; i < count; i++)
+			for(int i = 0; i < count; i++)
 			{
 				int index = dim == 2 ? Index2DTo1D(start[0] + i, start[1]) : Index3DTo1D(start[0] + i, start[1], start[2]);
 
@@ -533,7 +569,7 @@ void	LinkedCellParticleContainer::clearParticlesOfCellsAlongLine(const utils::Ve
 		}
 	case AXIS_Y:
 		{
-			for(int i = start[1]; i < count; i++)
+			for(int i = 0; i < count; i++)
 			{
 				int index = dim == 2 ? Index2DTo1D(start[0], start[1] + i) : Index3DTo1D(start[0], start[1] + i, start[2]);
 
@@ -545,7 +581,7 @@ void	LinkedCellParticleContainer::clearParticlesOfCellsAlongLine(const utils::Ve
 		}
 	case AXIS_Z:
 		{
-			for(int i = start[2]; i < count; i++)
+			for(int i = 0; i < count; i++)
 			{
 				int index = Index3DTo1D(start[0], start[1], start[2] + i);
 

@@ -301,63 +301,78 @@ public:
 	/// @data optional data given to func
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
 
+	/// inline method to quickly calculate an index for reassignment
+	/// @return returns index for grid including halo cells
+	inline int PositionToIndex2D(const utils::Vector<double, 3>& pos)
+	{
+		int xIndex = 0, yIndex = 0;
+
+		// calc Index
+		double x = (pos[0] - frontLowerLeftCorner[0]) / cellSize[0];
+		double y = (pos[1] - frontLowerLeftCorner[1]) / cellSize[1];
+				
+		// is particle contained in grid or halo?
+		// note that the regular grid starts with (1, 1)
+		
+		if(x < 0)xIndex = 0;
+		else xIndex =(int)x + 1;
+		if(y < 0)yIndex = 0;
+		else yIndex =(int)y + 1;
+		
+		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;
+		if(yIndex > cellCount[1] - 2)yIndex = cellCount[1] - 1;
+
+				
+		// make index
+		return Index2DTo1D(xIndex, yIndex);
+	}
+
+	/// inline method to quickly calculate an index for reassignment
+	/// @return returns index for grid including halo cells
+	inline int PositionToIndex3D(const utils::Vector<double, 3>& pos)
+	{
+		int xIndex = 0, yIndex = 0, zIndex = 0;
+
+		// calc Index
+		double x = (pos[0] - frontLowerLeftCorner[0]) / cellSize[0];
+		double y = (pos[1] - frontLowerLeftCorner[1]) / cellSize[1];
+		double z = (pos[2] - frontLowerLeftCorner[2]) / cellSize[2];
+				
+		// is particle contained in grid or halo?
+		// note that the regular grid starts with (1, 1, 1)
+		
+		if(x < 0)xIndex = 0;
+		else xIndex =(int)x + 1;
+		if(y < 0)yIndex = 0;
+		else yIndex =(int)y + 1;
+		if(z < 0)yIndex = 0;
+		else zIndex =(int)z + 1;
+		
+		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;
+		if(yIndex > cellCount[1] - 2)yIndex = cellCount[1] - 1;
+		if(zIndex > cellCount[2] - 2)zIndex = cellCount[2] - 1;
+
+				
+		// make index
+		return Index3DTo1D(xIndex, yIndex, zIndex);
+	}
+
 	/// a method to add a Particle to the LinkedCellParticleContainer
 	/// @param particle the particle to add
 	void AddParticle(const Particle& particle)
 	{
-		int xIndex = 0,yIndex = 0, zIndex = 0;
+		int index = 0;
 
 		assert(Cells);
 
 		// 2D
 		if(dim == 2) {
-				// calc Index
-				xIndex = (int)((particle.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-				yIndex = (int)((particle.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-
-				// is particle contained in grid or halo?
-				// note that the regular grid starts with (1, 1)
-				// and goes then till point (cellCount[0] - 2, cellCount[1] - 2)
-				if (xIndex < 1 || yIndex < 1 ||
-					xIndex >= cellCount[0] - 2 || yIndex >= cellCount[1] - 2)
-				{
-					// sort into correct halo cell
-					if(xIndex < 1)xIndex = 0;
-					if(yIndex < 1)yIndex = 0;
-					if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
-					if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
-
-
-				}
-				
-				// make index
-				int index = Index2DTo1D(xIndex, yIndex);
+				index = PositionToIndex2D(particle.x);
 				Cells[index].push_back(particle);
 			}
 		// 3D
 		else if(dim == 3) {
-			// calc Index
-			xIndex = (int)((particle.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-			yIndex = (int)((particle.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-			zIndex = (int)((particle.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
-
-			// is particle contained in grid or halo?
-			// note that the regular grid starts with (1, 1)
-			// and goes then till point (cellCount[0] - 2, cellCount[1] - 2)
-			if (xIndex < 1 || yIndex < 1 || zIndex < 1 ||
-				xIndex >= cellCount[0] - 2|| yIndex >= cellCount[1] - 2|| zIndex >= cellCount[2] - 2)
-			{
-				// sort into correct halo cell
-				if(xIndex < 1)xIndex = 0;
-				if(yIndex < 1)yIndex = 0;
-				if(zIndex < 1)zIndex = 0;
-				if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
-				if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
-				if(zIndex >= cellCount[2] - 2)zIndex = cellCount[2] - 2;
-			}
-			
-			// make index
-			int index = Index3DTo1D(xIndex, yIndex, zIndex);
+			index = PositionToIndex3D(particle.x);
 			Cells[index].push_back(particle);
 		}
 	}
@@ -530,7 +545,7 @@ public:
 	/// the default value of this variable for the LinkedCellAlgorithm is one
 	void ReassignParticles()
 	{
-		int xIndex = 0, yIndex = 0, zIndex = 0;
+		int index = 0;
 
 		// go through all Cells...
 		for(int i = 0; i < getCellCount(); i++)
@@ -541,25 +556,16 @@ public:
 			// go through every cell's particles...
 			for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); )
 			{
-				Particle p = *it;
+				Particle& p = *it;
 			
 				// 2D
 				if (dim == 2) {
-					// calc Index
-					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-
-					// sort into correct halo cell if necessary
-					if(xIndex < 1)xIndex = 0;
-					if(yIndex < 1)yIndex = 0;
-					if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
-					if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
+					index = PositionToIndex2D(p.x);
 					
 					// is particle outside of its father cell?
-					if(Index2DTo1D(xIndex, yIndex) != i)
+					if(index != i)
 					{
 						// reassign
-						int index = Index2DTo1D(xIndex, yIndex);
 						Cells[index].push_back(p);
 						
 						// remove particle from current cell (i-th cell)
@@ -569,24 +575,12 @@ public:
 				}
 				// 3D
 				else if (dim == 3) {
-					// calc Index
-					xIndex = (int)((p.x[0] - frontLowerLeftCorner[0]) / cellSize[0]);
-					yIndex = (int)((p.x[1] - frontLowerLeftCorner[1]) / cellSize[1]);
-					zIndex = (int)((p.x[2] - frontLowerLeftCorner[2]) / cellSize[2]);
-
-					// sort into correct halo cell if necessary
-					if(xIndex < 1)xIndex = 0;
-					if(yIndex < 1)yIndex = 0;
-					if(zIndex < 1)zIndex = 0;
-					if(xIndex >= cellCount[0] - 2)xIndex = cellCount[0] - 2;
-					if(yIndex >= cellCount[1] - 2)yIndex = cellCount[1] - 2;
-					if(zIndex >= cellCount[2] - 2)zIndex = cellCount[2] - 2;
-
+					index = PositionToIndex3D(p.x);
+					
 					// is particle outside of its father cell?
-					if(Index3DTo1D(xIndex, yIndex, zIndex) != i)
+					if(index != i)
 					{
 						// reassign			
-						int index = Index3DTo1D(xIndex, yIndex, zIndex);
 						Cells[index].push_back(p);
 						// remove particle from current cell (i-th cell)
 						it = Cells[i].erase(it);
