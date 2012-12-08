@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef SIMULATIONFILE_H
-#define SIMULATIONFILE_H
+#ifndef C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
+#define C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
 
 // Begin prologue.
 //
@@ -711,19 +711,61 @@ class params_t: public ::xml_schema::type
   void
   sigma (const sigma_type& x);
 
-  // brownianMotionFactor
+  // timestepsPerThermostatApplication
   // 
-  typedef ::xml_schema::decimal brownianMotionFactor_type;
-  typedef ::xsd::cxx::tree::traits< brownianMotionFactor_type, char, ::xsd::cxx::tree::schema_type::decimal > brownianMotionFactor_traits;
+  typedef ::xml_schema::int_ timestepsPerThermostatApplication_type;
+  typedef ::xsd::cxx::tree::traits< timestepsPerThermostatApplication_type, char > timestepsPerThermostatApplication_traits;
 
-  const brownianMotionFactor_type&
-  brownianMotionFactor () const;
+  const timestepsPerThermostatApplication_type&
+  timestepsPerThermostatApplication () const;
 
-  brownianMotionFactor_type&
-  brownianMotionFactor ();
+  timestepsPerThermostatApplication_type&
+  timestepsPerThermostatApplication ();
 
   void
-  brownianMotionFactor (const brownianMotionFactor_type& x);
+  timestepsPerThermostatApplication (const timestepsPerThermostatApplication_type& x);
+
+  // initialTemperature
+  // 
+  typedef ::xml_schema::decimal initialTemperature_type;
+  typedef ::xsd::cxx::tree::traits< initialTemperature_type, char, ::xsd::cxx::tree::schema_type::decimal > initialTemperature_traits;
+
+  const initialTemperature_type&
+  initialTemperature () const;
+
+  initialTemperature_type&
+  initialTemperature ();
+
+  void
+  initialTemperature (const initialTemperature_type& x);
+
+  // targetTemperature
+  // 
+  typedef ::xml_schema::decimal targetTemperature_type;
+  typedef ::xsd::cxx::tree::traits< targetTemperature_type, char, ::xsd::cxx::tree::schema_type::decimal > targetTemperature_traits;
+
+  const targetTemperature_type&
+  targetTemperature () const;
+
+  targetTemperature_type&
+  targetTemperature ();
+
+  void
+  targetTemperature (const targetTemperature_type& x);
+
+  // temperatureDifferenceStepSize
+  // 
+  typedef ::xml_schema::decimal temperatureDifferenceStepSize_type;
+  typedef ::xsd::cxx::tree::traits< temperatureDifferenceStepSize_type, char, ::xsd::cxx::tree::schema_type::decimal > temperatureDifferenceStepSize_traits;
+
+  const temperatureDifferenceStepSize_type&
+  temperatureDifferenceStepSize () const;
+
+  temperatureDifferenceStepSize_type&
+  temperatureDifferenceStepSize ();
+
+  void
+  temperatureDifferenceStepSize (const temperatureDifferenceStepSize_type& x);
 
   // t_start
   // 
@@ -781,7 +823,10 @@ class params_t: public ::xml_schema::type
             const t_end_type&,
             const epsilon_type&,
             const sigma_type&,
-            const brownianMotionFactor_type&,
+            const timestepsPerThermostatApplication_type&,
+            const initialTemperature_type&,
+            const targetTemperature_type&,
+            const temperatureDifferenceStepSize_type&,
             const t_start_type&,
             const outputfmt_type&,
             const algorithm_type&);
@@ -792,7 +837,10 @@ class params_t: public ::xml_schema::type
             const t_end_type&,
             const epsilon_type&,
             const sigma_type&,
-            const brownianMotionFactor_type&,
+            const timestepsPerThermostatApplication_type&,
+            const initialTemperature_type&,
+            const targetTemperature_type&,
+            const temperatureDifferenceStepSize_type&,
             const t_start_type&,
             const outputfmt_type&,
             ::std::auto_ptr< algorithm_type >&);
@@ -826,7 +874,10 @@ class params_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< t_end_type > t_end_;
   ::xsd::cxx::tree::one< epsilon_type > epsilon_;
   ::xsd::cxx::tree::one< sigma_type > sigma_;
-  ::xsd::cxx::tree::one< brownianMotionFactor_type > brownianMotionFactor_;
+  ::xsd::cxx::tree::one< timestepsPerThermostatApplication_type > timestepsPerThermostatApplication_;
+  ::xsd::cxx::tree::one< initialTemperature_type > initialTemperature_;
+  ::xsd::cxx::tree::one< targetTemperature_type > targetTemperature_;
+  ::xsd::cxx::tree::one< temperatureDifferenceStepSize_type > temperatureDifferenceStepSize_;
   ::xsd::cxx::tree::one< t_start_type > t_start_;
   ::xsd::cxx::tree::one< outputfmt_type > outputfmt_;
   ::xsd::cxx::tree::one< algorithm_type > algorithm_;
@@ -1569,4 +1620,4 @@ simulationfile (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 //
 // End epilogue.
 
-#endif // SIMULATIONFILE_H
+#endif // C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H

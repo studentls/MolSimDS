@@ -425,22 +425,76 @@ sigma (const sigma_type& x)
   this->sigma_.set (x);
 }
 
-const params_t::brownianMotionFactor_type& params_t::
-brownianMotionFactor () const
+const params_t::timestepsPerThermostatApplication_type& params_t::
+timestepsPerThermostatApplication () const
 {
-  return this->brownianMotionFactor_.get ();
+  return this->timestepsPerThermostatApplication_.get ();
 }
 
-params_t::brownianMotionFactor_type& params_t::
-brownianMotionFactor ()
+params_t::timestepsPerThermostatApplication_type& params_t::
+timestepsPerThermostatApplication ()
 {
-  return this->brownianMotionFactor_.get ();
+  return this->timestepsPerThermostatApplication_.get ();
 }
 
 void params_t::
-brownianMotionFactor (const brownianMotionFactor_type& x)
+timestepsPerThermostatApplication (const timestepsPerThermostatApplication_type& x)
 {
-  this->brownianMotionFactor_.set (x);
+  this->timestepsPerThermostatApplication_.set (x);
+}
+
+const params_t::initialTemperature_type& params_t::
+initialTemperature () const
+{
+  return this->initialTemperature_.get ();
+}
+
+params_t::initialTemperature_type& params_t::
+initialTemperature ()
+{
+  return this->initialTemperature_.get ();
+}
+
+void params_t::
+initialTemperature (const initialTemperature_type& x)
+{
+  this->initialTemperature_.set (x);
+}
+
+const params_t::targetTemperature_type& params_t::
+targetTemperature () const
+{
+  return this->targetTemperature_.get ();
+}
+
+params_t::targetTemperature_type& params_t::
+targetTemperature ()
+{
+  return this->targetTemperature_.get ();
+}
+
+void params_t::
+targetTemperature (const targetTemperature_type& x)
+{
+  this->targetTemperature_.set (x);
+}
+
+const params_t::temperatureDifferenceStepSize_type& params_t::
+temperatureDifferenceStepSize () const
+{
+  return this->temperatureDifferenceStepSize_.get ();
+}
+
+params_t::temperatureDifferenceStepSize_type& params_t::
+temperatureDifferenceStepSize ()
+{
+  return this->temperatureDifferenceStepSize_.get ();
+}
+
+void params_t::
+temperatureDifferenceStepSize (const temperatureDifferenceStepSize_type& x)
+{
+  this->temperatureDifferenceStepSize_.set (x);
 }
 
 const params_t::t_start_type& params_t::
@@ -1520,7 +1574,10 @@ params_t (const output_type& output,
           const t_end_type& t_end,
           const epsilon_type& epsilon,
           const sigma_type& sigma,
-          const brownianMotionFactor_type& brownianMotionFactor,
+          const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
+          const initialTemperature_type& initialTemperature,
+          const targetTemperature_type& targetTemperature,
+          const temperatureDifferenceStepSize_type& temperatureDifferenceStepSize,
           const t_start_type& t_start,
           const outputfmt_type& outputfmt,
           const algorithm_type& algorithm)
@@ -1531,7 +1588,10 @@ params_t (const output_type& output,
   t_end_ (t_end, ::xml_schema::flags (), this),
   epsilon_ (epsilon, ::xml_schema::flags (), this),
   sigma_ (sigma, ::xml_schema::flags (), this),
-  brownianMotionFactor_ (brownianMotionFactor, ::xml_schema::flags (), this),
+  timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
+  initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
+  targetTemperature_ (targetTemperature, ::xml_schema::flags (), this),
+  temperatureDifferenceStepSize_ (temperatureDifferenceStepSize, ::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
@@ -1545,7 +1605,10 @@ params_t (const output_type& output,
           const t_end_type& t_end,
           const epsilon_type& epsilon,
           const sigma_type& sigma,
-          const brownianMotionFactor_type& brownianMotionFactor,
+          const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
+          const initialTemperature_type& initialTemperature,
+          const targetTemperature_type& targetTemperature,
+          const temperatureDifferenceStepSize_type& temperatureDifferenceStepSize,
           const t_start_type& t_start,
           const outputfmt_type& outputfmt,
           ::std::auto_ptr< algorithm_type >& algorithm)
@@ -1556,7 +1619,10 @@ params_t (const output_type& output,
   t_end_ (t_end, ::xml_schema::flags (), this),
   epsilon_ (epsilon, ::xml_schema::flags (), this),
   sigma_ (sigma, ::xml_schema::flags (), this),
-  brownianMotionFactor_ (brownianMotionFactor, ::xml_schema::flags (), this),
+  timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
+  initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
+  targetTemperature_ (targetTemperature, ::xml_schema::flags (), this),
+  temperatureDifferenceStepSize_ (temperatureDifferenceStepSize, ::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
@@ -1574,7 +1640,10 @@ params_t (const params_t& x,
   t_end_ (x.t_end_, f, this),
   epsilon_ (x.epsilon_, f, this),
   sigma_ (x.sigma_, f, this),
-  brownianMotionFactor_ (x.brownianMotionFactor_, f, this),
+  timestepsPerThermostatApplication_ (x.timestepsPerThermostatApplication_, f, this),
+  initialTemperature_ (x.initialTemperature_, f, this),
+  targetTemperature_ (x.targetTemperature_, f, this),
+  temperatureDifferenceStepSize_ (x.temperatureDifferenceStepSize_, f, this),
   t_start_ (x.t_start_, f, this),
   outputfmt_ (x.outputfmt_, f, this),
   algorithm_ (x.algorithm_, f, this)
@@ -1592,7 +1661,10 @@ params_t (const ::xercesc::DOMElement& e,
   t_end_ (f, this),
   epsilon_ (f, this),
   sigma_ (f, this),
-  brownianMotionFactor_ (f, this),
+  timestepsPerThermostatApplication_ (f, this),
+  initialTemperature_ (f, this),
+  targetTemperature_ (f, this),
+  temperatureDifferenceStepSize_ (f, this),
   t_start_ (f, this),
   outputfmt_ (f, this),
   algorithm_ (f, this)
@@ -1683,13 +1755,46 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // brownianMotionFactor
+    // timestepsPerThermostatApplication
     //
-    if (n.name () == "brownianMotionFactor" && n.namespace_ ().empty ())
+    if (n.name () == "timestepsPerThermostatApplication" && n.namespace_ ().empty ())
     {
-      if (!brownianMotionFactor_.present ())
+      if (!timestepsPerThermostatApplication_.present ())
       {
-        this->brownianMotionFactor_.set (brownianMotionFactor_traits::create (i, f, this));
+        this->timestepsPerThermostatApplication_.set (timestepsPerThermostatApplication_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // initialTemperature
+    //
+    if (n.name () == "initialTemperature" && n.namespace_ ().empty ())
+    {
+      if (!initialTemperature_.present ())
+      {
+        this->initialTemperature_.set (initialTemperature_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // targetTemperature
+    //
+    if (n.name () == "targetTemperature" && n.namespace_ ().empty ())
+    {
+      if (!targetTemperature_.present ())
+      {
+        this->targetTemperature_.set (targetTemperature_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // temperatureDifferenceStepSize
+    //
+    if (n.name () == "temperatureDifferenceStepSize" && n.namespace_ ().empty ())
+    {
+      if (!temperatureDifferenceStepSize_.present ())
+      {
+        this->temperatureDifferenceStepSize_.set (temperatureDifferenceStepSize_traits::create (i, f, this));
         continue;
       }
     }
@@ -1778,10 +1883,31 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!brownianMotionFactor_.present ())
+  if (!timestepsPerThermostatApplication_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "brownianMotionFactor",
+      "timestepsPerThermostatApplication",
+      "");
+  }
+
+  if (!initialTemperature_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "initialTemperature",
+      "");
+  }
+
+  if (!targetTemperature_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "targetTemperature",
+      "");
+  }
+
+  if (!temperatureDifferenceStepSize_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "temperatureDifferenceStepSize",
       "");
   }
 
