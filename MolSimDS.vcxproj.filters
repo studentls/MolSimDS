@@ -99,6 +99,9 @@
     <ClInclude Include="src\XMLFile\simulationfile.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\Plane.h">
+      <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
