@@ -419,8 +419,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 						// for every axis...
 						
 						// check if the cells are on opposite sides
-						if (xAxis && ((x1 == 0 && x2 == cellCount[0] - 1) ||
-							(x2 == 0 && x1 == cellCount[0] - 1)))
+						if (xAxis && ((x1 == 1 && x2 == cellCount[0] - 2) ||
+							(x2 == 1 && x1 == cellCount[0] - 2)))
 						{
 							indirectNeighbour = true;
 							vec[2] = calcSimulationAreaExtent()[0] * (x1 == 0 ? 1.0 : -1.0);
@@ -429,8 +429,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 						else if (!((x1 - x2 == 1) || (x2 - x1 == 1)))
 							continue;
 						// check if the cells are on opposite sides
-						if (yAxis && ((y1 == 0 && y2 == cellCount[1] - 1) ||
-							(y2 == 0 && y1 == cellCount[1] - 1)))
+						if (yAxis && ((y1 == 1 && y2 == cellCount[1] - 2) ||
+							(y2 == 1 && y1 == cellCount[1] - 2)))
 						{
 							indirectNeighbour = true;
 							vec[3] = calcSimulationAreaExtent()[1] * (y1 == 0 ? 1.0 : -1.0);
@@ -468,8 +468,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 								// for every axis...
 								
 								// check if the cells are on opposite sides
-								if (xAxis && ((x1 == 0 && x2 == cellCount[0] - 1) ||
-									(x2 == 0 && x1 == cellCount[0] - 1)))
+								if (xAxis && ((x1 == 1 && x2 == cellCount[0] - 2) ||
+									(x2 == 1 && x1 == cellCount[0] - 2)))
 								{
 									indirectNeighbour = true;
 									vec[2] = calcSimulationAreaExtent()[0] * (x1 == 0 ? 1.0 : -1.0);
@@ -478,8 +478,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 								else if (!((x1 - x2 == 1) || (x2 - x1 == 1)))
 									continue;
 								// check if the cells are on opposite sides
-								if (yAxis && ((y1 == 0 && y2 == cellCount[1] - 1) ||
-									(y2 == 0 && y1 == cellCount[1] - 1)))
+								if (yAxis && ((y1 == 1 && y2 == cellCount[1] - 2) ||
+									(y2 == 1 && y1 == cellCount[1] - 2)))
 								{
 									indirectNeighbour = true;
 									vec[3] = calcSimulationAreaExtent()[1] * (y1 == 0 ? 1.0 : -1.0);
@@ -488,8 +488,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 								else if (!((y1 - y2 == 1) || (y2 - y1 == 1)))
 									continue;
 								// check if the cells are on opposite sides
-								if (zAxis && ((z1 == 0 && z2 == cellCount[2] - 1) ||
-									(z2 == 0 && z1 == cellCount[2] - 1)))
+								if (zAxis && ((z1 == 1 && z2 == cellCount[2] - 2) ||
+									(z2 == 1 && z1 == cellCount[2] - 2)))
 								{
 									indirectNeighbour = true;
 									vec[4] = calcSimulationAreaExtent()[2] * (z1 == 0 ? 1.0 : -1.0);
@@ -534,6 +534,8 @@ void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsForce(void(*fun
 void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsMovement()
 {
 	// TODO
+	// the area is larger than it needs to be
+	// because of the other guy's changes
 }
 
 std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()

@@ -30,8 +30,8 @@ author: F.Dietz & L.Spiegelberg
     <algorithm>
       <LinkedCell>
         <cutoff_radius>3.0</cutoff_radius>
-        <sizeofdomainX>8.0</sizeofdomainX>
-        <sizeofdomainY>8.0</sizeofdomainY>
+        <sizeofdomainX>9.0</sizeofdomainX>
+        <sizeofdomainY>9.0</sizeofdomainY>
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
