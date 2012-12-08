@@ -19,6 +19,10 @@
 #define AXIS_X		0
 #define AXIS_Y		1
 #define AXIS_Z		2
+#define AXIS_XY		10
+#define AXIS_XZ		20
+#define AXIS_YZ		30
+#define AXIS_XYZ	100
 
 //fixed issue, namespace was used inapproriately
 namespace utils {

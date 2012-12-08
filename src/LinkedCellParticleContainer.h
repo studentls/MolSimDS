@@ -189,6 +189,13 @@ private:
 	///				note that if AXIS_Z is used for dim = 2 there will be an error
 	void	getParticlesOfCellsAlongLine(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, unsigned int count, unsigned int axis);
 
+	/// function to get particles along a line of cells in direction of an axis in the grid
+	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
+	/// @param start point of start of the cells' line segment, note that if you use e.g. AXIS_XZ the start vector should have form (x, 0, z)
+	/// @param count how many cells shall be visited? (vector pair)
+	/// @param axis axis, can be AXIS_XY, AXIS_XZ, AXIS_YZ
+	void	getParticlesOfCellsAlongRectangle(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, const utils::Vector<unsigned int, 2> count, unsigned int axis);
+
 	/// function to clear particles along a line of cells in direction of an axis in the grid
 	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
 	/// @param start point of start of the cells' line segment
@@ -345,7 +352,7 @@ public:
 		else xIndex =(int)x + 1;
 		if(y < 0)yIndex = 0;
 		else yIndex =(int)y + 1;
-		if(z < 0)yIndex = 0;
+		if(z < 0)zIndex = 0;
 		else zIndex =(int)z + 1;
 		
 		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;

@@ -53,10 +53,8 @@ class ParticleContainerTest : public CppUnit::TestFixture
 	//fast setup macros
 	CPPUNIT_TEST_SUITE(ParticleContainerTest);
 	CPPUNIT_TEST(testListParticleContainerIteration);
-	CPPUNIT_TEST(testListParticleContainerIterationPairwise);/*
-	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo2D);	
-	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo3D);*/
-	CPPUNIT_TEST(testLinkedCellParticleContainerGetHaloBig);	
+	CPPUNIT_TEST(testListParticleContainerIterationPairwise);
+	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo);	
 	CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -151,126 +149,13 @@ public:
 	
 	}
 
-	void testLinkedCellParticleContainerGetHalo2D()
-	{
-		// 2D test
-
-		// construct particles
-		std::vector<Particle> particles;
-		utils::Vector<double, 3> corner;
-		utils::Vector<double, 3> extent;
-
-		//set 1x1 simulation area
-		for(int i = 0; i < 2; i++)
-		{
-			corner[i] = 0;
-			extent[i] = 1;
-		}
-
-		// place 8 halo particles, in each of the 8 possible halo regions!
-		
-		double positions[] = {-1, -1, 0,
-							  -0.5, -4, 0,
-							  5, -2, 0,
-							  3, 0.8, 0,
-							  25, 13, 0,
-							  0.3, 15, 0,
-							  -1, 6, 0,
-							  -2, 0.6, 0};
-
-		
-		// add to array
-		addSimpleParticlesToParticleContainerFromArray(particles, positions, 8, 1.0, 1);
-
-		LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(2, particles, 1, corner, extent, BC_NONE, 1.0);
-
-		// get halo particles
-		std::vector<Particle> halo = pc->getHaloParticles();
-
-		CPPUNIT_ASSERT(!halo.empty());
-
-		int sum = 0;
-		// perform sum check
-		for(std::vector<Particle>::iterator it = halo.begin(); it != halo.end(); it++)
-		{
-			sum += it->type;
-		}
-
-		SAFE_DELETE(pc);
-
-		// there shall be 8 particles contained
-		CPPUNIT_ASSERT(sum == 8);
-	}
-
-	void testLinkedCellParticleContainerGetHalo3D()
-	{
-		// 3D test
-
-		// construct particles
-		std::vector<Particle> particles;
-		utils::Vector<double, 3> corner;
-		utils::Vector<double, 3> extent;
-
-		//set 1x1x1 simulation area
-		for(int i = 0; i < 3; i++)
-		{
-			corner[i] = 0;
-			extent[i] = 1;
-		}
-
-		// place 8 halo particles, in each of the 8 possible halo regions!
-		
-		double positions[] = {-1, -1, 0.3,
-							  -0.5, -4, 0.3,
-							  5, -2, 0.4,
-							  3, 0.8, 0.2,
-							  25, 13, 0.5,
-							  0.3, 15, 0.6,
-							  -1, 6, 0.1,
-							  -2, 0.6, 0.3,
-							   0.5, 0.3, 0.2};
-
-		// add to array
-		addSimpleParticlesToParticleContainerFromArray(particles, positions, 8, 1.0, 1);
-
-		// lower plane
-		for(int i = 0; i < 9; i++)positions[3*i + 2] -= 12;	// z positions shift
-		
-		addSimpleParticlesToParticleContainerFromArray(particles, positions, 9, 1.0, 1);
-
-		// upper plane
-		for(int i = 0; i < 9; i++)positions[3*i + 2] += 38; // z positions shift
-		
-		addSimpleParticlesToParticleContainerFromArray(particles, positions, 9, 1.0, 1);
-
-
-		//construct container...
-		LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(2, particles, 1, corner, extent, BC_NONE, 1.0);
-
-		// get halo particles
-		std::vector<Particle> halo = pc->getHaloParticles();
-
-		CPPUNIT_ASSERT(!halo.empty());
-
-		int sum = 0;
-		// perform sum check
-		for(std::vector<Particle>::iterator it = halo.begin(); it != halo.end(); it++)
-		{
-			sum += it->type;
-		}
-
-		SAFE_DELETE(pc);
-
-		// there shall be 26 ( = 9 + 8 + 9 particles contained
-		CPPUNIT_ASSERT(sum == 26);		
-	}
-
-	void testLinkedCellParticleContainerGetHaloBig()
+	void testLinkedCellParticleContainerGetHalo()
 	{
 		
 		utils::Vector<unsigned int, 3> N;
 
-		int n = 3;
+		// set as you want, it should work fine :)
+		int n = 10;
 
 		
 
