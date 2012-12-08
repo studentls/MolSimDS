@@ -308,6 +308,7 @@ void Simulation::normalizeHeat() {
 		updatingHeat = false;
 	// determine the factor and update the velocities
 	heatNormalizationFactor = sqrt(currentTargetTemperature / currentHeat);
+	std::cout << "Heat: " << currentHeat << std::endl;
 	std::cout << "Normalizing heat. Factor: " << heatNormalizationFactor << std::endl;
 	particles->Iterate(heatNormalizer, (void*)&desc);
 }
