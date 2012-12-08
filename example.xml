@@ -14,7 +14,10 @@ author: F.Dietz & L.Spiegelberg
     <output>out</output>
     
     <iterationsperoutput>10</iterationsperoutput>
-    <brownianMotionFactor>0.1</brownianMotionFactor>
+    <timestepsPerThermostatApplication>-1</timestepsPerThermostatApplication>
+    <initialTemperature>0.0</initialTemperature>
+    <targetTemperature>2.0</targetTemperature>
+    <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>
    
     <delta_t>0.02</delta_t>
     <epsilon>5.0</epsilon>
