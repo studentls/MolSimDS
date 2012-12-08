@@ -166,9 +166,12 @@ void Simulation::calculateF() {
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
 
-	// apply Boundary conditions, if LinkedCell Algorithm is used...
+	// apply Boundary conditions (force), if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
+	{
 		((LinkedCellParticleContainer*)particles)->ApplyReflectiveBoundaryConditions(forceCalculator, (void*)&desc);
+		((LinkedCellParticleContainer*)particles)->ApplyPeriodicBoundaryConditionsForce(forceCalculator, (void*)&desc);
+	}
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {

@@ -63,6 +63,7 @@
       <AdditionalDependencies>log4cxx.lib;cppunitd.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);opengl32.lib;glut32.lib;glu32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
+    <CXX_Tree_Mapping_Rule />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -160,6 +161,9 @@
   <ItemGroup>
     <None Include="example.xml" />
     <None Include="listexample.xml" />
+    <None Include="periodicBoundaryTest.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="sphereexample.xml" />
     <None Include="Task2.xml" />
     <None Include="Task3.xml">

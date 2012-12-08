@@ -176,8 +176,6 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 	// go through boundaries...
 	for (std::vector<utils::Vector<double, 4> >::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
 	{
-		// TODO: this should obviously work by reference to the array, not copy it
-		// does it do that right now?
 		utils::Vector<double, 4>& elem = *it;
 		std::vector<Particle>& cell = Cells[(int)(elem[0])];
 		int axis = (int)(elem[1]);
@@ -194,7 +192,6 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 			Particle vp(p);
 			vp.x[axis] = border;
 			(*func)(data, p, vp);
-			// TODO: delete vp manually?
 		}
 	}
 
@@ -395,6 +392,149 @@ else if (dim == 3) {
 	}
 }
 
+void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, bool zAxis)
+{
+	periodicBoundaries[0] = xAxis;
+	periodicBoundaries[1] = yAxis;
+	periodicBoundaries[2] = zAxis;
+	if (dim == 2)
+	{
+		for (int x1 = 0; x1 < cellCount[0]; x1++)
+			for (int y1 = 0; y1 < cellCount[1]; y1++)
+				for (int x2 = 0; x2 < cellCount[0]; x2++)
+					for (int y2 = 0; y2 < cellCount[1]; y2++)
+					{
+						int index1 = Index2DTo1D(x1, y1);
+						int index2 = Index2DTo1D(x2, y2);
+						utils::Vector<double, 5> vec;
+						vec[0] = index1;
+						vec[1] = index2;
+						vec[2] = 0.0;
+						vec[3] = 0.0;
+						vec[4] = 0.0;
+						// ensure that every pair is only taken once
+						if (index1 <= index2)
+							continue;
+						bool indirectNeighbour = false;
+						// for every axis...
+						
+						// check if the cells are on opposite sides
+						if (xAxis && ((x1 == 0 && x2 == cellCount[0] - 1) ||
+							(x2 == 0 && x1 == cellCount[0] - 1)))
+						{
+							indirectNeighbour = true;
+							vec[2] = calcSimulationAreaExtent()[0] * (x1 == 0 ? 1.0 : -1.0);
+						}
+						// if they are not, and are not direct neighbours either, skip the pair
+						else if (!((x1 - x2 == 1) || (x2 - x1 == 1)))
+							continue;
+						// check if the cells are on opposite sides
+						if (yAxis && ((y1 == 0 && y2 == cellCount[1] - 1) ||
+							(y2 == 0 && y1 == cellCount[1] - 1)))
+						{
+							indirectNeighbour = true;
+							vec[3] = calcSimulationAreaExtent()[1] * (y1 == 0 ? 1.0 : -1.0);
+						}
+						// if they are not, and are not direct neighbours either, skip the pair
+						else if (!((y1 - y2 == 1) || (y2 - y1 == 1)))
+							continue;
+
+						// if it is a pair of indirect neighbours, store it
+						if (indirectNeighbour)
+							periodicBoundaryGroups.push_back(vec);
+					}
+	}
+	else if (dim == 3)
+	{
+		for (int x1 = 0; x1 < cellCount[0]; x1++)
+			for (int y1 = 0; y1 < cellCount[1]; y1++)
+				for (int z1 = 0; z1 < cellCount[2]; z1++)
+					for (int x2 = 0; x2 < cellCount[0]; x2++)
+						for (int y2 = 0; y2 < cellCount[1]; y2++)
+							for (int z2 = 0; z2 < cellCount[2]; z2++)
+								{
+								int index1 = Index3DTo1D(x1, y1, z1);
+								int index2 = Index3DTo1D(x2, y2, z2);
+								utils::Vector<double, 5> vec;
+								vec[0] = index1;
+								vec[1] = index2;
+								vec[2] = 0.0;
+								vec[3] = 0.0;
+								vec[4] = 0.0;
+								// ensure that every pair is only taken once
+								if (index1 <= index2)
+									continue;
+								bool indirectNeighbour = false;
+								// for every axis...
+								
+								// check if the cells are on opposite sides
+								if (xAxis && ((x1 == 0 && x2 == cellCount[0] - 1) ||
+									(x2 == 0 && x1 == cellCount[0] - 1)))
+								{
+									indirectNeighbour = true;
+									vec[2] = calcSimulationAreaExtent()[0] * (x1 == 0 ? 1.0 : -1.0);
+								}
+								// if they are not, and are not direct neighbours either, skip the pair
+								else if (!((x1 - x2 == 1) || (x2 - x1 == 1)))
+									continue;
+								// check if the cells are on opposite sides
+								if (yAxis && ((y1 == 0 && y2 == cellCount[1] - 1) ||
+									(y2 == 0 && y1 == cellCount[1] - 1)))
+								{
+									indirectNeighbour = true;
+									vec[3] = calcSimulationAreaExtent()[1] * (y1 == 0 ? 1.0 : -1.0);
+								}
+								// if they are not, and are not direct neighbours either, skip the pair
+								else if (!((y1 - y2 == 1) || (y2 - y1 == 1)))
+									continue;
+								// check if the cells are on opposite sides
+								if (zAxis && ((z1 == 0 && z2 == cellCount[2] - 1) ||
+									(z2 == 0 && z1 == cellCount[2] - 1)))
+								{
+									indirectNeighbour = true;
+									vec[4] = calcSimulationAreaExtent()[2] * (z1 == 0 ? 1.0 : -1.0);
+								}
+								// if they are not, and are not direct neighbours either, skip the pair
+								else if (!((z1 - z2 == 1) || (z2 - z1 == 1)))
+									continue;
+
+								// if it is a pair of indirect neighbours, store it
+								if (indirectNeighbour)
+									periodicBoundaryGroups.push_back(vec);
+							}
+	}
+}
+
+void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsForce(void(*func)(void*, Particle&, Particle&), void *data)
+{
+	for (std::vector<utils::Vector<double, 5> >::iterator it = periodicBoundaryGroups.begin(); it != periodicBoundaryGroups.end(); it++)
+	{
+		utils::Vector<double, 5>& elem = *it;
+		std::vector<Particle>& cell1 = Cells[(int)(elem[0])];
+		std::vector<Particle>& cell2 = Cells[(int)(elem[1])];
+		double axis1 = (int)(elem[2]);
+		double axis2 = (int)(elem[3]);
+		double axis3 = (int)(elem[4]);
+		for (std::vector<Particle>::iterator it = cell2.begin() ; it < cell2.end(); it++) {
+			Particle& p2 = *it;
+			p2.x[0] -= axis1;
+			p2.x[1] -= axis2;
+			p2.x[2] -= axis3;
+			for (std::vector<Particle>::iterator it = cell1.begin() ; it < cell1.end(); it++) {
+				Particle& p1 = *it;
+				func(data, p1, p2);
+			}
+			p2.x[0] += axis1;
+			p2.x[1] += axis2;
+			p2.x[2] += axis3;
+		}
+	}
+}
+
+void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsMovement()
+{
+	// TODO
+}
 
 std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
 {

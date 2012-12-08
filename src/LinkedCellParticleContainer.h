@@ -114,13 +114,25 @@ private:
 	/// boundary conditions encoded as flags
 	unsigned int boundaryConditions;
 
-	// each double in the Vector means something different
-	// 0, int: the cell
-	// 1, int: the axis
-	// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
-	// 3, double: the border's coordinate on the given axis, in the given direction
 	/// store what cells have reflective boundaries and of what type
+	/// each double in the Vector means something different
+	/// 0, int: the cell
+	/// 1, int: the axis
+	/// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
+	/// 3, double: the border's coordinate on the given axis, in the given direction
 	std::vector<utils::Vector<double, 4> >	reflectiveBoundaryCells;
+	
+	/// store groups of values that make it easier to apply periodicBoundaryConditions
+	/// each double in the Vector means something different
+	/// 0, int: cell1
+	/// 1, int: cell2
+	/// 2, double: axis1 (0 or length of area on axis)
+	/// 3, double: axis2 (0 or length of area on axis)
+	/// 4, double: axis3 (0 or length of area on axis)
+	std::vector<utils::Vector<double, 5> > periodicBoundaryGroups;
+
+	/// stores at which axis a periodic boundary exists
+	utils::Vector<bool, 3> periodicBoundaries;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
@@ -152,11 +164,15 @@ private:
 	}
 	
 	/// define the reflective boundary cells
+	/// for easier iteration later
 	void SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
 					bool frontReflectiveBoundary, bool backReflectiveBoundary,
 					// these two will be ignored in the two-dimensional case
 					bool bottomReflectiveBoundary, bool topReflectiveBoundary);
 
+	/// set periodic boundary cells
+	/// for easier iteration later
+	void SetPeriodicBoundaries(bool xAxis, bool yAxis, bool zAxis);
 
 	/// function to assign a vector of particles to formerly properly initialized cells
 	/// note, that this function clears all arrays!
@@ -301,12 +317,24 @@ public:
 								boundaryConditions & BC_BACK,
 								boundaryConditions & BC_BOTTOM,
 								boundaryConditions & BC_TOP);
+		
+		// set the periodic boundary conditions
+		SetPeriodicBoundaries(true, true, true);
+		periodicBoundaryGroups;
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
 	/// @param func function pointer, to calculate interaction with boundary particle
 	/// @data optional data given to func
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
+	
+	/// applies forces between particles on opposite sides of periodic boundaries
+	/// @param func function pointer, to calculate interaction with boundary particle on the other side
+	/// @data optional data given to func
+	void ApplyPeriodicBoundaryConditionsForce(void(*func)(void*, Particle&, Particle&), void *data);
+
+	/// ensure that particles that leave a periodic boundary are correctly entered on the opposite side
+	void ApplyPeriodicBoundaryConditionsMovement();
 
 	/// inline method to quickly calculate an index for reassignment
 	/// @return returns index for grid including halo cells
@@ -550,8 +578,12 @@ public:
 	/// note that this method should only be called every 'iterationsPerParticleToCellReassignment'th call
 	/// a good number for this must be determined experimentally for increased efficiency
 	/// the default value of this variable for the LinkedCellAlgorithm is one
+	/// this method also ensures that particles that leave a periodic boundary enter on the other side
 	void ReassignParticles()
 	{
+		// ensure that particles that leave a periodic boundary enter on the other side
+		ApplyPeriodicBoundaryConditionsMovement();
+
 		int index = 0;
 
 		// go through all Cells...
