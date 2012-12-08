@@ -32,7 +32,9 @@ namespace utils
 	class Plane
 	{
 	public:
-		// encoded in Hessian Normalform
+		// encoded in Hessian Normalform, all x € R³ are in the plane, iff
+		// n*x + d = 0
+		// and for simplicity reasons ||n||_2 = 1 always
 		Vector<double, 3>	n; // normal vector, always normalized!
 		double				d; // distance
 
@@ -41,11 +43,19 @@ namespace utils
 		Plane(const Vector<double, 3>& _n, const double _d):n(_n), d(_d)		{n.normalize();}
 		Plane(const Plane& p):n(p.n), d(p.d)									{}
 
+		/// construct Plane from Point and normal vector
+		Plane(const Vector<double, 3> point, const Vector<double, 3>& normal)
+		{
+			n = normal;
+			n.normalize();
+			d = -(n*point);
+		}
+
 		Plane& operator =(const Plane& p)										{n = p.n; d = p.d; return *this;}
 
 		Vector<double, 3> normalize()	{return n.normalize();}
 
-		double				distance(const Vector<double, 3>& point)	{return n * point;/*vector dot product, note that n is normalized*/}
+		double				distance(const Vector<double, 3>& point)	{return abs(n * point - d);/*vector dot product, note that n is normalized*/}
 
 	};
 }

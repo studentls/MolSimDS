@@ -29,6 +29,18 @@
 #define BC_FRONT		0x10
 #define BC_BACK			0x20
 
+
+// boundary type
+#define BT_REFLECTIVE   0x1
+#define BT_PERIODIC		0x2
+
+/// helper struct for a boundary
+struct Boundary
+{
+	utils::Plane p;			/// plane to store where the boundary is
+	unsigned int type;	/// type of boundary
+};
+
 /// a class that is used to store Particles and iterate over them
 /// utilizes Linked-Cell algorithm for improved performance (O(n) instead of O(n^2))
 /// see this graph which compares LinkedCell with a brute-force algorithm:
@@ -120,13 +132,9 @@ private:
 	/// boundary conditions encoded as flags
 	unsigned int boundaryConditions;
 
-	// each double in the Vector means something different
-	// 0, int: the cell
-	// 1, int: the axis
-	// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
-	// 3, double: the border's coordinate on the given axis, in the given direction
-	/// store what cells have reflective boundaries and of what type
-	std::vector<utils::Vector<double, 4> >	reflectiveBoundaryCells;
+	// store reflective boundaries as planes
+	std::vector<Boundary> boundaries;
+
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!

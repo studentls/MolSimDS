@@ -92,30 +92,59 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 
 void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
 {
-	// go through boundaries...
-	for (std::vector<utils::Vector<double, 4> >::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
+	using namespace std;
+	using namespace utils;
+	
+	// go through boundaries (max. 6)
+	for(vector<Boundary>::iterator bt = boundaries.begin(); bt != boundaries.end(); bt++)
 	{
-		// TODO: this should obviously work by reference to the array, not copy it
-		// does it do that right now?
-		utils::Vector<double, 4>& elem = *it;
-		std::vector<Particle>& cell = Cells[(int)(elem[0])];
-		int axis = (int)(elem[1]);
-		double direction = elem[2];
-		double border = elem[3];
-		for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
-			Particle& p = *it;
-			double dist = direction * (border - p.x[axis]);
-			// skip the particle if it is too far away from the border
-			if (dist > reflectiveBoundaryDistance)
-				continue;
-			// create a temporary, virtual Particle
-			// a copy of the current particle, but located at the border
-			Particle vp(p);
-			vp.x[axis] = border;
-			(*func)(data, p, vp);
-			// TODO: delete vp manually?
+		// go through boundary cells
+		for(vector<unsigned int>::iterator it = boundaryIndices.begin(); it != boundaryIndices.end(); it++)
+		{
+			if(Cells[*it].empty())continue;
+
+			// go through boundary cell
+			for(vector<Particle>::iterator pt = Cells[*it].begin(); pt != Cells[*it].end(); pt++)
+			{
+				double dist = bt->p.distance(pt->x);
+				// skip the particle if it is too far away from the border
+				if (dist > reflectiveBoundaryDistance)
+					continue;
+				// create a temporary, virtual Particle
+				// a copy of the current particle, but located at the border
+				/*Particle vp(*pt);
+				vp.x[axis] = border;
+				(*func)(data, p, vp);*/
+
+			}
 		}
 	}
+	
+	//
+	//// go through boundaries...
+	//for (std::vector<utils::Vector<double, 4> >::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
+	//{
+	//	// TODO: this should obviously work by reference to the array, not copy it
+	//	// does it do that right now?
+	//	utils::Vector<double, 4>& elem = *it;
+	//	std::vector<Particle>& cell = Cells[(int)(elem[0])];
+	//	int axis = (int)(elem[1]);
+	//	double direction = elem[2];
+	//	double border = elem[3];
+	//	for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
+	//		Particle& p = *it;
+	//		double dist = direction * (border - p.x[axis]);
+	//		// skip the particle if it is too far away from the border
+	//		if (dist > reflectiveBoundaryDistance)
+	//			continue;
+	//		// create a temporary, virtual Particle
+	//		// a copy of the current particle, but located at the border
+	//		Particle vp(p);
+	//		vp.x[axis] = border;
+	//		(*func)(data, p, vp);
+	//		// TODO: delete vp manually?
+	//	}
+	//}
 
 	// Annotation:
 	// In Task 3 it is mentioned that each boundary shall specified if it reflects or outflows the particle
@@ -199,119 +228,44 @@ void	LinkedCellParticleContainer::SetReflectiveBoundaries(bool leftReflectiveBou
 					// these two will be ignored in the two-dimensional case
 					bool bottomReflectiveBoundary, bool topReflectiveBoundary)
 {
-	// TODO: testing and debugging
-	if (dim == 2) {
-		if (leftReflectiveBoundary || rightReflectiveBoundary)
-			for (int y = 0; y < cellCount[1]; y++) {
-				if (leftReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(0, y);
-					vec[1] = 0;
-					vec[2] = -1.0;
-					vec[3] = frontLowerLeftCorner[0];
-					reflectiveBoundaryCells.push_back(vec);
-				}
-				if (rightReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(cellCount[0] - 1, y);;
-					vec[1] = 0;
-					vec[2] = 1.0;
-					vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
-					this->reflectiveBoundaryCells.push_back(vec);
-				}
-			}
-		if (frontReflectiveBoundary || backReflectiveBoundary)
-			for (int x = 0; x < cellCount[0]; x++) {
-				if (frontReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(x, 0);
-					vec[1] = 1;
-					vec[2] = -1.0;
-					vec[3] = frontLowerLeftCorner[1];
-					this->reflectiveBoundaryCells.push_back(vec);
-				}
-				if (backReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(x, cellCount[1] - 1);
-					vec[1] = 1;
-					vec[2] = 1.0;
-					vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
-					this->reflectiveBoundaryCells.push_back(vec);
-				}
-			}
+	using namespace utils;
+
+	Boundary boundary;
+	boundary.type = BT_REFLECTIVE;
+
+	// insert boundaries
+	if(leftReflectiveBoundary)
+	{		
+		boundary.p = Plane(Vector(frontLowerLeftCorner[0], 0.0, 0.0), Vector(1.0, 0.0, 0.0));
+		boundaries.push_back(boundary);
 	}
-else if (dim == 3) {
-		if (leftReflectiveBoundary || rightReflectiveBoundary)
-			for (int y = 0; y < cellCount[1]; y++)
-				for (int z = 0; z < cellCount[2]; z++) {
-					if (leftReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(0, y, z);
-						vec[1] = 0;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[0];
-						this->reflectiveBoundaryCells.push_back(vec);
-					}
-					if (rightReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(cellCount[0] - 1, y, z);
-						vec[1] = 0;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
-						this->reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-	if (frontReflectiveBoundary || backReflectiveBoundary)
-			for (int x = 0; x < cellCount[0]; x++)
-				for (int z = 0; z < cellCount[2]; z++) {
-					if (frontReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, 0, z);
-						vec[1] = 1;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[1];
-						this->reflectiveBoundaryCells.push_back(vec);
-					}
-					if (backReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, cellCount[1] - 1, z);
-						vec[1] = 1;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-		if (bottomReflectiveBoundary || topReflectiveBoundary)
-			for (int x = 0; x < cellCount[0]; x++)
-				for (int y = 0; y < cellCount[1]; y++) {
-					if (bottomReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, y, 0);
-						vec[1] = 2;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[2];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-					if (topReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, y, cellCount[2] - 1);
-						vec[1] = 2;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[2] + calcSimulationAreaExtent()[2];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-				}
+	if(rightReflectiveBoundary)
+	{		
+		boundary.p = Plane(Vector(frontLowerLeftCorner[0] + cellCount[0] * cellSize[0], 0.0, 0.0), Vector(1.0, 0.0, 0.0));
+		boundaries.push_back(boundary);
 	}
+	if(frontReflectiveBoundary)
+	{		
+		boundary.p = Plane(Vector(0.0, frontLowerLeftCorner[1], 0.0), Vector(0.0, 1.0, 0.0));
+		boundaries.push_back(boundary);
+	}
+	if(backReflectiveBoundary)
+	{		
+		boundary.p = Plane(Vector(0.0, frontLowerLeftCorner[1] + cellCount[1] * cellSize[1], 0.0), Vector(0.0, 1.0, 0.0));
+		boundaries.push_back(boundary);
+	}
+	if(bottomReflectiveBoundary)
+	{		
+		boundary.p = Plane(Vector(0, 0.0, frontLowerLeftCorner[2]), Vector(0.0, 0.0, 1.0));
+		boundaries.push_back(boundary);
+	}
+	if(topReflectiveBoundary)
+	{		
+		boundary.p = Plane(Vector(0, 0.0, frontLowerLeftCorner[2] + cellCount[2] * cellSize[2]), Vector(0.0, 0.0, 1.0));
+		boundaries.push_back(boundary);
+	}
+
+	// note: for performance reasons, maybe index lists can be now generated to make iteration faster
 }
 
 void LinkedCellParticleContainer::clearHaloParticles()
