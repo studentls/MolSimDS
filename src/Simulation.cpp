@@ -80,6 +80,7 @@ err_type Simulation::Run()
 	// initialize some values
 	double current_time = desc.start_time;
 	int iteration = 0;
+	updatingHeat = false;
 
 	// set common statistical values...
 	statistics.particle_count = particles->getParticleCount();
@@ -91,11 +92,22 @@ err_type Simulation::Run()
 	//start timer
 	utils::Timer timer;
 
+	// initiate heat for all particles
+	initiateHeat();
+
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
 
 		// perform one iteration step
 		performStep();
+
+	    // normalize v to get the heat you want
+	    // do this only every thousandth iteration
+		// unless the updating takes several iterations
+	    if (iteration % desc.timestepsPerThermostatApplication == 0)
+			updatingHeat = true;
+		if (updatingHeat)
+	        normalizeHeat();
 
 		// TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
@@ -252,6 +264,60 @@ void Simulation::velCalculator(void* data, Particle& p) {
 	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
 	p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
+}
+
+bool Simulation::updatingHeat = false;
+double Simulation::sumOfKineticEnergies = 0.0;
+double Simulation::heatNormalizationFactor = 0.0;
+double Simulation::dBrownianMotionMassless = 0.0;
+
+void Simulation::initiateHeat() {
+	dBrownianMotionMassless = sqrt(desc.initialTemperature * desc.dimensions);
+	particles->Iterate(heatInitializer, (void*)&desc);
+}
+
+void Simulation::heatInitializer(void* data, Particle& p) {
+	#ifdef DEBUG
+	// assert data is a valid pointer!
+	if(!data)
+	{
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
+		return;
+	}
+#endif
+
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	// apply Brownian motion via Boltzmann distribution
+	MaxwellBoltzmannDistribution(p, dBrownianMotionMassless / sqrt(p.m), desc->dimensions);
+}
+
+void Simulation::normalizeHeat() {
+	// determine the current sum of kinetic energies
+	sumOfKineticEnergies = 0.0;
+	particles->Iterate(velocitySumAcquirer, (void*)&desc);
+	// determine the current heat
+	double currentHeat = sumOfKineticEnergies / particles->getParticleCount() / desc.dimensions * 2.0;
+	double currentTargetTemperature = desc.targetTemperature;
+	// ensure that the heat isn't adapted by too much at once
+	if (currentTargetTemperature > currentHeat + desc.temperatureDifferenceStepSize)
+		currentTargetTemperature = currentHeat + desc.temperatureDifferenceStepSize;
+	else if (currentTargetTemperature < currentHeat - desc.temperatureDifferenceStepSize)
+		currentTargetTemperature = currentHeat - desc.temperatureDifferenceStepSize;
+	else
+		updatingHeat = false;
+	// determine the factor and update the velocities
+	heatNormalizationFactor = sqrt(currentTargetTemperature / currentHeat);
+	std::cout << "Normalizing heat. Factor: " << heatNormalizationFactor << std::endl;
+	particles->Iterate(heatNormalizer, (void*)&desc);
+}
+
+void Simulation::velocitySumAcquirer(void* data, Particle& p) {
+	sumOfKineticEnergies += p.v.L2NormSq() * p.m * 0.5;
+}
+
+void Simulation::heatNormalizer(void* data, Particle& p) {
+	p.v = p.v * heatNormalizationFactor;
 }
 
 void Simulation::plotParticles(int iteration) {

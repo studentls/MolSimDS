@@ -188,7 +188,7 @@ public:
 			}
 
 			ListParticleContainer lpc;
-			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel);
 
 			lowercorner[0] = 0.0;
 			lowercorner[1] = 0.0;

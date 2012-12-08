@@ -129,6 +129,14 @@ public:
 		return sqrt(square_sum);
 	}
 
+	double L2NormSq() const {
+		double square_sum = 0;
+		for (int i = 0; i < length; i++) {
+			square_sum += (this->content[i] * this->content[i]);
+		}
+		return square_sum;
+	}
+
 	///
 	/// @param to distance between caller vector and vector to
 	/// @return returns distance of vector to given vector

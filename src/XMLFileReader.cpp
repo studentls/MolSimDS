@@ -43,7 +43,7 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 
 	
 	//set desc
-	desc.brownianMotionFactor	= file->params().brownianMotionFactor();
+	desc.initialTemperature	= file->params().brownianMotionFactor();
 	desc.delta_t				= file->params().delta_t();
 	desc.end_time				= file->params().t_end();
 	desc.epsilon				= file->params().epsilon();
@@ -148,7 +148,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 
 		// make Cuboid and add to particle
-		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v, desc.brownianMotionFactor);
+		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
@@ -185,7 +185,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		radius = it->r();
 
 		// make Cuboid and add to particle
-		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim, desc.brownianMotionFactor);
+		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
