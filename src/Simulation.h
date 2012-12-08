@@ -87,7 +87,7 @@ struct SimulationDesc
 
 		dimensions = 3;
 
-		timestepsPerThermostatApplication = 10;
+		timestepsPerThermostatApplication = -1;
 		initialTemperature = 0.0;
 		targetTemperature = 2.0;
 		temperatureDifferenceStepSize = 0.1;

@@ -85,7 +85,10 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="t_end" type="xsd:decimal"></xsd:element>
       <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
       <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
-      <xsd:element name="brownianMotionFactor" type="xsd:decimal"></xsd:element>
+      <xsd:element name="timestepsPerThermostatApplication" type="xsd:int"></xsd:element>
+      <xsd:element name="initialTemperature" type="xsd:decimal"></xsd:element>
+      <xsd:element name="targetTemperature" type="xsd:decimal"></xsd:element>
+      <xsd:element name="temperatureDifferenceStepSize" type="xsd:decimal"></xsd:element>
       <xsd:element name="t_start" type="xsd:decimal"></xsd:element>
       <xsd:element name="outputfmt">
         <xsd:simpleType>

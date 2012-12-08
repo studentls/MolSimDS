@@ -104,10 +104,13 @@ err_type Simulation::Run()
 	    // normalize v to get the heat you want
 	    // do this only every thousandth iteration
 		// unless the updating takes several iterations
-	    if (iteration % desc.timestepsPerThermostatApplication == 0)
-			updatingHeat = true;
-		if (updatingHeat)
-	        normalizeHeat();
+		if (desc.timestepsPerThermostatApplication > 0)
+		{
+	        if (iteration % desc.timestepsPerThermostatApplication == 0)
+		    	updatingHeat = true;
+		    if (updatingHeat)
+	            normalizeHeat();
+		}
 
 		// TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
