@@ -177,5 +177,11 @@
     <None Include="periodicBoundaryTest.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="smallExp.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="bigExp.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<!--
+
+file: Task3.xml everything for Sheet3 
+author: F.Dietz & L.Spiegelberg
+
+-->
+
+<simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="simulationfile.xsd">
+
+  <params>
+    <output>out</output>
+
+    <iterationsperoutput>10</iterationsperoutput>
+    <gravity>12.44</gravity>
+    <timestepsPerThermostatApplication>1000</timestepsPerThermostatApplication>
+    <initialTemperature>40.0</initialTemperature>
+    <targetTemperature>2.0</targetTemperature>
+    <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>
+
+    <delta_t>0.0005</delta_t>
+    <outputfmt>VTK</outputfmt>
+
+    <t_end>50.0</t_end>
+    <t_start>0.0</t_start>
+
+    <algorithm>
+      <LinkedCell>
+        <cutoff_radius>2.5</cutoff_radius>
+        <sizeofdomainX>300.0</sizeofdomainX>
+        <sizeofdomainY>54.0</sizeofdomainY>
+        <sizeofdomainZ>0.0</sizeofdomainZ>
+        <offset>0.0 0.0 0.0</offset>
+        <conditions>
+          <condition value="all"></condition>
+        </conditions>
+      </LinkedCell>
+    </algorithm>
+
+  </params>
+
+  <data>
+    <!-- Liquid1 -->
+    <cuboid>
+      <epsilon>1.0</epsilon>
+      <sigma>1.2</sigma>
+      <h>1.2</h>
+      <m>1</m>
+      <N>250 20 1</N>
+      <V>0.0 0.0 0.0</V>
+      <X>0.6 2.0 0.0</X>
+    </cuboid>
+
+    <!-- Liquid2 -->
+    <cuboid>
+      <epsilon>1.0</epsilon>
+      <sigma>1.1</sigma>
+      <h>1.2</h>
+      <m>2</m>
+      <N>250 20 1</N>
+      <V>0.0 0.0 0.0</V>
+      <X>0.6 27.0 0.0</X>
+    </cuboid>
+  </data>
+
+</simulationfile>

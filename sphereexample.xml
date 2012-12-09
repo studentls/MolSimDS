@@ -20,7 +20,7 @@ author: F.Dietz & L.Spiegelberg
     <targetTemperature>2.0</targetTemperature>
     <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>
    
-    <delta_t>0.00005</delta_t>
+    <delta_t>0.0005</delta_t>
     <outputfmt>VTK</outputfmt>
     
     <t_end>5.0</t_end>

@@ -159,12 +159,14 @@
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
+    <None Include="bigExp.xml" />
     <None Include="example.xml" />
     <None Include="FallingDrop.xml" />
     <None Include="listexample.xml" />
     <None Include="periodicBoundaryTest.xml">
       <SubType>Designer</SubType>
     </None>
+    <None Include="smallExp.xml" />
     <None Include="sphereexample.xml" />
     <None Include="Task2.xml" />
     <None Include="Task3.xml">
