@@ -170,7 +170,10 @@ void Simulation::calculateF() {
 
 	// apply Boundary conditions, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
+	{
 		((LinkedCellParticleContainer*)particles)->ApplyReflectiveBoundaryConditions(forceCalculator, (void*)&desc);
+		((LinkedCellParticleContainer*)particles)->ApplyPeriodicBoundaryConditionsForce(forceCalculator, (void*)&desc);
+	}
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {

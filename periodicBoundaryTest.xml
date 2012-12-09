@@ -24,8 +24,8 @@ IT IS __SUPPOSED__ TO LOOK WEIRD!
 -->
     
     <iterationsperoutput>10</iterationsperoutput>
-    <gravity>10</gravity>
-    <timestepsPerThermostatApplication>100</timestepsPerThermostatApplication>
+    <gravity>0</gravity>
+    <timestepsPerThermostatApplication>-1</timestepsPerThermostatApplication>
     <initialTemperature>0.0</initialTemperature>
     <targetTemperature>2.0</targetTemperature>
     <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>

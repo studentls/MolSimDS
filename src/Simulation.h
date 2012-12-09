@@ -76,7 +76,7 @@ struct SimulationDesc
 		end_time = 5.0;
 		output_fmt = SOF_NONE;
 		
-	    brownianMotionFactor = 0.1;
+	    gravity = 0.0;
 		epsilon = 5.0;
 		sigma = 1.0;
 
