@@ -711,19 +711,19 @@ class params_t: public ::xml_schema::type
   void
   sigma (const sigma_type& x);
 
-  // brownianMotionFactor
+  // gravity
   // 
-  typedef ::xml_schema::decimal brownianMotionFactor_type;
-  typedef ::xsd::cxx::tree::traits< brownianMotionFactor_type, char, ::xsd::cxx::tree::schema_type::decimal > brownianMotionFactor_traits;
+  typedef ::xml_schema::decimal gravity_type;
+  typedef ::xsd::cxx::tree::traits< gravity_type, char, ::xsd::cxx::tree::schema_type::decimal > gravity_traits;
 
-  const brownianMotionFactor_type&
-  brownianMotionFactor () const;
+  const gravity_type&
+  gravity () const;
 
-  brownianMotionFactor_type&
-  brownianMotionFactor ();
+  gravity_type&
+  gravity ();
 
   void
-  brownianMotionFactor (const brownianMotionFactor_type& x);
+  gravity (const gravity_type& x);
 
   // timestepsPerThermostatApplication
   // 
@@ -837,7 +837,7 @@ class params_t: public ::xml_schema::type
             const t_end_type&,
             const epsilon_type&,
             const sigma_type&,
-            const brownianMotionFactor_type&,
+            const gravity_type&,
             const timestepsPerThermostatApplication_type&,
             const initialTemperature_type&,
             const targetTemperature_type&,
@@ -852,7 +852,7 @@ class params_t: public ::xml_schema::type
             const t_end_type&,
             const epsilon_type&,
             const sigma_type&,
-            const brownianMotionFactor_type&,
+            const gravity_type&,
             const timestepsPerThermostatApplication_type&,
             const initialTemperature_type&,
             const targetTemperature_type&,
@@ -890,7 +890,7 @@ class params_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< t_end_type > t_end_;
   ::xsd::cxx::tree::one< epsilon_type > epsilon_;
   ::xsd::cxx::tree::one< sigma_type > sigma_;
-  ::xsd::cxx::tree::one< brownianMotionFactor_type > brownianMotionFactor_;
+  ::xsd::cxx::tree::one< gravity_type > gravity_;
   ::xsd::cxx::tree::one< timestepsPerThermostatApplication_type > timestepsPerThermostatApplication_;
   ::xsd::cxx::tree::one< initialTemperature_type > initialTemperature_;
   ::xsd::cxx::tree::one< targetTemperature_type > targetTemperature_;

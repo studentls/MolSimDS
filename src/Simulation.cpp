@@ -165,6 +165,9 @@ void Simulation::calculateF() {
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
 
+	// call particles.Iterate() on gravityApplier
+	particles->Iterate(gravityApplier, (void*)&desc);
+
 	// apply Boundary conditions, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
 		((LinkedCellParticleContainer*)particles)->ApplyReflectiveBoundaryConditions(forceCalculator, (void*)&desc);
@@ -217,6 +220,22 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	
 	
 	p2.addForce(-1.0 * force);
+}
+
+void Simulation::gravityApplier(void* data, Particle& p)
+{
+	#ifdef DEBUG
+	// assert data is a valid pointer!
+	if(!data)
+	{
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
+		return;
+	}
+#endif
+
+	SimulationDesc *desc = (SimulationDesc*)data;
+	
+	p.v[1] -= desc->gravity * desc->delta_t;
 }
 
 void Simulation::calculateX() {

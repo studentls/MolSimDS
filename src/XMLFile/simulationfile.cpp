@@ -425,22 +425,22 @@ sigma (const sigma_type& x)
   this->sigma_.set (x);
 }
 
-const params_t::brownianMotionFactor_type& params_t::
-brownianMotionFactor () const
+const params_t::gravity_type& params_t::
+gravity () const
 {
-  return this->brownianMotionFactor_.get ();
+  return this->gravity_.get ();
 }
 
-params_t::brownianMotionFactor_type& params_t::
-brownianMotionFactor ()
+params_t::gravity_type& params_t::
+gravity ()
 {
-  return this->brownianMotionFactor_.get ();
+  return this->gravity_.get ();
 }
 
 void params_t::
-brownianMotionFactor (const brownianMotionFactor_type& x)
+gravity (const gravity_type& x)
 {
-  this->brownianMotionFactor_.set (x);
+  this->gravity_.set (x);
 }
 
 const params_t::timestepsPerThermostatApplication_type& params_t::
@@ -1592,7 +1592,7 @@ params_t (const output_type& output,
           const t_end_type& t_end,
           const epsilon_type& epsilon,
           const sigma_type& sigma,
-          const brownianMotionFactor_type& brownianMotionFactor,
+          const gravity_type& gravity,
           const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
           const initialTemperature_type& initialTemperature,
           const targetTemperature_type& targetTemperature,
@@ -1607,7 +1607,7 @@ params_t (const output_type& output,
   t_end_ (t_end, ::xml_schema::flags (), this),
   epsilon_ (epsilon, ::xml_schema::flags (), this),
   sigma_ (sigma, ::xml_schema::flags (), this),
-  brownianMotionFactor_ (brownianMotionFactor, ::xml_schema::flags (), this),
+  gravity_ (gravity, ::xml_schema::flags (), this),
   timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
   initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
   targetTemperature_ (targetTemperature, ::xml_schema::flags (), this),
@@ -1625,7 +1625,7 @@ params_t (const output_type& output,
           const t_end_type& t_end,
           const epsilon_type& epsilon,
           const sigma_type& sigma,
-          const brownianMotionFactor_type& brownianMotionFactor,
+          const gravity_type& gravity,
           const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
           const initialTemperature_type& initialTemperature,
           const targetTemperature_type& targetTemperature,
@@ -1640,7 +1640,7 @@ params_t (const output_type& output,
   t_end_ (t_end, ::xml_schema::flags (), this),
   epsilon_ (epsilon, ::xml_schema::flags (), this),
   sigma_ (sigma, ::xml_schema::flags (), this),
-  brownianMotionFactor_ (brownianMotionFactor, ::xml_schema::flags (), this),
+  gravity_ (gravity, ::xml_schema::flags (), this),
   timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
   initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
   targetTemperature_ (targetTemperature, ::xml_schema::flags (), this),
@@ -1662,7 +1662,7 @@ params_t (const params_t& x,
   t_end_ (x.t_end_, f, this),
   epsilon_ (x.epsilon_, f, this),
   sigma_ (x.sigma_, f, this),
-  brownianMotionFactor_ (x.brownianMotionFactor_, f, this),
+  gravity_ (x.gravity_, f, this),
   timestepsPerThermostatApplication_ (x.timestepsPerThermostatApplication_, f, this),
   initialTemperature_ (x.initialTemperature_, f, this),
   targetTemperature_ (x.targetTemperature_, f, this),
@@ -1684,7 +1684,7 @@ params_t (const ::xercesc::DOMElement& e,
   t_end_ (f, this),
   epsilon_ (f, this),
   sigma_ (f, this),
-  brownianMotionFactor_ (f, this),
+  gravity_ (f, this),
   timestepsPerThermostatApplication_ (f, this),
   initialTemperature_ (f, this),
   targetTemperature_ (f, this),
@@ -1779,13 +1779,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // brownianMotionFactor
+    // gravity
     //
-    if (n.name () == "brownianMotionFactor" && n.namespace_ ().empty ())
+    if (n.name () == "gravity" && n.namespace_ ().empty ())
     {
-      if (!brownianMotionFactor_.present ())
+      if (!gravity_.present ())
       {
-        this->brownianMotionFactor_.set (brownianMotionFactor_traits::create (i, f, this));
+        this->gravity_.set (gravity_traits::create (i, f, this));
         continue;
       }
     }
@@ -1918,10 +1918,10 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!brownianMotionFactor_.present ())
+  if (!gravity_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
-      "brownianMotionFactor",
+      "gravity",
       "");
   }
 

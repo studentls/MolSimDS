@@ -24,7 +24,7 @@ IT IS __SUPPOSED__ TO LOOK WEIRD!
 -->
     
     <iterationsperoutput>10</iterationsperoutput>
-    <brownianMotionFactor>0.1</brownianMotionFactor>
+    <gravity>10</gravity>
     <timestepsPerThermostatApplication>100</timestepsPerThermostatApplication>
     <initialTemperature>0.0</initialTemperature>
     <targetTemperature>2.0</targetTemperature>

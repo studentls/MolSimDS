@@ -46,7 +46,7 @@ struct SimulationDesc
 	double				start_time;
 	double				end_time;
 	
-	double				brownianMotionFactor;
+	double				gravity;
 	double				epsilon;
 	double				sigma;
 
@@ -137,6 +137,9 @@ private:
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	static void				forceCalculator(void*, Particle&, Particle&);
+
+	/// applies gravity to a particle. Used in calculateF()
+	static void				gravityApplier(void*, Particle& p);
 
 	/// calculate the position for all particles
 	void					calculateX();
