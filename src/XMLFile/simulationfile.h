@@ -683,34 +683,6 @@ class params_t: public ::xml_schema::type
   void
   t_end (const t_end_type& x);
 
-  // epsilon
-  // 
-  typedef ::xml_schema::decimal epsilon_type;
-  typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::decimal > epsilon_traits;
-
-  const epsilon_type&
-  epsilon () const;
-
-  epsilon_type&
-  epsilon ();
-
-  void
-  epsilon (const epsilon_type& x);
-
-  // sigma
-  // 
-  typedef ::xml_schema::decimal sigma_type;
-  typedef ::xsd::cxx::tree::traits< sigma_type, char, ::xsd::cxx::tree::schema_type::decimal > sigma_traits;
-
-  const sigma_type&
-  sigma () const;
-
-  sigma_type&
-  sigma ();
-
-  void
-  sigma (const sigma_type& x);
-
   // gravity
   // 
   typedef ::xml_schema::decimal gravity_type;
@@ -835,8 +807,6 @@ class params_t: public ::xml_schema::type
             const iterationsperoutput_type&,
             const delta_t_type&,
             const t_end_type&,
-            const epsilon_type&,
-            const sigma_type&,
             const gravity_type&,
             const timestepsPerThermostatApplication_type&,
             const initialTemperature_type&,
@@ -850,8 +820,6 @@ class params_t: public ::xml_schema::type
             const iterationsperoutput_type&,
             const delta_t_type&,
             const t_end_type&,
-            const epsilon_type&,
-            const sigma_type&,
             const gravity_type&,
             const timestepsPerThermostatApplication_type&,
             const initialTemperature_type&,
@@ -888,8 +856,6 @@ class params_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< iterationsperoutput_type > iterationsperoutput_;
   ::xsd::cxx::tree::one< delta_t_type > delta_t_;
   ::xsd::cxx::tree::one< t_end_type > t_end_;
-  ::xsd::cxx::tree::one< epsilon_type > epsilon_;
-  ::xsd::cxx::tree::one< sigma_type > sigma_;
   ::xsd::cxx::tree::one< gravity_type > gravity_;
   ::xsd::cxx::tree::one< timestepsPerThermostatApplication_type > timestepsPerThermostatApplication_;
   ::xsd::cxx::tree::one< initialTemperature_type > initialTemperature_;
@@ -903,6 +869,34 @@ class params_t: public ::xml_schema::type
 class particle_t: public ::xml_schema::type
 {
   public:
+  // epsilon
+  // 
+  typedef ::xml_schema::decimal epsilon_type;
+  typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::decimal > epsilon_traits;
+
+  const epsilon_type&
+  epsilon () const;
+
+  epsilon_type&
+  epsilon ();
+
+  void
+  epsilon (const epsilon_type& x);
+
+  // sigma
+  // 
+  typedef ::xml_schema::decimal sigma_type;
+  typedef ::xsd::cxx::tree::traits< sigma_type, char, ::xsd::cxx::tree::schema_type::decimal > sigma_traits;
+
+  const sigma_type&
+  sigma () const;
+
+  sigma_type&
+  sigma ();
+
+  void
+  sigma (const sigma_type& x);
+
   // X
   // 
   typedef ::Vec3_t X_type;
@@ -953,7 +947,9 @@ class particle_t: public ::xml_schema::type
 
   // Constructors.
   //
-  particle_t (const X_type&,
+  particle_t (const epsilon_type&,
+              const sigma_type&,
+              const X_type&,
               const V_type&,
               const m_type&);
 
@@ -980,6 +976,8 @@ class particle_t: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
+  ::xsd::cxx::tree::one< epsilon_type > epsilon_;
+  ::xsd::cxx::tree::one< sigma_type > sigma_;
   ::xsd::cxx::tree::one< X_type > X_;
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< m_type > m_;
@@ -988,6 +986,34 @@ class particle_t: public ::xml_schema::type
 class cuboid_t: public ::xml_schema::type
 {
   public:
+  // epsilon
+  // 
+  typedef ::xml_schema::decimal epsilon_type;
+  typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::decimal > epsilon_traits;
+
+  const epsilon_type&
+  epsilon () const;
+
+  epsilon_type&
+  epsilon ();
+
+  void
+  epsilon (const epsilon_type& x);
+
+  // sigma
+  // 
+  typedef ::xml_schema::decimal sigma_type;
+  typedef ::xsd::cxx::tree::traits< sigma_type, char, ::xsd::cxx::tree::schema_type::decimal > sigma_traits;
+
+  const sigma_type&
+  sigma () const;
+
+  sigma_type&
+  sigma ();
+
+  void
+  sigma (const sigma_type& x);
+
   // X
   // 
   typedef ::Vec3_t X_type;
@@ -1069,7 +1095,9 @@ class cuboid_t: public ::xml_schema::type
 
   // Constructors.
   //
-  cuboid_t (const X_type&,
+  cuboid_t (const epsilon_type&,
+            const sigma_type&,
+            const X_type&,
             const V_type&,
             const N_type&,
             const h_type&,
@@ -1098,6 +1126,8 @@ class cuboid_t: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
+  ::xsd::cxx::tree::one< epsilon_type > epsilon_;
+  ::xsd::cxx::tree::one< sigma_type > sigma_;
   ::xsd::cxx::tree::one< X_type > X_;
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< N_type > N_;
@@ -1108,6 +1138,34 @@ class cuboid_t: public ::xml_schema::type
 class sphere_t: public ::xml_schema::type
 {
   public:
+  // epsilon
+  // 
+  typedef ::xml_schema::decimal epsilon_type;
+  typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::decimal > epsilon_traits;
+
+  const epsilon_type&
+  epsilon () const;
+
+  epsilon_type&
+  epsilon ();
+
+  void
+  epsilon (const epsilon_type& x);
+
+  // sigma
+  // 
+  typedef ::xml_schema::decimal sigma_type;
+  typedef ::xsd::cxx::tree::traits< sigma_type, char, ::xsd::cxx::tree::schema_type::decimal > sigma_traits;
+
+  const sigma_type&
+  sigma () const;
+
+  sigma_type&
+  sigma ();
+
+  void
+  sigma (const sigma_type& x);
+
   // X
   // 
   typedef ::Vec3_t X_type;
@@ -1200,7 +1258,9 @@ class sphere_t: public ::xml_schema::type
 
   // Constructors.
   //
-  sphere_t (const X_type&,
+  sphere_t (const epsilon_type&,
+            const sigma_type&,
+            const X_type&,
             const V_type&,
             const r_type&,
             const h_type&,
@@ -1230,6 +1290,8 @@ class sphere_t: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
+  ::xsd::cxx::tree::one< epsilon_type > epsilon_;
+  ::xsd::cxx::tree::one< sigma_type > sigma_;
   ::xsd::cxx::tree::one< X_type > X_;
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< r_type > r_;

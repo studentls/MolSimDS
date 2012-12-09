@@ -35,6 +35,8 @@ public:
 			const utils::Vector<double, 3>& x_arg,
 	        const utils::Vector<double, 3>& v_arg,
 	        double m_arg,
+			double epsilon_arg,
+			double sigma_arg,
 	        int type = 0
 	);
 
@@ -52,6 +54,14 @@ public:
 
 	/// type of the particle. The use of this value depends on particularities of the implementation. Currently not in use
 	int type;
+
+	/// the epsilon value for this particle
+	/// used for calculating the Lennard-Jones potential
+	double epsilon;
+
+	/// the sigma value for this particle
+	/// used for calculating the Lennard-Jones potential
+	double sigma;
 
 	/// get the current force acting on the Particle
 	utils::Vector<double, 3>& getF();

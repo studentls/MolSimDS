@@ -83,8 +83,6 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="iterationsperoutput" type="xsd:int"></xsd:element>
       <xsd:element name="delta_t" type="xsd:decimal"></xsd:element>
       <xsd:element name="t_end" type="xsd:decimal"></xsd:element>
-      <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
-      <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
       <xsd:element name="gravity" type="xsd:decimal"></xsd:element>
       <xsd:element name="timestepsPerThermostatApplication" type="xsd:int"></xsd:element>
       <xsd:element name="initialTemperature" type="xsd:decimal"></xsd:element>
@@ -112,6 +110,8 @@ author: Leonhard Spiegelberg & Florian Dietz
   
   <xsd:complexType name="particle_t">
     <xsd:all>
+      <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
+      <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
       <xsd:element name="X" type="Vec3_t"></xsd:element>
       <xsd:element name="V" type="Vec3_t"></xsd:element>
       <xsd:element name="m" type="xsd:decimal"></xsd:element>
@@ -120,6 +120,8 @@ author: Leonhard Spiegelberg & Florian Dietz
 
   <xsd:complexType name="cuboid_t">
     <xsd:all>
+      <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
+      <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
       <xsd:element name="X" type="Vec3_t"></xsd:element>
       <xsd:element name="V" type="Vec3_t"></xsd:element>
       <xsd:element name="N" type="dim3_t"></xsd:element>
@@ -130,6 +132,8 @@ author: Leonhard Spiegelberg & Florian Dietz
 
   <xsd:complexType name="sphere_t">
     <xsd:all>
+      <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
+      <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
       <xsd:element name="X" type="Vec3_t"></xsd:element>
       <xsd:element name="V" type="Vec3_t"></xsd:element>
       <xsd:element name="r" type="xsd:decimal"></xsd:element>

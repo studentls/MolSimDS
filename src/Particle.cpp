@@ -14,6 +14,8 @@ Particle::Particle(int type_arg) {
 	type = type_arg;
 	f = 0.0;
 	old_f = 0.0;
+	epsilon = 0.0;
+	sigma = 0.0;
 }
 
 Particle::Particle(const Particle& other) {
@@ -24,12 +26,16 @@ Particle::Particle(const Particle& other) {
 	old_f = other.old_f;
 	m = other.m;
 	type = other.type;
+	epsilon = 0.0;
+	sigma = 0.0;
 }
 
 // Todo: maybe use initializater list instead of copy?
 Particle::Particle(const	utils::Vector<double, 3>& x_arg,
 	        const utils::Vector<double, 3>& v_arg,
 	        double m_arg,
+			double epsilon_arg,
+			double sigma_arg,
 	        int type_arg
 ) {
     x = x_arg;
@@ -38,6 +44,8 @@ Particle::Particle(const	utils::Vector<double, 3>& x_arg,
     type = type_arg;
     f = 0.0;
     old_f = 0.0;
+	epsilon = epsilon_arg;
+	sigma = sigma_arg;
 }
 
 utils::Vector<double, 3>& Particle::getF() {

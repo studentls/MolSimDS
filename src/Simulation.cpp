@@ -196,8 +196,13 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 
 	// calculate force via Lennard-Jones Potential
 	// these calculations are rather straightforward, looking at the formula
+	
+	// calculate average value for sigma and epsilon
+	double sigma = (p1.sigma + p2.sigma) * 0.5;
+	double epsilon = sqrt(p1.epsilon * p2.epsilon);
+
 	double dist = p1.x.distance(p2.x);
-	double temp1 = desc->sigma / dist;
+	double temp1 = sigma / dist;
 	// this is faster than power functions or manual multiplication
 	double pow2 = temp1 * temp1;
 	double pow3 = pow2 * temp1;
@@ -205,7 +210,7 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	double pow12 = pow6 * pow6;
 
 	double temp2 = pow6 - 2.0 * pow12;
-	double prefactor = 24.0 * desc->epsilon / dist / dist;
+	double prefactor = 24.0 * epsilon / dist / dist;
 	double factor = prefactor * temp2;
 	
 	// DEPRECATED

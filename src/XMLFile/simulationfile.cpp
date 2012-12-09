@@ -389,42 +389,6 @@ t_end (const t_end_type& x)
   this->t_end_.set (x);
 }
 
-const params_t::epsilon_type& params_t::
-epsilon () const
-{
-  return this->epsilon_.get ();
-}
-
-params_t::epsilon_type& params_t::
-epsilon ()
-{
-  return this->epsilon_.get ();
-}
-
-void params_t::
-epsilon (const epsilon_type& x)
-{
-  this->epsilon_.set (x);
-}
-
-const params_t::sigma_type& params_t::
-sigma () const
-{
-  return this->sigma_.get ();
-}
-
-params_t::sigma_type& params_t::
-sigma ()
-{
-  return this->sigma_.get ();
-}
-
-void params_t::
-sigma (const sigma_type& x)
-{
-  this->sigma_.set (x);
-}
-
 const params_t::gravity_type& params_t::
 gravity () const
 {
@@ -585,6 +549,42 @@ algorithm (::std::auto_ptr< algorithm_type > x)
 // particle_t
 // 
 
+const particle_t::epsilon_type& particle_t::
+epsilon () const
+{
+  return this->epsilon_.get ();
+}
+
+particle_t::epsilon_type& particle_t::
+epsilon ()
+{
+  return this->epsilon_.get ();
+}
+
+void particle_t::
+epsilon (const epsilon_type& x)
+{
+  this->epsilon_.set (x);
+}
+
+const particle_t::sigma_type& particle_t::
+sigma () const
+{
+  return this->sigma_.get ();
+}
+
+particle_t::sigma_type& particle_t::
+sigma ()
+{
+  return this->sigma_.get ();
+}
+
+void particle_t::
+sigma (const sigma_type& x)
+{
+  this->sigma_.set (x);
+}
+
 const particle_t::X_type& particle_t::
 X () const
 {
@@ -654,6 +654,42 @@ m (const m_type& x)
 
 // cuboid_t
 // 
+
+const cuboid_t::epsilon_type& cuboid_t::
+epsilon () const
+{
+  return this->epsilon_.get ();
+}
+
+cuboid_t::epsilon_type& cuboid_t::
+epsilon ()
+{
+  return this->epsilon_.get ();
+}
+
+void cuboid_t::
+epsilon (const epsilon_type& x)
+{
+  this->epsilon_.set (x);
+}
+
+const cuboid_t::sigma_type& cuboid_t::
+sigma () const
+{
+  return this->sigma_.get ();
+}
+
+cuboid_t::sigma_type& cuboid_t::
+sigma ()
+{
+  return this->sigma_.get ();
+}
+
+void cuboid_t::
+sigma (const sigma_type& x)
+{
+  this->sigma_.set (x);
+}
 
 const cuboid_t::X_type& cuboid_t::
 X () const
@@ -766,6 +802,42 @@ m (const m_type& x)
 
 // sphere_t
 // 
+
+const sphere_t::epsilon_type& sphere_t::
+epsilon () const
+{
+  return this->epsilon_.get ();
+}
+
+sphere_t::epsilon_type& sphere_t::
+epsilon ()
+{
+  return this->epsilon_.get ();
+}
+
+void sphere_t::
+epsilon (const epsilon_type& x)
+{
+  this->epsilon_.set (x);
+}
+
+const sphere_t::sigma_type& sphere_t::
+sigma () const
+{
+  return this->sigma_.get ();
+}
+
+sphere_t::sigma_type& sphere_t::
+sigma ()
+{
+  return this->sigma_.get ();
+}
+
+void sphere_t::
+sigma (const sigma_type& x)
+{
+  this->sigma_.set (x);
+}
 
 const sphere_t::X_type& sphere_t::
 X () const
@@ -1590,8 +1662,6 @@ params_t (const output_type& output,
           const iterationsperoutput_type& iterationsperoutput,
           const delta_t_type& delta_t,
           const t_end_type& t_end,
-          const epsilon_type& epsilon,
-          const sigma_type& sigma,
           const gravity_type& gravity,
           const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
           const initialTemperature_type& initialTemperature,
@@ -1605,8 +1675,6 @@ params_t (const output_type& output,
   iterationsperoutput_ (iterationsperoutput, ::xml_schema::flags (), this),
   delta_t_ (delta_t, ::xml_schema::flags (), this),
   t_end_ (t_end, ::xml_schema::flags (), this),
-  epsilon_ (epsilon, ::xml_schema::flags (), this),
-  sigma_ (sigma, ::xml_schema::flags (), this),
   gravity_ (gravity, ::xml_schema::flags (), this),
   timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
   initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
@@ -1623,8 +1691,6 @@ params_t (const output_type& output,
           const iterationsperoutput_type& iterationsperoutput,
           const delta_t_type& delta_t,
           const t_end_type& t_end,
-          const epsilon_type& epsilon,
-          const sigma_type& sigma,
           const gravity_type& gravity,
           const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
           const initialTemperature_type& initialTemperature,
@@ -1638,8 +1704,6 @@ params_t (const output_type& output,
   iterationsperoutput_ (iterationsperoutput, ::xml_schema::flags (), this),
   delta_t_ (delta_t, ::xml_schema::flags (), this),
   t_end_ (t_end, ::xml_schema::flags (), this),
-  epsilon_ (epsilon, ::xml_schema::flags (), this),
-  sigma_ (sigma, ::xml_schema::flags (), this),
   gravity_ (gravity, ::xml_schema::flags (), this),
   timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
   initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
@@ -1660,8 +1724,6 @@ params_t (const params_t& x,
   iterationsperoutput_ (x.iterationsperoutput_, f, this),
   delta_t_ (x.delta_t_, f, this),
   t_end_ (x.t_end_, f, this),
-  epsilon_ (x.epsilon_, f, this),
-  sigma_ (x.sigma_, f, this),
   gravity_ (x.gravity_, f, this),
   timestepsPerThermostatApplication_ (x.timestepsPerThermostatApplication_, f, this),
   initialTemperature_ (x.initialTemperature_, f, this),
@@ -1682,8 +1744,6 @@ params_t (const ::xercesc::DOMElement& e,
   iterationsperoutput_ (f, this),
   delta_t_ (f, this),
   t_end_ (f, this),
-  epsilon_ (f, this),
-  sigma_ (f, this),
   gravity_ (f, this),
   timestepsPerThermostatApplication_ (f, this),
   initialTemperature_ (f, this),
@@ -1753,28 +1813,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!t_end_.present ())
       {
         this->t_end_.set (t_end_traits::create (i, f, this));
-        continue;
-      }
-    }
-
-    // epsilon
-    //
-    if (n.name () == "epsilon" && n.namespace_ ().empty ())
-    {
-      if (!epsilon_.present ())
-      {
-        this->epsilon_.set (epsilon_traits::create (i, f, this));
-        continue;
-      }
-    }
-
-    // sigma
-    //
-    if (n.name () == "sigma" && n.namespace_ ().empty ())
-    {
-      if (!sigma_.present ())
-      {
-        this->sigma_.set (sigma_traits::create (i, f, this));
         continue;
       }
     }
@@ -1904,20 +1942,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!epsilon_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "epsilon",
-      "");
-  }
-
-  if (!sigma_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "sigma",
-      "");
-  }
-
   if (!gravity_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
@@ -1991,10 +2015,14 @@ params_t::
 //
 
 particle_t::
-particle_t (const X_type& X,
+particle_t (const epsilon_type& epsilon,
+            const sigma_type& sigma,
+            const X_type& X,
             const V_type& V,
             const m_type& m)
 : ::xml_schema::type (),
+  epsilon_ (epsilon, ::xml_schema::flags (), this),
+  sigma_ (sigma, ::xml_schema::flags (), this),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
   m_ (m, ::xml_schema::flags (), this)
@@ -2006,6 +2034,8 @@ particle_t (const particle_t& x,
             ::xml_schema::flags f,
             ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
+  epsilon_ (x.epsilon_, f, this),
+  sigma_ (x.sigma_, f, this),
   X_ (x.X_, f, this),
   V_ (x.V_, f, this),
   m_ (x.m_, f, this)
@@ -2017,6 +2047,8 @@ particle_t (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f,
             ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  epsilon_ (f, this),
+  sigma_ (f, this),
   X_ (f, this),
   V_ (f, this),
   m_ (f, this)
@@ -2037,6 +2069,28 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xercesc::DOMElement& i (p.cur_element ());
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
+
+    // epsilon
+    //
+    if (n.name () == "epsilon" && n.namespace_ ().empty ())
+    {
+      if (!epsilon_.present ())
+      {
+        this->epsilon_.set (epsilon_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // sigma
+    //
+    if (n.name () == "sigma" && n.namespace_ ().empty ())
+    {
+      if (!sigma_.present ())
+      {
+        this->sigma_.set (sigma_traits::create (i, f, this));
+        continue;
+      }
+    }
 
     // X
     //
@@ -2080,6 +2134,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     break;
   }
 
+  if (!epsilon_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "epsilon",
+      "");
+  }
+
+  if (!sigma_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "sigma",
+      "");
+  }
+
   if (!X_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
@@ -2118,12 +2186,16 @@ particle_t::
 //
 
 cuboid_t::
-cuboid_t (const X_type& X,
+cuboid_t (const epsilon_type& epsilon,
+          const sigma_type& sigma,
+          const X_type& X,
           const V_type& V,
           const N_type& N,
           const h_type& h,
           const m_type& m)
 : ::xml_schema::type (),
+  epsilon_ (epsilon, ::xml_schema::flags (), this),
+  sigma_ (sigma, ::xml_schema::flags (), this),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
   N_ (N, ::xml_schema::flags (), this),
@@ -2137,6 +2209,8 @@ cuboid_t (const cuboid_t& x,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
+  epsilon_ (x.epsilon_, f, this),
+  sigma_ (x.sigma_, f, this),
   X_ (x.X_, f, this),
   V_ (x.V_, f, this),
   N_ (x.N_, f, this),
@@ -2150,6 +2224,8 @@ cuboid_t (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  epsilon_ (f, this),
+  sigma_ (f, this),
   X_ (f, this),
   V_ (f, this),
   N_ (f, this),
@@ -2172,6 +2248,28 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xercesc::DOMElement& i (p.cur_element ());
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
+
+    // epsilon
+    //
+    if (n.name () == "epsilon" && n.namespace_ ().empty ())
+    {
+      if (!epsilon_.present ())
+      {
+        this->epsilon_.set (epsilon_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // sigma
+    //
+    if (n.name () == "sigma" && n.namespace_ ().empty ())
+    {
+      if (!sigma_.present ())
+      {
+        this->sigma_.set (sigma_traits::create (i, f, this));
+        continue;
+      }
+    }
 
     // X
     //
@@ -2240,6 +2338,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     break;
   }
 
+  if (!epsilon_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "epsilon",
+      "");
+  }
+
+  if (!sigma_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "sigma",
+      "");
+  }
+
   if (!X_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
@@ -2292,13 +2404,17 @@ cuboid_t::
 //
 
 sphere_t::
-sphere_t (const X_type& X,
+sphere_t (const epsilon_type& epsilon,
+          const sigma_type& sigma,
+          const X_type& X,
           const V_type& V,
           const r_type& r,
           const h_type& h,
           const m_type& m,
           const dimensions_type& dimensions)
 : ::xml_schema::type (),
+  epsilon_ (epsilon, ::xml_schema::flags (), this),
+  sigma_ (sigma, ::xml_schema::flags (), this),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
   r_ (r, ::xml_schema::flags (), this),
@@ -2313,6 +2429,8 @@ sphere_t (const sphere_t& x,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
+  epsilon_ (x.epsilon_, f, this),
+  sigma_ (x.sigma_, f, this),
   X_ (x.X_, f, this),
   V_ (x.V_, f, this),
   r_ (x.r_, f, this),
@@ -2327,6 +2445,8 @@ sphere_t (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  epsilon_ (f, this),
+  sigma_ (f, this),
   X_ (f, this),
   V_ (f, this),
   r_ (f, this),
@@ -2350,6 +2470,28 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xercesc::DOMElement& i (p.cur_element ());
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
+
+    // epsilon
+    //
+    if (n.name () == "epsilon" && n.namespace_ ().empty ())
+    {
+      if (!epsilon_.present ())
+      {
+        this->epsilon_.set (epsilon_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // sigma
+    //
+    if (n.name () == "sigma" && n.namespace_ ().empty ())
+    {
+      if (!sigma_.present ())
+      {
+        this->sigma_.set (sigma_traits::create (i, f, this));
+        continue;
+      }
+    }
 
     // X
     //
@@ -2424,6 +2566,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     }
 
     break;
+  }
+
+  if (!epsilon_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "epsilon",
+      "");
+  }
+
+  if (!sigma_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "sigma",
+      "");
   }
 
   if (!X_.present ())
