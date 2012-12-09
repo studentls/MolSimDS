@@ -297,12 +297,12 @@ public:
 		AssignParticles(particles);
 
 		// set the reflective boundary conditions
-		SetReflectiveBoundaries(boundaryConditions & BC_LEFT,
-								boundaryConditions & BC_RIGHT,
-								boundaryConditions & BC_FRONT,
-								boundaryConditions & BC_BACK,
-								boundaryConditions & BC_BOTTOM,
-								boundaryConditions & BC_TOP);
+		SetReflectiveBoundaries(this->boundaryConditions & BC_LEFT,
+								this->boundaryConditions & BC_RIGHT,
+								this->boundaryConditions & BC_FRONT,
+								this->boundaryConditions & BC_BACK,
+								this->boundaryConditions & BC_BOTTOM,
+								this->boundaryConditions & BC_TOP);
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
@@ -545,6 +545,7 @@ public:
 				p.push_back(*it);
 			}
 		}
+
 		return p;
 	}
 

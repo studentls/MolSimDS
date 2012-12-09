@@ -171,5 +171,8 @@
     <None Include="Task3.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="FallingDrop.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>
