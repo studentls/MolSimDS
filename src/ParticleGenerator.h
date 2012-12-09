@@ -31,6 +31,8 @@ public:
 	/// @param meshWidth distance between neighbouring particles
 	/// @param mass the mass of each particle
 	/// @param vInitialVelocity the initial velocity of each particle
+	/// @param epsilon the epsilon value to use for the particles
+	/// @param sigma the sigma value to use for the particles
 	/// @param dBrownianMotion brownianMotionFactor
 	/// @param type ParticleType
 	static void	makeCuboid(ParticleContainer& pc,
@@ -39,8 +41,10 @@ public:
 					   const double meshWidth,
 					   const double mass,
 					   const Vec3& vInitialVelocity,
+					   const double epsilon,
+					   const double sigma,
 					   const double dBrownianMotion = 0.1,// set this later individual, use default value at the moment
-					   const int type = 0) 
+					   const int type = 0)
 	{
 		// acknowledge that default constructor sets forces to zero...
 		Particle p;
@@ -74,10 +78,12 @@ public:
 	/// @param pc the ParticleContainer where particles will be added to
 	/// @param vCenter the center of the sphere
 	/// @param radius radius of the sphere measured in particles
-	/// @param dimensions valid values are 2 or 3. For dimensions = 2, this will generate a flat disc, for 3 a real sphere
 	/// @param meshWidth distance between neighbouring particles
 	/// @param mass the mass of each particle
 	/// @param vInitialVelocity the initial velocity of each particle
+	/// @param epsilon the epsilon value to use for the particles
+	/// @param sigma the sigma value to use for the particles
+	/// @param dimensions valid values are 2 or 3. For dimensions = 2, this will generate a flat disc, for 3 a real sphere
 	/// @param dBrownianMotion brownianMotionFactor
 	/// @param type ParticleType
 	static void makeSphere(ParticleContainer& pc,
@@ -86,6 +92,8 @@ public:
 							const double mass,
 							const unsigned int radius,
 							const double meshWidth,
+						    const double epsilon,
+						    const double sigma,
 							const unsigned int dimensions = 2,
 							const double dBrownianMotion = 0.1,// set this later individual, use default value at the moment
 							const int type = 0)

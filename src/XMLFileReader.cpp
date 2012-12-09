@@ -50,14 +50,12 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	desc.temperatureDifferenceStepSize	= file->params().temperatureDifferenceStepSize();
 	desc.delta_t				= file->params().delta_t();
 	desc.end_time				= file->params().t_end();
-	desc.epsilon				= file->params().epsilon();
 	
 	//compare strings
 	if(strcmp(file->params().outputfmt().c_str(), "VTK") == 0)desc.output_fmt = SOF_VTK;
 	else if(strcmp(file->params().outputfmt().c_str(), "XYZ") == 0)desc.output_fmt = SOF_XYZ;
 	else desc.output_fmt = SOF_NONE;
 
-	desc.sigma					= file->params().sigma();
 	desc.start_time				= file->params().t_start();
 
 	desc.iterationsperoutput	= file->params().iterationsperoutput();
@@ -133,6 +131,8 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		double m;
 		double h;
 		utils::Vector<unsigned int, 3> dim;
+		double epsilon;
+		double sigma;
 
 		corner[0] = it->X().at(0);
 		corner[1] = it->X().at(1);
@@ -150,9 +150,12 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		dim[1] = it->N().at(1);
 		dim[2] = (it->N().size() > 2) ? it->N().at(2) : 1;
 
+		epsilon = it->epsilon();
+		sigma = it->sigma();
+
 
 		// make Cuboid and add to particle
-		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v, 0);
+		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v, epsilon, sigma, 0);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
@@ -171,6 +174,8 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		double h;
 		unsigned int dim;
 		unsigned int radius;
+		double epsilon;
+		double sigma;
 
 		center[0] = it->X().at(0);
 		center[1] = it->X().at(1);
@@ -188,8 +193,11 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 		radius = it->r();
 
+		epsilon = it->epsilon();
+		sigma = it->sigma();
+
 		// make Cuboid and add to particle
-		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim, 0);
+		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, epsilon, sigma, dim, 0);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	

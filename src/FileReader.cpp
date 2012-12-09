@@ -26,6 +26,8 @@ void FileReader::readFile(std::vector<Particle>& particles, const char* filename
 	double x[] = {0,0,0};
 	double v[] = {1,1,1};
 	double m = 1;
+	double epsilon = 0;
+	double sigma = 0;
     int num_particles = 0;
 
     std::ifstream input_file(filename);
@@ -62,7 +64,9 @@ void FileReader::readFile(std::vector<Particle>& particles, const char* filename
     			exit(-1);
     		}
     		datastream >> m;
-    		Particle p(x, v, m);
+    		datastream >> epsilon;
+    		datastream >> sigma;
+    		Particle p(x, v, m, epsilon, sigma);
     		particles.push_back(p);
 
     		getline(input_file, tmp_string);

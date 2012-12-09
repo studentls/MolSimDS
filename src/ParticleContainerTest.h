@@ -107,7 +107,7 @@ public:
 		int iParticleCount = 10;
 		for(int i = 0; i < iParticleCount; i++)
 		{
-			Particle p1(Vec3(1.0), Vec3(1.0), 1.0);
+			Particle p1(Vec3(1.0), Vec3(1.0), 1.0, 5.0, 1.0);
 			PC.AddParticle(p1);
 		}
 
@@ -131,7 +131,7 @@ public:
 		int iParticleCount = 10;
 		for(int i = 0; i < iParticleCount; i++)
 		{
-			Particle p1(Vec3(1.0), Vec3(1.0), 1.0);
+			Particle p1(Vec3(1.0), Vec3(1.0), 1.0, 5.0, 1.0);
 			PC.AddParticle(p1);
 		}
 

@@ -47,6 +47,8 @@ struct SimulationDesc
 	double				end_time;
 	
 	double				gravity;
+	double				epsilon;
+	double				sigma;
 
 	int					dimensions;
 	

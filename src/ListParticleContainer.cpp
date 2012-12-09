@@ -105,9 +105,11 @@ bool ListParticleContainer::AddParticlesFromFileNew(const char *filename)
 		Vec3 x;
 		double mass;
 		double meshwidth;
+		double epsilon;
+		double sigma;
 		
-		if(sscanf(buffer, "%s %lf %lf %lf %lf %lf %lf %lf %d %d %d  %lf", 
-			&cmd, &x[0], &x[1], &x[2], &v[0], &v[1], &v[2], &mass, &dim[0], &dim[1], &dim[2], &meshwidth))
+		if(sscanf(buffer, "%s %lf %lf %lf %lf %lf %lf %lf %d %d %d  %lf %lf %lf", 
+			&cmd, &x[0], &x[1], &x[2], &v[0], &v[1], &v[2], &mass, &dim[0], &dim[1], &dim[2], &meshwidth, sigma, epsilon))
 		{
 			if(strcmp(cmd, "cuboid") == 0)
 			{
@@ -116,7 +118,7 @@ bool ListParticleContainer::AddParticlesFromFileNew(const char *filename)
 				for(int i = 0; i < 3; i++)assert(dim[i] < 1000);
 
 				ParticleGenerator::makeCuboid(*this,
-					x, dim, meshwidth, mass, v);
+					x, dim, meshwidth, mass, v, epsilon, sigma);
 			}
 		}
 		else LOG4CXX_ERROR(particleGenerationLogger, " >> matching error, file corrupted?");
