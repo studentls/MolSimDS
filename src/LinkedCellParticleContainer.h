@@ -159,7 +159,7 @@ private:
 		// calc based on number of cells in each dimension and their individual extent
 		for(int i = 0; i < dim; i++)
 		{
-			res[i] = cellCount[i] * cellSize[i];
+			res[i] = (cellCount[i] - 2) * cellSize[i];
 		}
 
 		return res;
