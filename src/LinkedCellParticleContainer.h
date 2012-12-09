@@ -162,6 +162,10 @@ private:
 
 		return res;
 	}
+
+	/// store the original extent of the simulation area as a three dimensional vector
+	/// before the halo-layer was added
+	utils::Vector<double, 3> originalSimulationAreaExtent;
 	
 	/// define the reflective boundary cells
 	/// for easier iteration later
@@ -276,6 +280,7 @@ public:
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->reflectiveBoundaryDistance = sigma * 1.1225;
 		this->boundaryConditions = boundaryConditions;
+		this->originalSimulationAreaExtent = simulationAreaExtent;
 
 		// calc number of cells in each dimension, note that we are rounding down
 		// this is done because the number of cells that fit in the designated area may not be a natural number

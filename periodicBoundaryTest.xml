@@ -14,7 +14,7 @@ author: F.Dietz & L.Spiegelberg
     <output>out</output>
     
     <iterationsperoutput>10</iterationsperoutput>
-    <timestepsPerThermostatApplication>10</timestepsPerThermostatApplication>
+    <timestepsPerThermostatApplication>-1</timestepsPerThermostatApplication>
     <initialTemperature>0.0</initialTemperature>
     <targetTemperature>2.0</targetTemperature>
     <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>
@@ -35,7 +35,7 @@ author: F.Dietz & L.Spiegelberg
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
-          <condition value="all"></condition>
+          <condition value="none"></condition>
         </conditions>
       </LinkedCell>
     </algorithm>
@@ -47,19 +47,19 @@ author: F.Dietz & L.Spiegelberg
     <cuboid>
       <h>1.1225</h>
       <m>1</m>
-      <N>100 20 1</N>
-      <V>0.0 0.0 0.0</V>
-      <X>20.0 20.0 0.0</X>
+      <N>1 3 1</N>
+      <V>-5.0 2.0 0.0</V>
+      <X>0.5 0.0 0.0</X>
     </cuboid>
     
-    <!-- C2 -->
     <cuboid>
       <h>1.1225</h>
       <m>1</m>
-      <N>20 20 1</N>
-      <V>0.0 -10.0 0.0</V>
-      <X>70.0 60.0 0.0</X>
+      <N>1 3 1</N>
+      <V>3.0 2.0 0.0</V>
+      <X>8.0 0.0 0.0</X>
     </cuboid>
+    
   </data>
 
 </simulationfile>

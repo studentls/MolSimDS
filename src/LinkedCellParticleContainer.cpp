@@ -406,42 +406,45 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 					{
 						int index1 = Index2DTo1D(x1, y1);
 						int index2 = Index2DTo1D(x2, y2);
-						utils::Vector<double, 5> vec;
-						vec[0] = index1;
-						vec[1] = index2;
-						vec[2] = 0.0;
-						vec[3] = 0.0;
-						vec[4] = 0.0;
+
 						// ensure that every pair is only taken once
 						if (index1 <= index2)
 							continue;
-						bool indirectNeighbour = false;
-						// for every axis...
-						
-						// check if the cells are on opposite sides
-						if (xAxis && ((x1 == 1 && x2 == cellCount[0] - 2) ||
-							(x2 == 1 && x1 == cellCount[0] - 2)))
-						{
-							indirectNeighbour = true;
-							vec[2] = calcSimulationAreaExtent()[0] * (x1 == 0 ? 1.0 : -1.0);
-						}
-						// if they are not, and are not direct neighbours either, skip the pair
-						else if (!((x1 - x2 == 1) || (x2 - x1 == 1)))
-							continue;
-						// check if the cells are on opposite sides
-						if (yAxis && ((y1 == 1 && y2 == cellCount[1] - 2) ||
-							(y2 == 1 && y1 == cellCount[1] - 2)))
-						{
-							indirectNeighbour = true;
-							vec[3] = calcSimulationAreaExtent()[1] * (y1 == 0 ? 1.0 : -1.0);
-						}
-						// if they are not, and are not direct neighbours either, skip the pair
-						else if (!((y1 - y2 == 1) || (y2 - y1 == 1)))
-							continue;
 
-						// if it is a pair of indirect neighbours, store it
-						if (indirectNeighbour)
-							periodicBoundaryGroups.push_back(vec);
+						// for every possibility of each dimension
+						// being either a direct neighbour
+						// or a neighbour through the periodic boundary
+						for (int xOpp = 0; xOpp < 2; xOpp++)
+							for (int yOpp = 0; yOpp < 2; yOpp++)
+							{
+								// presume that relation, then check later if it is actually true
+								// this is necessary because the relation can't be determined directly
+								// if there are too few cells, so that there are several valid relations
+								// for each pair of cells
+								bool xOpposite = (xOpp == 0);
+								bool yOpposite = (yOpp == 0);
+								// skip those where the cells are direct neighbours in every dimension
+								if (!xOpposite && !yOpposite)// && !zOpposite)
+									continue;
+								// for every axis, skip the pair if
+								// the above presumption regarding the positions
+								// turns out to be wrong for the pair of particles
+								if (xOpposite && !((x1 == 1 && x2 == cellCount[0] - 2) || (x2 == 1 && x1 == cellCount[0] - 2)) ||
+									!xOpposite && !(x1 == x2 + 1 || x1 == x2 - 1 || x1 == x2))
+									continue;
+								if (yOpposite && !((y1 == 1 && y2 == cellCount[1] - 2) || (y2 == 1 && y1 == cellCount[1] - 2)) ||
+									!yOpposite && !(y1 == y2 + 1 || y1 == y2 - 1 || y1 == y2))
+									continue;
+								
+								// if the algorithm gets till here, it is a pair of indirect neighbours. store it.
+								utils::Vector<double, 5> vec;
+								vec[0] = index1;
+								vec[1] = index2;
+								vec[2] = xOpposite ? (originalSimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
+								vec[3] = yOpposite ? (originalSimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
+								vec[4] = 0;
+								periodicBoundaryGroups.push_back(vec);
+							}
 					}
 	}
 	else if (dim == 3)
@@ -452,55 +455,53 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 					for (int x2 = 0; x2 < cellCount[0]; x2++)
 						for (int y2 = 0; y2 < cellCount[1]; y2++)
 							for (int z2 = 0; z2 < cellCount[2]; z2++)
-								{
-								int index1 = Index3DTo1D(x1, y1, z1);
-								int index2 = Index3DTo1D(x2, y2, z2);
-								utils::Vector<double, 5> vec;
-								vec[0] = index1;
-								vec[1] = index2;
-								vec[2] = 0.0;
-								vec[3] = 0.0;
-								vec[4] = 0.0;
+							{
+								int index1 = Index2DTo1D(x1, y1);
+								int index2 = Index2DTo1D(x2, y2);
+
 								// ensure that every pair is only taken once
 								if (index1 <= index2)
 									continue;
-								bool indirectNeighbour = false;
-								// for every axis...
-								
-								// check if the cells are on opposite sides
-								if (xAxis && ((x1 == 1 && x2 == cellCount[0] - 2) ||
-									(x2 == 1 && x1 == cellCount[0] - 2)))
-								{
-									indirectNeighbour = true;
-									vec[2] = calcSimulationAreaExtent()[0] * (x1 == 0 ? 1.0 : -1.0);
-								}
-								// if they are not, and are not direct neighbours either, skip the pair
-								else if (!((x1 - x2 == 1) || (x2 - x1 == 1)))
-									continue;
-								// check if the cells are on opposite sides
-								if (yAxis && ((y1 == 1 && y2 == cellCount[1] - 2) ||
-									(y2 == 1 && y1 == cellCount[1] - 2)))
-								{
-									indirectNeighbour = true;
-									vec[3] = calcSimulationAreaExtent()[1] * (y1 == 0 ? 1.0 : -1.0);
-								}
-								// if they are not, and are not direct neighbours either, skip the pair
-								else if (!((y1 - y2 == 1) || (y2 - y1 == 1)))
-									continue;
-								// check if the cells are on opposite sides
-								if (zAxis && ((z1 == 1 && z2 == cellCount[2] - 2) ||
-									(z2 == 1 && z1 == cellCount[2] - 2)))
-								{
-									indirectNeighbour = true;
-									vec[4] = calcSimulationAreaExtent()[2] * (z1 == 0 ? 1.0 : -1.0);
-								}
-								// if they are not, and are not direct neighbours either, skip the pair
-								else if (!((z1 - z2 == 1) || (z2 - z1 == 1)))
-									continue;
 
-								// if it is a pair of indirect neighbours, store it
-								if (indirectNeighbour)
-									periodicBoundaryGroups.push_back(vec);
+								// for every possibility of each dimension
+								// being either a direct neighbour
+								// or a neighbour through the periodic boundary
+								for (int xOpp = 0; xOpp < 2; xOpp++)
+									for (int yOpp = 0; yOpp < 2; yOpp++)
+										for (int zOpp = 0; zOpp < 2; zOpp++)
+										{
+											// presume that relation, then check later if it is actually true
+											// this is necessary because the relation can't be determined directly
+											// if there are too few cells, so that there are several valid relations
+											// for each pair of cells
+											bool xOpposite = (xOpp == 0);
+											bool yOpposite = (yOpp == 0);
+											bool zOpposite = (zOpp == 0);
+											// skip those where the cells are direct neighbours in every dimension
+											if (!xOpposite && !yOpposite && !zOpposite)
+												continue;
+											// for every axis, skip the pair if
+											// the above presumption regarding the positions
+											// turns out to be wrong for the pair of particles
+											if (xOpposite && !((x1 == 1 && x2 == cellCount[0] - 2) || (x2 == 1 && x1 == cellCount[0] - 2)) ||
+												!xOpposite && !(x1 == x2 + 1 || x1 == x2 - 1 || x1 == x2))
+												continue;
+											if (yOpposite && !((y1 == 1 && y2 == cellCount[1] - 2) || (y2 == 1 && y1 == cellCount[1] - 2)) ||
+												!yOpposite && !(y1 == y2 + 1 || y1 == y2 - 1 || y1 == y2))
+												continue;
+											if (zOpposite && !((z1 == 1 && z2 == cellCount[2] - 2) || (z2 == 1 && z1 == cellCount[2] - 2)) ||
+												!zOpposite && !(z1 == z2 + 1 || z1 == z2 - 1 || z1 == z2))
+												continue;
+								
+											// if the algorithm gets till here, it is a pair of indirect neighbours. store it.
+											utils::Vector<double, 5> vec;
+											vec[0] = index1;
+											vec[1] = index2;
+											vec[2] = xOpposite ? (originalSimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
+											vec[3] = yOpposite ? (originalSimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
+											vec[4] = zOpposite ? (originalSimulationAreaExtent[2] * ((z1 == 0) ? 1.0 : -1.0)) : 0;
+											periodicBoundaryGroups.push_back(vec);
+										}
 							}
 	}
 }
@@ -533,9 +534,28 @@ void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsForce(void(*fun
 
 void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsMovement()
 {
-	// TODO
-	// the area is larger than it needs to be
-	// because of the other guy's changes
+	// skip this function if no periodic boundaries are used
+	if (!periodicBoundaries[0] && !periodicBoundaries[1] && !periodicBoundaries[2])
+		return;
+
+	// go through all Cells...
+	for(int i = 0; i < getCellCount(); i++)
+	{
+		if(Cells[i].empty())continue;
+
+		for(std::vector<Particle>::iterator it = Cells[i].begin(); it != Cells[i].end(); it++)
+		{
+			Particle& p = *it;
+			for (int i = 0; i < dim; i++)
+				if (periodicBoundaries[i])
+				{
+					if (p.x[i] < this->frontLowerLeftCorner[i])
+						p.x[i] += this->originalSimulationAreaExtent[i];
+					else if (p.x[i] > this->frontLowerLeftCorner[i] + this->originalSimulationAreaExtent[i])
+						p.x[i] -= this->originalSimulationAreaExtent[i];
+				}
+		}
+	}
 }
 
 std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
