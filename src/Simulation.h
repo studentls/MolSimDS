@@ -49,6 +49,8 @@ struct SimulationDesc
 	double				brownianMotionFactor;
 	double				epsilon;
 	double				sigma;
+
+	int					dimensions;
 	
 	int					timestepsPerThermostatApplication;
 	double				initialTemperature;
@@ -77,6 +79,13 @@ struct SimulationDesc
 	    brownianMotionFactor = 0.1;
 		epsilon = 5.0;
 		sigma = 1.0;
+
+		dimensions = 3;
+
+		timestepsPerThermostatApplication = -1;
+		initialTemperature = 0.0;
+		targetTemperature = 2.0;
+		temperatureDifferenceStepSize = 0.1;
 
 		iterationsperoutput = 10;
 

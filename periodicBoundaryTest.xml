@@ -12,10 +12,20 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <output>out</output>
+    
+<!--
 
+NOTE:
+
+THIS FILE TESTS BOTH TEMPERATURE AND BOUNDARY CONDITIONS!
+
+IT IS __SUPPOSED__ TO LOOK WEIRD!
+
+-->
+    
     <iterationsperoutput>10</iterationsperoutput>
     <brownianMotionFactor>0.1</brownianMotionFactor>
-    <timestepsPerThermostatApplication>-1</timestepsPerThermostatApplication>
+    <timestepsPerThermostatApplication>100</timestepsPerThermostatApplication>
     <initialTemperature>0.0</initialTemperature>
     <targetTemperature>2.0</targetTemperature>
     <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>

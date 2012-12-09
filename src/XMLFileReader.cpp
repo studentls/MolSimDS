@@ -44,6 +44,10 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	
 	//set desc
 	desc.brownianMotionFactor	= file->params().brownianMotionFactor();
+	desc.timestepsPerThermostatApplication	= file->params().timestepsPerThermostatApplication();
+	desc.initialTemperature	= file->params().initialTemperature();
+	desc.targetTemperature	= file->params().targetTemperature();
+	desc.temperatureDifferenceStepSize	= file->params().temperatureDifferenceStepSize();
 	desc.delta_t				= file->params().delta_t();
 	desc.end_time				= file->params().t_end();
 	desc.epsilon				= file->params().epsilon();
