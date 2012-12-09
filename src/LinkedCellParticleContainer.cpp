@@ -379,6 +379,8 @@ void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsForce(void(*fun
 		double axis3 = (int)(elem[4]);
 		for (std::vector<Particle>::iterator it = cell2.begin() ; it < cell2.end(); it++) {
 			Particle& p2 = *it;
+			// temporarily pretend that the particle were on the other side of the boundary
+			// then apply the changes
 			p2.x[0] -= axis1;
 			p2.x[1] -= axis2;
 			p2.x[2] -= axis3;

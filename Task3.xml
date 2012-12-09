@@ -21,9 +21,7 @@ author: F.Dietz & L.Spiegelberg
     <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>
    
     <delta_t>0.0005</delta_t>
-    <epsilon>5.0</epsilon>
     <outputfmt>VTK</outputfmt>
-    <sigma>1.0</sigma>
     
     <t_end>20.0</t_end>
     <t_start>0.0</t_start>
@@ -46,6 +44,8 @@ author: F.Dietz & L.Spiegelberg
   <data>
     <!-- C1 -->
     <cuboid>
+      <epsilon>5.0</epsilon>
+      <sigma>1.0</sigma>
       <h>1.1225</h>
       <m>1</m>
       <N>100 20 1</N>
@@ -55,6 +55,8 @@ author: F.Dietz & L.Spiegelberg
     
     <!-- C2 -->
     <cuboid>
+      <epsilon>5.0</epsilon>
+      <sigma>1.0</sigma>
       <h>1.1225</h>
       <m>1</m>
       <N>20 20 1</N>
