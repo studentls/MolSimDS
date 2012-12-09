@@ -49,6 +49,11 @@ struct SimulationDesc
 	double				brownianMotionFactor;
 	double				epsilon;
 	double				sigma;
+	
+	int					timestepsPerThermostatApplication;
+	double				initialTemperature;
+	double				targetTemperature;
+	double				temperatureDifferenceStepSize;
 
 	unsigned int		iterationsperoutput;
 
@@ -135,6 +140,39 @@ private:
 
 	/// calculate the new velocity of a particle for a new iteration. Used in calculateV()
 	static void				velCalculator(void*, Particle& p);
+	
+	/// initiates random motion/heat of all particles
+	void Simulation::initiateHeat();
+
+	/// used by initiateHeat to apply random initialization to all particles
+	static void Simulation::heatInitializer(void* data, Particle& p);
+
+	/// normalize the heat of the particles
+	void Simulation::normalizeHeat();
+
+	/// whether or not the heat is currently being updated
+	/// because the heat may have to be adapted in incremental steps
+	/// it does not suffice to just use a modulo calculation
+	static bool updatingHeat;
+
+	/// used by the velocitySumAcquirer to store the kinetic energies in
+	static double sumOfKineticEnergies;
+
+	/// used by the heatNormalizer
+	static double heatNormalizationFactor;
+
+	/// the Brownian Motion, used for initialization of the heat
+	/// not the actual brownian motion, but a helper variable that still
+	/// needs to be divided by sqrt(mass) later
+	static double dBrownianMotionMassless;
+
+	/// used to normalize the heat of the particles
+	/// determines the current sum of the velocities of all particles, which is used to determine the heat
+	static void velocitySumAcquirer(void*, Particle& p);
+	
+	/// used to normalize the heat of the particles
+	/// applies a factor to the velocity of each particle
+	static void heatNormalizer(void*, Particle& p);
 
 	/// plot the particles to a xyz-file
 	/// @param iteration the number of this iteration

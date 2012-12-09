@@ -135,6 +135,18 @@ private:
 	// store reflective boundaries as planes
 	std::vector<Boundary> boundaries;
 
+	/// store groups of values that make it easier to apply periodicBoundaryConditions
+	/// each double in the Vector means something different
+	/// 0, int: cell1
+	/// 1, int: cell2
+	/// 2, double: axis1 (0 or length of area on axis)
+	/// 3, double: axis2 (0 or length of area on axis)
+	/// 4, double: axis3 (0 or length of area on axis)
+	std::vector<utils::Vector<double, 5> > periodicBoundaryGroups;
+
+	/// stores at which axis a periodic boundary exists
+	utils::Vector<bool, 3> periodicBoundaries;
+
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
@@ -164,13 +176,20 @@ private:
 
 		return res;
 	}
+
+	/// store the original extent of the simulation area as a three dimensional vector
+	/// before the halo-layer was added
+	utils::Vector<double, 3> originalSimulationAreaExtent;
 	
 	/// define the reflective boundary cells
 	void SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
 					bool frontReflectiveBoundary, bool backReflectiveBoundary,
 					// these two will be ignored in the two-dimensional case
 					bool bottomReflectiveBoundary, bool topReflectiveBoundary);
-
+	
+	/// set periodic boundary cells
+	/// for easier iteration later
+	void SetPeriodicBoundaries(bool xAxis, bool yAxis, bool zAxis);
 
 	/// function to assign a vector of particles to formerly properly initialized cells
 	/// note, that this function clears all arrays!
@@ -262,6 +281,7 @@ public:
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->reflectiveBoundaryDistance = sigma * 1.1225;
 		this->boundaryConditions = boundaryConditions;
+		this->originalSimulationAreaExtent = simulationAreaExtent;
 
 		// calc number of cells in each dimension, note that we are rounding down
 		// this is done because the number of cells that fit in the designated area may not be a natural number
@@ -303,12 +323,26 @@ public:
 								this->boundaryConditions & BC_BACK,
 								this->boundaryConditions & BC_BOTTOM,
 								this->boundaryConditions & BC_TOP);
+
+		// TODO:
+		// make this use the boundary conditions from the xml file
+
+		// set the periodic boundary conditions
+		SetPeriodicBoundaries(true, true, true);
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
 	/// @param func function pointer, to calculate interaction with boundary particle
 	/// @data optional data given to func
 	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
+	
+	/// applies forces between particles on opposite sides of periodic boundaries
+	/// @param func function pointer, to calculate interaction with boundary particle on the other side
+	/// @data optional data given to func
+	void ApplyPeriodicBoundaryConditionsForce(void(*func)(void*, Particle&, Particle&), void *data);
+
+	/// ensure that particles that leave a periodic boundary are correctly entered on the opposite side
+	void ApplyPeriodicBoundaryConditionsMovement();
 
 	/// inline method to quickly calculate an index for reassignment
 	/// @return returns index for grid including halo cells
@@ -555,6 +589,9 @@ public:
 	/// the default value of this variable for the LinkedCellAlgorithm is one
 	void ReassignParticles()
 	{
+		// ensure that particles that leave a periodic boundary enter on the other side
+		ApplyPeriodicBoundaryConditionsMovement();
+
 		int index = 0;
 
 		// go through all Cells...
