@@ -19,6 +19,10 @@
 #include "ListParticleContainer.h"
 #include "ParticleGenerator.h"
 
+//delete later
+static const double maxsigma = 1.0; 
+
+
 err_type XMLFileReader::readFile(const char *filename, bool validate)
 {
 	// exists file?
@@ -43,22 +47,44 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 
 	
 	//set desc
-	desc.brownianMotionFactor	= file->params().brownianMotionFactor();
+
+	// is there a brownian Motion factor encoded? if yes set to the value, otherwise to zero
+	if(file->params().brownianMotionFactor().present())
+		desc.brownianMotionFactor	= file->params().brownianMotionFactor().get();
+	else desc.brownianMotionFactor = 0.0;
+	
+	
 	desc.delta_t				= file->params().delta_t();
 	desc.end_time				= file->params().t_end();
-	desc.epsilon				= file->params().epsilon();
+
 	
 	//compare strings
 	if(strcmp(file->params().outputfmt().c_str(), "VTK") == 0)desc.output_fmt = SOF_VTK;
 	else if(strcmp(file->params().outputfmt().c_str(), "XYZ") == 0)desc.output_fmt = SOF_XYZ;
 	else desc.output_fmt = SOF_NONE;
-
-	desc.sigma					= file->params().sigma();
+	
 	desc.start_time				= file->params().t_start();
 
 	desc.iterationsperoutput	= file->params().iterationsperoutput();
 
 	desc.outname				= file->params().output();
+	
+	// add a default material
+	desc.materials.push_back(createDefaultMaterial());
+
+	// go through materials, if no material exists, create default material
+	for( ::data_t::material_const_iterator it = file->data().material().begin();
+		it != file->data().material().end(); it++)
+	{
+		Material mat;
+		// get values
+		mat.epsilon = it->epsilon().get();
+		mat.sigma = it->sigma().get();
+		mat.name = it->name().get();
+
+		// add
+		desc.materials.push_back(mat);
+	}
 	
 	//file parsed...
 	fileParsed = true;
@@ -83,6 +109,9 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 	// big particle container to store everything
 	vector<Particle> particles;
 
+	
+	// this method shall be later removed...
+	// at the moment particles from inputfiles have always the default material...
 	// go through input files...
 	for(::data_t::inputfile_const_iterator it = file->data().inputfile().begin();
 		it != file->data().inputfile().end(); it++)
@@ -111,7 +140,13 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 		p.m = it->m();
 
-		// type is not supported yet...
+		// set type to corresponding material
+		if(it->material().present())
+		{
+			int index = getMaterialIndex(desc, it->material().get().c_str());
+			p.type = index >= 0 ? index : 0;
+		}
+		else p.type = 0; // set to default material
 
 		// add to vector
 		particles.push_back(p);
@@ -147,8 +182,17 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		dim[2] = (it->N().size() > 2) ? it->N().at(2) : 1;
 
 
+		int type = 0;
+
+		// set type to corresponding material if avaliable
+		if(it->material().present())
+		{
+			int index = getMaterialIndex(desc, it->material().get().c_str());
+			type = index >= 0 ? index : 0;
+		}
+
 		// make Cuboid and add to particle
-		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v, desc.brownianMotionFactor);
+		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v, desc.brownianMotionFactor, type);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
@@ -184,8 +228,17 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 		radius = it->r();
 
+		int type = 0;
+
+		// set type to corresponding material if avaliable
+		if(it->material().present())
+		{
+			int index = getMaterialIndex(desc, it->material().get().c_str());
+			type = index >= 0 ? index : 0;
+		}
+
 		// make Cuboid and add to particle
-		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim, desc.brownianMotionFactor);
+		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim, desc.brownianMotionFactor, type);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
@@ -243,8 +296,10 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 
 		}
 
+		
+
 		container = new LinkedCellParticleContainer(dim, particles, cutoffDistance, frontLowerLeftCorner,
-			simulationAreaExtent, bc, desc.sigma);
+			simulationAreaExtent, bc, maxsigma);
 		
 		(*out) = container;
 

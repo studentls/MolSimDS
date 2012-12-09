@@ -85,7 +85,14 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="t_end" type="xsd:decimal"></xsd:element>
       <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
       <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
-      <xsd:element name="brownianMotionFactor" type="xsd:decimal"></xsd:element>
+      <xsd:element name="brownianMotionFactor" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
+      
+      <xsd:element name="gravity" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="timeStepsTillThermostatApplication" type="xsd:int"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="initialTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="targetTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="temperatureDifferenceStepSize" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      
       <xsd:element name="t_start" type="xsd:decimal"></xsd:element>
       <xsd:element name="outputfmt">
         <xsd:simpleType>
@@ -111,6 +118,7 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="X" type="Vec3_t"></xsd:element>
       <xsd:element name="V" type="Vec3_t"></xsd:element>
       <xsd:element name="m" type="xsd:decimal"></xsd:element>
+      <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
     </xsd:all>
   </xsd:complexType>
 
@@ -121,6 +129,7 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="N" type="dim3_t"></xsd:element>
       <xsd:element name="h" type="xsd:decimal"></xsd:element>
       <xsd:element name="m" type="xsd:decimal"></xsd:element>
+      <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
     </xsd:all>
   </xsd:complexType>
 
@@ -132,7 +141,15 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="h" type="xsd:decimal"></xsd:element>
       <xsd:element name="m" type="xsd:decimal"></xsd:element>
       <xsd:element name="dimensions" type="xsd:integer"></xsd:element>
+      <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
     </xsd:all>
+  </xsd:complexType>
+
+  <!-- material definition index by type-->
+  <xsd:complexType name="material_t">
+    <xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+    <xsd:attribute name="epsilon" type="xsd:decimal"></xsd:attribute>
+    <xsd:attribute name="sigma" type="xsd:decimal"></xsd:attribute>    
   </xsd:complexType>
   
   <xsd:complexType name="data_t">
@@ -141,6 +158,7 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="inputfile" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
       <xsd:element name="cuboid" type="cuboid_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
       <xsd:element name="sphere" type="sphere_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+      <xsd:element name="material" type="material_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
     </xsd:sequence>
   </xsd:complexType>
  

@@ -40,7 +40,7 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 
 	if(FAILED(fr.readFile(filename)))return E_FILEERROR;
 
-	this->desc = fr.getDescription();
+	desc = fr.getDescription();
 
 	// get container
 	Release(); // to free mem
@@ -130,7 +130,7 @@ err_type Simulation::Run()
 }
 
 err_type Simulation::Release()
-{
+{	
 	// delete Particle data
 	if(particles)particles->Clear();
 
@@ -174,10 +174,20 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 
 	SimulationDesc *desc = (SimulationDesc*)data;
 
+	// assert indices
+	assert(p1.type >= 0);
+	assert(p2.type >= 0);
+	assert(p1.type < desc->materials.size());
+	assert(p2.type < desc->materials.size());
+
+	// cache this later for better performance...
+	double epsilon = sqrt(desc->materials[p1.type].epsilon * desc->materials[p2.type].epsilon);
+	double sigma = (desc->materials[p1.type].sigma  + desc->materials[p2.type].sigma) * 0.5;
+
 	// calculate force via Lennard-Jones Potential
 	// these calculations are rather straightforward, looking at the formula
 	double dist = p1.x.distance(p2.x);
-	double temp1 = desc->sigma / dist;
+	double temp1 = sigma / dist;
 	// this is faster than power functions or manual multiplication
 	double pow2 = temp1 * temp1;
 	double pow3 = pow2 * temp1;
@@ -185,7 +195,7 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	double pow12 = pow6 * pow6;
 
 	double temp2 = pow6 - 2.0 * pow12;
-	double prefactor = 24.0 * desc->epsilon / dist / dist;
+	double prefactor = 24.0 * epsilon / dist / dist;
 	double factor = prefactor * temp2;
 	
 	// DEPRECATED

@@ -40,13 +40,17 @@ author: F.Dietz & L.Spiegelberg
   </params>
 
   <data>
+    <!-- material1-->
+    <material epsilon="5.0" sigma="1.0" name="sphereMat"/>
+   
     <!-- C1 -->
-    <cuboid>
+    <cuboid >
       <h>1.1225</h>
       <m>1</m>
       <N>10 10 1</N>
       <V>0.0 -10.0 0.0</V>
       <X>5.0 5.0 5.0</X>
+      <material>sphereMat</material>
     </cuboid>
   </data>
 

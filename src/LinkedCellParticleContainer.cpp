@@ -107,8 +107,8 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 			{
 				
 				// go through boundaries (max. 6)
-	for(vector<Boundary>::iterator bt = boundaries.begin(); bt != boundaries.end(); bt++)
-	{
+				for(vector<Boundary>::iterator bt = boundaries.begin(); bt != boundaries.end(); bt++)
+				{
 					double dist = bt->p.distance(pt->x);
 				
 					// skip the particle if it is too far away from the border
@@ -120,9 +120,7 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 					// a copy of the current particle, but located on the boundary
 					Particle vp(*pt);
 					vp.x = vp.x - dist * bt->p.n;
-					(*func)(data, *pt, vp);
-
-				
+					(*func)(data, *pt, vp);				
 			}
 		}
 	}

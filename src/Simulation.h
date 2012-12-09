@@ -32,6 +32,21 @@ enum SimulationOutputFormat
 	SOF_XYZ
 };
 
+/// struct to hold information about a material, that is assigned to a particle with type
+struct Material
+{
+	double	sigma;
+	double	epsilon;
+	std::string name;
+
+	/// constructor setting values to default values
+	Material()
+	{
+		epsilon = 5.0;
+		sigma	= 1.0; 
+	}
+};
+
 /// a struct that describes common Simulation params
 /// @param delta_t step size
 /// @param start_time start time of simulation
@@ -47,12 +62,13 @@ struct SimulationDesc
 	double				end_time;
 	
 	double				brownianMotionFactor;
-	double				epsilon;
-	double				sigma;
 
 	unsigned int		iterationsperoutput;
 
 	std::string			outname;
+
+	/// stores all materials in the simulation
+	std::vector<Material>	materials;
 
 	// DEPRECATED
 	// this value may be renamed appropriately in a later version
@@ -70,8 +86,6 @@ struct SimulationDesc
 		output_fmt = SOF_NONE;
 		
 	    brownianMotionFactor = 0.1;
-		epsilon = 5.0;
-		sigma = 1.0;
 
 		iterationsperoutput = 10;
 
@@ -80,6 +94,7 @@ struct SimulationDesc
 		//gravitational_constant = 1.0;
 	}
 };
+
 
 /// a struct to hold statistical data of a simulation
 struct SimulationStatistics

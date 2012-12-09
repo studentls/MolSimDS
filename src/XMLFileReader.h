@@ -34,6 +34,42 @@ private:
 	
 	std::auto_ptr<simulationfile_t> file;
 	bool							fileParsed;
+
+	/// creates a simple default material
+	/// @return a default material
+	inline Material						createDefaultMaterial()
+	{
+		Material mat;
+
+		mat.name = "default";
+		mat.epsilon = 1.0;
+		mat.sigma = 1.0;
+		return mat;
+	}
+
+	/// function to search for the index in the materials' array of a simulation description
+	/// @param strMatName the materialname to search for
+	/// @param desc a simulation description
+	/// @return returns the index or -1 if a material with name str is not found
+	int  getMaterialIndex(const SimulationDesc& desc, const std::string & strMatName)
+	{
+		int i = 0;
+
+		// empty?
+		if(desc.materials.empty())return -1;
+
+		for(std::vector<Material>::const_iterator it = desc.materials.begin();
+			it != desc.materials.end(); it++)
+		{
+			// strcmp and return index if match
+			if(strMatName.compare(it->name) == 0)return i;
+
+			i++;
+		}
+
+		// return -1 if not found
+		return -1;
+	}
 public:
 	XMLFileReader() : fileParsed(false)	{}
 
