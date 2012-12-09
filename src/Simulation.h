@@ -173,11 +173,6 @@ private:
 	/// used by the heatNormalizer
 	static double heatNormalizationFactor;
 
-	/// the Brownian Motion, used for initialization of the heat
-	/// not the actual brownian motion, but a helper variable that still
-	/// needs to be divided by sqrt(mass) later
-	static double dBrownianMotionMassless;
-
 	/// used to normalize the heat of the particles
 	/// determines the current sum of the velocities of all particles, which is used to determine the heat
 	static void velocitySumAcquirer(void*, Particle& p);

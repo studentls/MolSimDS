@@ -298,10 +298,8 @@ void Simulation::velCalculator(void* data, Particle& p) {
 bool Simulation::updatingHeat = false;
 double Simulation::sumOfKineticEnergies = 0.0;
 double Simulation::heatNormalizationFactor = 0.0;
-double Simulation::dBrownianMotionMassless = 0.0;
 
 void Simulation::initiateHeat() {
-	dBrownianMotionMassless = sqrt(desc.initialTemperature * desc.dimensions);
 	particles->Iterate(heatInitializer, (void*)&desc);
 }
 
@@ -318,7 +316,7 @@ void Simulation::heatInitializer(void* data, Particle& p) {
 	SimulationDesc *desc = (SimulationDesc*)data;
 
 	// apply Brownian motion via Boltzmann distribution
-	MaxwellBoltzmannDistribution(p, dBrownianMotionMassless / sqrt(p.m), desc->dimensions);
+	MaxwellBoltzmannDistribution(p, sqrt(desc->initialTemperature / p.m), desc->dimensions);
 }
 
 void Simulation::normalizeHeat() {

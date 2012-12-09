@@ -26,8 +26,8 @@ Particle::Particle(const Particle& other) {
 	old_f = other.old_f;
 	m = other.m;
 	type = other.type;
-	epsilon = 0.0;
-	sigma = 0.0;
+	epsilon = other.epsilon;
+	sigma = other.sigma;
 }
 
 // Todo: maybe use initializater list instead of copy?

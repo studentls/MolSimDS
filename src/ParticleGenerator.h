@@ -64,6 +64,9 @@ public:
 					p.type	= type;
 					p.m		= mass;
 
+					p.epsilon = epsilon;
+					p.sigma = sigma;
+
 					// apply Brownian motion via Boltzmann distribution
 
 					// at the moment only 2D !!!
@@ -119,6 +122,9 @@ public:
 						p.v			= vInitialVelocity;
 						p.type		= type;
 						p.m			= mass;
+
+						p.epsilon = epsilon;
+						p.sigma = sigma;
 
 						// apply Brownian motion via Boltzmann distribution
 						MaxwellBoltzmannDistribution(p, dBrownianMotion, dimensions);

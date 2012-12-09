@@ -17,7 +17,7 @@ author: F.Dietz & L.Spiegelberg
     <gravity>12.44</gravity>
     <timestepsPerThermostatApplication>1000</timestepsPerThermostatApplication>
     <initialTemperature>40.0</initialTemperature>
-    <targetTemperature>2.0</targetTemperature>
+    <targetTemperature>40.0</targetTemperature>
     <temperatureDifferenceStepSize>0.1</temperatureDifferenceStepSize>
    
     <delta_t>0.0005</delta_t>
@@ -34,7 +34,7 @@ author: F.Dietz & L.Spiegelberg
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
-          <condition value="all"></condition>
+          <condition value="none"></condition>
         </conditions>
       </LinkedCell>
     </algorithm>
