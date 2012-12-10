@@ -57,16 +57,23 @@ struct Material
 /// @param outname filename for output
 struct SimulationDesc
 {
-	double				delta_t;
-	double				start_time;
-	double				end_time;
+	double					delta_t;
+	double					start_time;
+	double					end_time;
 	
-	double				brownianMotionFactor;
+	double					brownianMotionFactor;
 
-	unsigned int		iterationsperoutput;
+	unsigned int			iterationsperoutput;
 
-	std::string			outname;
+	unsigned int			iterationsTillThermostatApplication;		/// steps, till thermostat is applied, 0 if no thermostat exists
+	double					temperature;							/// current temperature in Kelvin
+	double					targetTemperature;						/// target temperature
+	double					temperatureStepSize;					/// after timestepsTillThermostatApplication the temperature will be increased till it reaches targetTemperature
 
+	unsigned int			dimensions;								/// Dimensions of the simulation, can be 2 or 3
+
+	std::string				outname;
+		
 	/// stores all materials in the simulation
 	std::vector<Material>	materials;
 
@@ -86,13 +93,24 @@ struct SimulationDesc
 		output_fmt = SOF_NONE;
 		
 	    brownianMotionFactor = 0.1;
+		
+		iterationsTillThermostatApplication = 0;
+		temperature = 0;
+		targetTemperature = 0;
+		temperatureStepSize = 0;
+
 
 		iterationsperoutput = 10;
+		dimensions = 0;
 
 		outname = "out";
 		// DEPRECATED
 		//gravitational_constant = 1.0;
 	}
+
+	/// function to test if a thermostat is present and should be applied
+	/// @return true if thermostat is present and should be applied
+	bool		applyThermostat()	{return iterationsTillThermostatApplication != 0;}
 };
 
 
@@ -154,6 +172,24 @@ private:
 	/// plot the particles to a xyz-file
 	/// @param iteration the number of this iteration
 	void					plotParticles(int iteration);
+
+	/// calculates kinetic energy of the system and outputs into a double
+	static void				kineticEnergyCalculator(void* data, Particle& p);
+
+	/// calculates summed mass of all particles, data is a double pointer
+	static void				totalMassCalculator(void *data, Particle& p);
+
+	/// set Brownianmotion hard
+	static void				setBrownianMotionCalculator(void *data, Particle& p);
+
+	/// initialize particles to given temperature
+	void					initializeThermostat();
+
+	/// adjust temperature
+	void					adjustThermostat();
+
+	/// apply beta(Velocity Scale Factor) to particles
+	static void				applyTemperatureScalingFactor(void *data, Particle& p);
 
 public:
 	Simulation():particles(NULL)			{}

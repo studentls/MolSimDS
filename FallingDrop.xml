@@ -11,6 +11,7 @@ author: F.Dietz & L.Spiegelberg
        xsi:noNamespaceSchemaLocation="simulationfile.xsd">
 
   <params>
+    <dimension>2</dimension>
     <output>out</output>
     
     <iterationsperoutput>10</iterationsperoutput>

@@ -311,6 +311,24 @@ LinkedCell (::std::auto_ptr< LinkedCell_type > x)
 // params_t
 // 
 
+const params_t::dimension_type& params_t::
+dimension () const
+{
+  return this->dimension_.get ();
+}
+
+params_t::dimension_type& params_t::
+dimension ()
+{
+  return this->dimension_.get ();
+}
+
+void params_t::
+dimension (const dimension_type& x)
+{
+  this->dimension_.set (x);
+}
+
 const params_t::output_type& params_t::
 output () const
 {
@@ -473,28 +491,28 @@ gravity (const gravity_optional& x)
   this->gravity_ = x;
 }
 
-const params_t::timeStepsTillThermostatApplication_optional& params_t::
-timeStepsTillThermostatApplication () const
+const params_t::iterationsTillThermostatApplication_optional& params_t::
+iterationsTillThermostatApplication () const
 {
-  return this->timeStepsTillThermostatApplication_;
+  return this->iterationsTillThermostatApplication_;
 }
 
-params_t::timeStepsTillThermostatApplication_optional& params_t::
-timeStepsTillThermostatApplication ()
+params_t::iterationsTillThermostatApplication_optional& params_t::
+iterationsTillThermostatApplication ()
 {
-  return this->timeStepsTillThermostatApplication_;
-}
-
-void params_t::
-timeStepsTillThermostatApplication (const timeStepsTillThermostatApplication_type& x)
-{
-  this->timeStepsTillThermostatApplication_.set (x);
+  return this->iterationsTillThermostatApplication_;
 }
 
 void params_t::
-timeStepsTillThermostatApplication (const timeStepsTillThermostatApplication_optional& x)
+iterationsTillThermostatApplication (const iterationsTillThermostatApplication_type& x)
 {
-  this->timeStepsTillThermostatApplication_ = x;
+  this->iterationsTillThermostatApplication_.set (x);
+}
+
+void params_t::
+iterationsTillThermostatApplication (const iterationsTillThermostatApplication_optional& x)
+{
+  this->iterationsTillThermostatApplication_ = x;
 }
 
 const params_t::initialTemperature_optional& params_t::
@@ -545,28 +563,28 @@ targetTemperature (const targetTemperature_optional& x)
   this->targetTemperature_ = x;
 }
 
-const params_t::temperatureDifferenceStepSize_optional& params_t::
-temperatureDifferenceStepSize () const
+const params_t::temperatureStepSize_optional& params_t::
+temperatureStepSize () const
 {
-  return this->temperatureDifferenceStepSize_;
+  return this->temperatureStepSize_;
 }
 
-params_t::temperatureDifferenceStepSize_optional& params_t::
-temperatureDifferenceStepSize ()
+params_t::temperatureStepSize_optional& params_t::
+temperatureStepSize ()
 {
-  return this->temperatureDifferenceStepSize_;
-}
-
-void params_t::
-temperatureDifferenceStepSize (const temperatureDifferenceStepSize_type& x)
-{
-  this->temperatureDifferenceStepSize_.set (x);
+  return this->temperatureStepSize_;
 }
 
 void params_t::
-temperatureDifferenceStepSize (const temperatureDifferenceStepSize_optional& x)
+temperatureStepSize (const temperatureStepSize_type& x)
 {
-  this->temperatureDifferenceStepSize_ = x;
+  this->temperatureStepSize_.set (x);
+}
+
+void params_t::
+temperatureStepSize (const temperatureStepSize_optional& x)
+{
+  this->temperatureStepSize_ = x;
 }
 
 const params_t::t_start_type& params_t::
@@ -1830,7 +1848,8 @@ algorithm_t::
 //
 
 params_t::
-params_t (const output_type& output,
+params_t (const dimension_type& dimension,
+          const output_type& output,
           const iterationsperoutput_type& iterationsperoutput,
           const delta_t_type& delta_t,
           const t_end_type& t_end,
@@ -1840,6 +1859,7 @@ params_t (const output_type& output,
           const outputfmt_type& outputfmt,
           const algorithm_type& algorithm)
 : ::xml_schema::type (),
+  dimension_ (dimension, ::xml_schema::flags (), this),
   output_ (output, ::xml_schema::flags (), this),
   iterationsperoutput_ (iterationsperoutput, ::xml_schema::flags (), this),
   delta_t_ (delta_t, ::xml_schema::flags (), this),
@@ -1848,10 +1868,10 @@ params_t (const output_type& output,
   sigma_ (sigma, ::xml_schema::flags (), this),
   brownianMotionFactor_ (::xml_schema::flags (), this),
   gravity_ (::xml_schema::flags (), this),
-  timeStepsTillThermostatApplication_ (::xml_schema::flags (), this),
+  iterationsTillThermostatApplication_ (::xml_schema::flags (), this),
   initialTemperature_ (::xml_schema::flags (), this),
   targetTemperature_ (::xml_schema::flags (), this),
-  temperatureDifferenceStepSize_ (::xml_schema::flags (), this),
+  temperatureStepSize_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
@@ -1859,7 +1879,8 @@ params_t (const output_type& output,
 }
 
 params_t::
-params_t (const output_type& output,
+params_t (const dimension_type& dimension,
+          const output_type& output,
           const iterationsperoutput_type& iterationsperoutput,
           const delta_t_type& delta_t,
           const t_end_type& t_end,
@@ -1869,6 +1890,7 @@ params_t (const output_type& output,
           const outputfmt_type& outputfmt,
           ::std::auto_ptr< algorithm_type >& algorithm)
 : ::xml_schema::type (),
+  dimension_ (dimension, ::xml_schema::flags (), this),
   output_ (output, ::xml_schema::flags (), this),
   iterationsperoutput_ (iterationsperoutput, ::xml_schema::flags (), this),
   delta_t_ (delta_t, ::xml_schema::flags (), this),
@@ -1877,10 +1899,10 @@ params_t (const output_type& output,
   sigma_ (sigma, ::xml_schema::flags (), this),
   brownianMotionFactor_ (::xml_schema::flags (), this),
   gravity_ (::xml_schema::flags (), this),
-  timeStepsTillThermostatApplication_ (::xml_schema::flags (), this),
+  iterationsTillThermostatApplication_ (::xml_schema::flags (), this),
   initialTemperature_ (::xml_schema::flags (), this),
   targetTemperature_ (::xml_schema::flags (), this),
-  temperatureDifferenceStepSize_ (::xml_schema::flags (), this),
+  temperatureStepSize_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
@@ -1892,6 +1914,7 @@ params_t (const params_t& x,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
+  dimension_ (x.dimension_, f, this),
   output_ (x.output_, f, this),
   iterationsperoutput_ (x.iterationsperoutput_, f, this),
   delta_t_ (x.delta_t_, f, this),
@@ -1900,10 +1923,10 @@ params_t (const params_t& x,
   sigma_ (x.sigma_, f, this),
   brownianMotionFactor_ (x.brownianMotionFactor_, f, this),
   gravity_ (x.gravity_, f, this),
-  timeStepsTillThermostatApplication_ (x.timeStepsTillThermostatApplication_, f, this),
+  iterationsTillThermostatApplication_ (x.iterationsTillThermostatApplication_, f, this),
   initialTemperature_ (x.initialTemperature_, f, this),
   targetTemperature_ (x.targetTemperature_, f, this),
-  temperatureDifferenceStepSize_ (x.temperatureDifferenceStepSize_, f, this),
+  temperatureStepSize_ (x.temperatureStepSize_, f, this),
   t_start_ (x.t_start_, f, this),
   outputfmt_ (x.outputfmt_, f, this),
   algorithm_ (x.algorithm_, f, this)
@@ -1915,6 +1938,7 @@ params_t (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  dimension_ (f, this),
   output_ (f, this),
   iterationsperoutput_ (f, this),
   delta_t_ (f, this),
@@ -1923,10 +1947,10 @@ params_t (const ::xercesc::DOMElement& e,
   sigma_ (f, this),
   brownianMotionFactor_ (f, this),
   gravity_ (f, this),
-  timeStepsTillThermostatApplication_ (f, this),
+  iterationsTillThermostatApplication_ (f, this),
   initialTemperature_ (f, this),
   targetTemperature_ (f, this),
-  temperatureDifferenceStepSize_ (f, this),
+  temperatureStepSize_ (f, this),
   t_start_ (f, this),
   outputfmt_ (f, this),
   algorithm_ (f, this)
@@ -1947,6 +1971,17 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xercesc::DOMElement& i (p.cur_element ());
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
+
+    // dimension
+    //
+    if (n.name () == "dimension" && n.namespace_ ().empty ())
+    {
+      if (!dimension_.present ())
+      {
+        this->dimension_.set (dimension_traits::create (i, f, this));
+        continue;
+      }
+    }
 
     // output
     //
@@ -2039,13 +2074,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // timeStepsTillThermostatApplication
+    // iterationsTillThermostatApplication
     //
-    if (n.name () == "timeStepsTillThermostatApplication" && n.namespace_ ().empty ())
+    if (n.name () == "iterationsTillThermostatApplication" && n.namespace_ ().empty ())
     {
-      if (!this->timeStepsTillThermostatApplication_)
+      if (!this->iterationsTillThermostatApplication_)
       {
-        this->timeStepsTillThermostatApplication_.set (timeStepsTillThermostatApplication_traits::create (i, f, this));
+        this->iterationsTillThermostatApplication_.set (iterationsTillThermostatApplication_traits::create (i, f, this));
         continue;
       }
     }
@@ -2072,13 +2107,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // temperatureDifferenceStepSize
+    // temperatureStepSize
     //
-    if (n.name () == "temperatureDifferenceStepSize" && n.namespace_ ().empty ())
+    if (n.name () == "temperatureStepSize" && n.namespace_ ().empty ())
     {
-      if (!this->temperatureDifferenceStepSize_)
+      if (!this->temperatureStepSize_)
       {
-        this->temperatureDifferenceStepSize_.set (temperatureDifferenceStepSize_traits::create (i, f, this));
+        this->temperatureStepSize_.set (temperatureStepSize_traits::create (i, f, this));
         continue;
       }
     }
@@ -2123,6 +2158,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     }
 
     break;
+  }
+
+  if (!dimension_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "dimension",
+      "");
   }
 
   if (!output_.present ())

@@ -625,6 +625,20 @@ class algorithm_t: public ::xml_schema::type
 class params_t: public ::xml_schema::type
 {
   public:
+  // dimension
+  // 
+  typedef ::xml_schema::unsigned_int dimension_type;
+  typedef ::xsd::cxx::tree::traits< dimension_type, char > dimension_traits;
+
+  const dimension_type&
+  dimension () const;
+
+  dimension_type&
+  dimension ();
+
+  void
+  dimension (const dimension_type& x);
+
   // output
   // 
   typedef ::xml_schema::string output_type;
@@ -748,23 +762,23 @@ class params_t: public ::xml_schema::type
   void
   gravity (const gravity_optional& x);
 
-  // timeStepsTillThermostatApplication
+  // iterationsTillThermostatApplication
   // 
-  typedef ::xml_schema::int_ timeStepsTillThermostatApplication_type;
-  typedef ::xsd::cxx::tree::optional< timeStepsTillThermostatApplication_type > timeStepsTillThermostatApplication_optional;
-  typedef ::xsd::cxx::tree::traits< timeStepsTillThermostatApplication_type, char > timeStepsTillThermostatApplication_traits;
+  typedef ::xml_schema::int_ iterationsTillThermostatApplication_type;
+  typedef ::xsd::cxx::tree::optional< iterationsTillThermostatApplication_type > iterationsTillThermostatApplication_optional;
+  typedef ::xsd::cxx::tree::traits< iterationsTillThermostatApplication_type, char > iterationsTillThermostatApplication_traits;
 
-  const timeStepsTillThermostatApplication_optional&
-  timeStepsTillThermostatApplication () const;
+  const iterationsTillThermostatApplication_optional&
+  iterationsTillThermostatApplication () const;
 
-  timeStepsTillThermostatApplication_optional&
-  timeStepsTillThermostatApplication ();
-
-  void
-  timeStepsTillThermostatApplication (const timeStepsTillThermostatApplication_type& x);
+  iterationsTillThermostatApplication_optional&
+  iterationsTillThermostatApplication ();
 
   void
-  timeStepsTillThermostatApplication (const timeStepsTillThermostatApplication_optional& x);
+  iterationsTillThermostatApplication (const iterationsTillThermostatApplication_type& x);
+
+  void
+  iterationsTillThermostatApplication (const iterationsTillThermostatApplication_optional& x);
 
   // initialTemperature
   // 
@@ -802,23 +816,23 @@ class params_t: public ::xml_schema::type
   void
   targetTemperature (const targetTemperature_optional& x);
 
-  // temperatureDifferenceStepSize
+  // temperatureStepSize
   // 
-  typedef ::xml_schema::decimal temperatureDifferenceStepSize_type;
-  typedef ::xsd::cxx::tree::optional< temperatureDifferenceStepSize_type > temperatureDifferenceStepSize_optional;
-  typedef ::xsd::cxx::tree::traits< temperatureDifferenceStepSize_type, char, ::xsd::cxx::tree::schema_type::decimal > temperatureDifferenceStepSize_traits;
+  typedef ::xml_schema::decimal temperatureStepSize_type;
+  typedef ::xsd::cxx::tree::optional< temperatureStepSize_type > temperatureStepSize_optional;
+  typedef ::xsd::cxx::tree::traits< temperatureStepSize_type, char, ::xsd::cxx::tree::schema_type::decimal > temperatureStepSize_traits;
 
-  const temperatureDifferenceStepSize_optional&
-  temperatureDifferenceStepSize () const;
+  const temperatureStepSize_optional&
+  temperatureStepSize () const;
 
-  temperatureDifferenceStepSize_optional&
-  temperatureDifferenceStepSize ();
-
-  void
-  temperatureDifferenceStepSize (const temperatureDifferenceStepSize_type& x);
+  temperatureStepSize_optional&
+  temperatureStepSize ();
 
   void
-  temperatureDifferenceStepSize (const temperatureDifferenceStepSize_optional& x);
+  temperatureStepSize (const temperatureStepSize_type& x);
+
+  void
+  temperatureStepSize (const temperatureStepSize_optional& x);
 
   // t_start
   // 
@@ -870,7 +884,8 @@ class params_t: public ::xml_schema::type
 
   // Constructors.
   //
-  params_t (const output_type&,
+  params_t (const dimension_type&,
+            const output_type&,
             const iterationsperoutput_type&,
             const delta_t_type&,
             const t_end_type&,
@@ -880,7 +895,8 @@ class params_t: public ::xml_schema::type
             const outputfmt_type&,
             const algorithm_type&);
 
-  params_t (const output_type&,
+  params_t (const dimension_type&,
+            const output_type&,
             const iterationsperoutput_type&,
             const delta_t_type&,
             const t_end_type&,
@@ -913,6 +929,7 @@ class params_t: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
+  ::xsd::cxx::tree::one< dimension_type > dimension_;
   ::xsd::cxx::tree::one< output_type > output_;
   ::xsd::cxx::tree::one< iterationsperoutput_type > iterationsperoutput_;
   ::xsd::cxx::tree::one< delta_t_type > delta_t_;
@@ -921,10 +938,10 @@ class params_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< sigma_type > sigma_;
   brownianMotionFactor_optional brownianMotionFactor_;
   gravity_optional gravity_;
-  timeStepsTillThermostatApplication_optional timeStepsTillThermostatApplication_;
+  iterationsTillThermostatApplication_optional iterationsTillThermostatApplication_;
   initialTemperature_optional initialTemperature_;
   targetTemperature_optional targetTemperature_;
-  temperatureDifferenceStepSize_optional temperatureDifferenceStepSize_;
+  temperatureStepSize_optional temperatureStepSize_;
   ::xsd::cxx::tree::one< t_start_type > t_start_;
   ::xsd::cxx::tree::one< outputfmt_type > outputfmt_;
   ::xsd::cxx::tree::one< algorithm_type > algorithm_;

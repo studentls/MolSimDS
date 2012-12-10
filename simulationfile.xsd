@@ -79,6 +79,7 @@ author: Leonhard Spiegelberg & Florian Dietz
   
   <xsd:complexType name="params_t">
     <xsd:all>
+      <xsd:element name="dimension" type="xsd:unsignedInt"></xsd:element>
       <xsd:element name="output" type="xsd:string"></xsd:element>
       <xsd:element name="iterationsperoutput" type="xsd:int"></xsd:element>
       <xsd:element name="delta_t" type="xsd:decimal"></xsd:element>
@@ -88,10 +89,10 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="brownianMotionFactor" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
       
       <xsd:element name="gravity" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
-      <xsd:element name="timeStepsTillThermostatApplication" type="xsd:int"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="iterationsTillThermostatApplication" type="xsd:int"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="initialTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="targetTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
-      <xsd:element name="temperatureDifferenceStepSize" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="temperatureStepSize" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       
       <xsd:element name="t_start" type="xsd:decimal"></xsd:element>
       <xsd:element name="outputfmt">

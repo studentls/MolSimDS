@@ -50,8 +50,11 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 	// is particles a valid pointer? - If not file has not been parsed correctly...
 	if(!particles)return E_FILEERROR;
 
-	//calc initial forces...
+	// calc initial forces...
 	calculateF();
+
+	// is a thermostat present? if yes, initialize it
+	if(desc.applyThermostat())initializeThermostat();
 
 	return S_OK;
 }
@@ -94,6 +97,11 @@ err_type Simulation::Run()
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
 
+		// thermostat present? if yes apply
+		if(desc.applyThermostat())
+			if( iteration % desc.iterationsTillThermostatApplication == 0)
+				adjustThermostat();
+		
 		// perform one iteration step
 		performStep();
 
@@ -290,4 +298,81 @@ void Simulation::plotParticles(int iteration) {
 		{
 		}
 	}
+}
+
+void Simulation::kineticEnergyCalculator(void *data, Particle& p)
+{
+	double *eout = (double*)data;
+
+	// calc according to
+	// Task 1, Sheet 4
+	*eout += p.m * p.v.L2NormSq() * 0.5;
+}
+
+void Simulation::totalMassCalculator(void *data, Particle& p)
+{
+	double *sum = (double*)data;
+
+	*sum += p.m;
+}
+
+void Simulation::setBrownianMotionCalculator(void *data, Particle& p)
+{
+	double brownianMotionFactor = ((SimulationDesc*)data)->brownianMotionFactor;
+	unsigned int dim = ((SimulationDesc*)data)->dimensions;
+
+	// apply brownian Motion
+	MaxwellBoltzmannDistribution(p, brownianMotionFactor, dim);
+}
+
+void Simulation::applyTemperatureScalingFactor(void *data, Particle& p)
+{
+	double beta = *((double*)data);
+	p.v = p.v * beta;
+}
+
+void Simulation::initializeThermostat()
+{
+	assert(particles);
+
+	// calc kinetic Energy of the whole system
+	// temperature is start temperature
+	// currently we use a dimensionless method
+	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
+
+	// we need the total mass of all particles...
+	double totalMass = 0.0;
+	particles->Iterate(totalMassCalculator, (void*)&totalMass);
+
+	// calculate inital velocity that is set for each particle
+	desc.brownianMotionFactor = sqrt(2.0 * EnergyProposed / (desc.dimensions * totalMass));
+
+	// set brownianMotion to every particle
+	particles->Iterate(setBrownianMotionCalculator, (void*)&desc);
+
+}
+
+void Simulation::adjustThermostat()
+{
+	assert(particles);
+
+	// calc beta
+
+	//get energy of the system
+	double EnergyAtTheMoment = 0.0;
+	particles->Iterate(kineticEnergyCalculator, (double*)&EnergyAtTheMoment);
+
+	// proposed energy
+	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
+
+	// beta
+	double beta = sqrt(EnergyProposed / EnergyAtTheMoment);
+
+	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
+
+	// inc temperature
+	desc.temperature += desc.temperatureStepSize;
+
+	// secure that temperature is not above target temperature
+	if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
 }

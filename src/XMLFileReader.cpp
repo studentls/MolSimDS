@@ -86,6 +86,34 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		desc.materials.push_back(mat);
 	}
 	
+	// thermostat
+	// is timeStepsTillThermostatApplication and the rest of factors present?
+	if(file->params().iterationsTillThermostatApplication().present() && file->params().initialTemperature().present()
+		&& file->params().targetTemperature().present() && file->params().temperatureStepSize().present())
+	{
+		desc.iterationsTillThermostatApplication = file->params().iterationsTillThermostatApplication().get();
+		// set current temperature to initial temperature
+		// currently dimensionless!
+		desc.temperature = file->params().initialTemperature().get();
+		desc.targetTemperature = file->params().targetTemperature().get();
+		desc.temperatureStepSize = file->params().temperatureStepSize().get();
+	}
+	else
+	{
+		// no thermostat application...
+		desc.iterationsTillThermostatApplication = 0;
+		desc.temperature = 0;
+		desc.targetTemperature = 0;
+		desc.temperatureStepSize = 0;
+	}
+	
+	// dimension
+	desc.dimensions = file->params().dimension();
+
+	// assert dimension is 2 or 3
+	if(desc.dimensions != 2 && desc.dimensions != 3)
+		LOG4CXX_ERROR(generalOutputLogger, "unsupported dimension, please use only 2D or 3D");
+
 	//file parsed...
 	fileParsed = true;
 
