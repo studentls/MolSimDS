@@ -19,6 +19,7 @@
 
 // use flag System for Boundaries
 // to combine flags use e.g. BC_RIGHT | BC_LEFT
+// reflective boundaries
 #define BC_NONE			0
 #define BC_OUTFLOW		0x1000
 #define BC_ALL			0x3F		// right | left |...|back
@@ -28,6 +29,14 @@
 #define BC_BOTTOM		0x8
 #define BC_FRONT		0x10
 #define BC_BACK			0x20
+
+// special periodic boundaries
+#define BC_RIGHT_PERIODIC	0x100
+#define BC_LEFT_PERIODIC	0x200
+#define BC_TOP_PERIODIC		0x400
+#define BC_BOTTOM_PERIODIC	0x800
+#define BC_FRONT_PERIODIC	0x1000
+#define BC_BACK_PERIODIC	0x2000
 
 
 // boundary type

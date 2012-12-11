@@ -313,18 +313,54 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 			for(::conditions_t::condition_const_iterator it = lc.conditions().get().condition().begin();
 				it != lc.conditions().get().condition().end(); it++)
 			{
-				// set flags
-				if(strcmp(it->value().get().c_str(), "left")		== 0)bc	|= BC_LEFT;
-				if(strcmp(it->value().get().c_str(), "right")		== 0)bc	|= BC_RIGHT;
-				if(strcmp(it->value().get().c_str(), "top")		== 0)bc	|= BC_TOP;
-				if(strcmp(it->value().get().c_str(), "bottom")	== 0)bc	|= BC_BOTTOM;
-				if(strcmp(it->value().get().c_str(), "front")		== 0)bc	|= BC_FRONT;				
-				if(strcmp(it->value().get().c_str(), "back")		== 0)bc	|= BC_BACK;
-							
+
+				std::string val = it->value();
+
+				// is a periodic boundary present?
+				if(it->type().present())
+				{
+					if(strcmp(it->type().get().c_str(), "periodic") == 0)
+					{
+						// set flags
+						if(strcmp(val.c_str(), "left")		== 0)bc	|= BC_LEFT_PERIODIC;
+						if(strcmp(val.c_str(), "right")		== 0)bc	|= BC_RIGHT_PERIODIC;
+						if(strcmp(val.c_str(), "top")		== 0)bc	|= BC_TOP_PERIODIC;
+						if(strcmp(val.c_str(), "bottom")	== 0)bc	|= BC_BOTTOM_PERIODIC;
+						if(strcmp(val.c_str(), "front")		== 0)bc	|= BC_FRONT_PERIODIC;				
+						if(strcmp(val.c_str(), "back")		== 0)bc	|= BC_BACK_PERIODIC;
+					}
+					else if(strcmp(it->type().get().c_str(), "reflective") == 0)
+					{
+						// set flags
+						if(strcmp(val.c_str(), "left")		== 0)bc	|= BC_LEFT;
+						if(strcmp(val.c_str(), "right")		== 0)bc	|= BC_RIGHT;
+						if(strcmp(val.c_str(), "top")		== 0)bc	|= BC_TOP;
+						if(strcmp(val.c_str(), "bottom")	== 0)bc	|= BC_BOTTOM;
+						if(strcmp(val.c_str(), "front")		== 0)bc	|= BC_FRONT;				
+						if(strcmp(val.c_str(), "back")		== 0)bc	|= BC_BACK;
+					}
+					else
+						LOG4CXX_ERROR(generalOutputLogger, "unkown boundary type");
+				}
+				else
+				{			
+					// otherwise use reflective boundaries as default
+
+					// set flags
+					if(strcmp(val.c_str(), "left")		== 0)bc	|= BC_LEFT;
+					if(strcmp(val.c_str(), "right")		== 0)bc	|= BC_RIGHT;
+					if(strcmp(val.c_str(), "top")		== 0)bc	|= BC_TOP;
+					if(strcmp(val.c_str(), "bottom")	== 0)bc	|= BC_BOTTOM;
+					if(strcmp(val.c_str(), "front")		== 0)bc	|= BC_FRONT;				
+					if(strcmp(val.c_str(), "back")		== 0)bc	|= BC_BACK;							
+				}
+				
 				// special cases
-				if(strcmp(it->value().get().c_str(), "all")		== 0)bc	= BC_ALL;
-				if(strcmp(it->value().get().c_str(), "none")		== 0)bc	= BC_NONE;
-				if(strcmp(it->value().get().c_str(), "outflow")		== 0)bc	= BC_OUTFLOW;
+				if(strcmp(val.c_str(), "all")		== 0)bc	= BC_ALL;
+				if(strcmp(val.c_str(), "none")		== 0)bc	= BC_NONE;
+
+
+				if(strcmp(val.c_str(), "outflow")		== 0)bc	|= BC_OUTFLOW;
 			}
 
 		}

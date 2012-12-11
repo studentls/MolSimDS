@@ -1281,16 +1281,16 @@ data (::std::auto_ptr< data_type > x)
 // condition
 // 
 
-const condition::value_optional& condition::
+const condition::value_type& condition::
 value () const
 {
-  return this->value_;
+  return this->value_.get ();
 }
 
-condition::value_optional& condition::
+condition::value_type& condition::
 value ()
 {
-  return this->value_;
+  return this->value_.get ();
 }
 
 void condition::
@@ -1300,15 +1300,39 @@ value (const value_type& x)
 }
 
 void condition::
-value (const value_optional& x)
-{
-  this->value_ = x;
-}
-
-void condition::
 value (::std::auto_ptr< value_type > x)
 {
   this->value_.set (x);
+}
+
+const condition::type_optional& condition::
+type () const
+{
+  return this->type_;
+}
+
+condition::type_optional& condition::
+type ()
+{
+  return this->type_;
+}
+
+void condition::
+type (const type_type& x)
+{
+  this->type_.set (x);
+}
+
+void condition::
+type (const type_optional& x)
+{
+  this->type_ = x;
+}
+
+void condition::
+type (::std::auto_ptr< type_type > x)
+{
+  this->type_.set (x);
 }
 
 
@@ -3116,30 +3140,37 @@ simulationfile_t::
 //
 
 condition::
-condition ()
+condition (const value_type& value)
 : ::xml_schema::string (),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
 condition::
-condition (const char* _xsd_string_base)
+condition (const char* _xsd_string_base,
+           const value_type& value)
 : ::xml_schema::string (_xsd_string_base),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
 condition::
-condition (const ::std::string& _xsd_string_base)
+condition (const ::std::string& _xsd_string_base,
+           const value_type& value)
 : ::xml_schema::string (_xsd_string_base),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
 condition::
-condition (const ::xml_schema::string& _xsd_string_base)
+condition (const ::xml_schema::string& _xsd_string_base,
+           const value_type& value)
 : ::xml_schema::string (_xsd_string_base),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
@@ -3148,7 +3179,8 @@ condition (const condition& x,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
 : ::xml_schema::string (x, f, c),
-  value_ (x.value_, f, this)
+  value_ (x.value_, f, this),
+  type_ (x.type_, f, this)
 {
 }
 
@@ -3157,7 +3189,8 @@ condition (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
 : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
-  value_ (f, this)
+  value_ (f, this),
+  type_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -3184,6 +3217,22 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       this->value_.set (r);
       continue;
     }
+
+    if (n.name () == "type" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< type_type > r (
+        type_traits::create (i, f, this));
+
+      this->type_.set (r);
+      continue;
+    }
+  }
+
+  if (!value_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_attribute< char > (
+      "value",
+      "");
   }
 }
 

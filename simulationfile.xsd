@@ -35,7 +35,8 @@ author: Leonhard Spiegelberg & Florian Dietz
              note that if a condition with value "all", "outflow" or "none" appears, all left, right,... 
              conditions will be ignored!
              -->
-            <xsd:attribute name="value" type="xsd:string"></xsd:attribute>
+             <xsd:attribute name="value" type="xsd:string" use="required"></xsd:attribute>
+             <xsd:attribute name="type" type="xsd:string" use="optional"></xsd:attribute>
            </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>        

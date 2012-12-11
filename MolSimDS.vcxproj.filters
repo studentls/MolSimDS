@@ -177,5 +177,8 @@
     <None Include="ThermostatSmall.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="PeriodicBoundaries.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>
