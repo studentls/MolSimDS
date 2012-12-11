@@ -97,9 +97,9 @@ err_type Simulation::Run()
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
 
-		// thermostat present? if yes apply
+		// thermostat present? if yes apply(for iteration 0 thermostat is already set)
 		if(desc.applyThermostat())
-			if( iteration % desc.iterationsTillThermostatApplication == 0)
+			if( iteration % desc.iterationsTillThermostatApplication == 0 && iteration != 0)
 				adjustThermostat();
 		
 		// perform one iteration step
@@ -158,6 +158,10 @@ void Simulation::calculateF() {
 
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
+
+	// call gravityCalculator to add gravity force for each particle
+	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.
+		particles->Iterate(gravityCalculator, (void*)&desc);
 
 	// apply Boundary conditions, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
@@ -221,6 +225,19 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	
 	
 	p2.addForce(-1.0 * force);
+}
+
+void Simulation::gravityCalculator(void *data, Particle& p)
+{
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	// add gravitational force, based on G = m * g
+	utils::Vector<double, 3> grav_force;
+
+	// only y - component is affected...
+	grav_force[1] = p.m * desc->gravitational_constant;
+
+	p.addForce(grav_force);
 }
 
 void Simulation::calculateX() {
@@ -355,7 +372,12 @@ void Simulation::initializeThermostat()
 void Simulation::adjustThermostat()
 {
 	assert(particles);
+	
+	// inc temperature
+	desc.temperature += desc.temperatureStepSize;
 
+	// secure that temperature is not above target temperature
+	if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
 	// calc beta
 
 	//get energy of the system
@@ -370,9 +392,5 @@ void Simulation::adjustThermostat()
 
 	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
 
-	// inc temperature
-	desc.temperature += desc.temperatureStepSize;
-
-	// secure that temperature is not above target temperature
-	if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	
 }

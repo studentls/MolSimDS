@@ -114,6 +114,11 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	if(desc.dimensions != 2 && desc.dimensions != 3)
 		LOG4CXX_ERROR(generalOutputLogger, "unsupported dimension, please use only 2D or 3D");
 
+	// set gravity factor
+	if(file->params().gravity().present())
+		desc.gravitational_constant = file->params().gravity().get();
+	else desc.gravitational_constant = 0.0;
+
 	//file parsed...
 	fileParsed = true;
 

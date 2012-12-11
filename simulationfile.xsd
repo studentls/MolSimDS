@@ -155,10 +155,10 @@ author: Leonhard Spiegelberg & Florian Dietz
   
   <xsd:complexType name="data_t">
     <xsd:sequence>
-      <xsd:element name="particle" type="particle_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-      <xsd:element name="inputfile" type="xsd:string" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-      <xsd:element name="cuboid" type="cuboid_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
-      <xsd:element name="sphere" type="sphere_t" maxOccurs="unbounded" minOccurs="0"></xsd:element>
+      <xsd:element name="particle" type="particle_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="inputfile" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="cuboid" type="cuboid_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="sphere" type="sphere_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
       <xsd:element name="material" type="material_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
     </xsd:sequence>
   </xsd:complexType>

@@ -77,10 +77,7 @@ struct SimulationDesc
 	/// stores all materials in the simulation
 	std::vector<Material>	materials;
 
-	// DEPRECATED
-	// this value may be renamed appropriately in a later version
-	// if the particles are affected by magnetic instead of gravitational forces
-	//double	gravitational_constant;
+	double	gravitational_constant;
 
 	SimulationOutputFormat output_fmt;
 
@@ -104,8 +101,9 @@ struct SimulationDesc
 		dimensions = 0;
 
 		outname = "out";
-		// DEPRECATED
-		//gravitational_constant = 1.0;
+		
+		// no gravitational force per default
+		gravitational_constant = 0.0;
 	}
 
 	/// function to test if a thermostat is present and should be applied
@@ -156,6 +154,9 @@ private:
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	static void				forceCalculator(void*, Particle&, Particle&);
+
+	/// calculate Gravity force for each particle
+	static void				gravityCalculator(void*, Particle&);
 
 	/// calculate the position for all particles
 	void					calculateX();
