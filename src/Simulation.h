@@ -32,6 +32,21 @@ enum SimulationOutputFormat
 	SOF_XYZ
 };
 
+/// struct to hold information about a material, that is assigned to a particle with type
+struct Material
+{
+	double	sigma;
+	double	epsilon;
+	std::string name;
+
+	/// constructor setting values to default values
+	Material()
+	{
+		epsilon = 5.0;
+		sigma	= 1.0; 
+	}
+};
+
 /// a struct that describes common Simulation params
 /// @param delta_t step size
 /// @param start_time start time of simulation
@@ -49,28 +64,27 @@ enum SimulationOutputFormat
 /// @param outname filename for output
 struct SimulationDesc
 {
-	double				delta_t;
-	double				start_time;
-	double				end_time;
+	double					delta_t;
+	double					start_time;
+	double					end_time;
 	
-	double				epsilon;
-	double				sigma;
+	double					brownianMotionFactor;
 
-	int					dimensions;
+	unsigned int			iterationsperoutput;
 
-	int					timestepsPerThermostatApplication;
-	double				initialTemperature;
-	double				targetTemperature;
-	double				temperatureDifferenceStepSize;
+	unsigned int			iterationsTillThermostatApplication;		/// steps, till thermostat is applied, 0 if no thermostat exists
+	double					temperature;							/// current temperature in Kelvin
+	double					targetTemperature;						/// target temperature
+	double					temperatureStepSize;					/// after timestepsTillThermostatApplication the temperature will be increased till it reaches targetTemperature
 
-	unsigned int		iterationsperoutput;
+	unsigned int			dimensions;								/// Dimensions of the simulation, can be 2 or 3
 
-	std::string			outname;
+	std::string				outname;
+		
+	/// stores all materials in the simulation
+	std::vector<Material>	materials;
 
-	// DEPRECATED
-	// this value may be renamed appropriately in a later version
-	// if the particles are affected by magnetic instead of gravitational forces
-	//double	gravitational_constant;
+	double	gravitational_constant;
 
 	SimulationOutputFormat output_fmt;
 
@@ -82,23 +96,30 @@ struct SimulationDesc
 		end_time = 5.0;
 		output_fmt = SOF_NONE;
 		
-		epsilon = 5.0;
-		sigma = 1.0;
+	    brownianMotionFactor = 0.1;
+		
+		iterationsTillThermostatApplication = 0;
+		temperature = 0;
+		targetTemperature = 0;
+		temperatureStepSize = 0;
 
-		dimensions = 3;
 
-		timestepsPerThermostatApplication = -1;
-		initialTemperature = 0.0;
-		targetTemperature = 2.0;
-		temperatureDifferenceStepSize = 0.1;
+		dimensions = 2;
 
 		iterationsperoutput = 10;
+		dimensions = 0;
 
 		outname = "out";
-		// DEPRECATED
-		//gravitational_constant = 1.0;
+		
+		// no gravitational force per default
+		gravitational_constant = 0.0;
 	}
+
+	/// function to test if a thermostat is present and should be applied
+	/// @return true if thermostat is present and should be applied
+	bool		applyThermostat()	{return iterationsTillThermostatApplication != 0;}
 };
+
 
 /// a struct to hold statistical data of a simulation
 struct SimulationStatistics
@@ -143,6 +164,9 @@ private:
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	static void				forceCalculator(void*, Particle&, Particle&);
 
+	/// calculate Gravity force for each particle
+	static void				gravityCalculator(void*, Particle&);
+
 	/// calculate the position for all particles
 	void					calculateX();
 
@@ -155,42 +179,27 @@ private:
 	/// calculate the new velocity of a particle for a new iteration. Used in calculateV()
 	static void				velCalculator(void*, Particle& p);
 	
-	/// initiates random motion/heat of all particles
-	void Simulation::initiateHeat();
-
-	/// used by initiateHeat to apply random initialization to all particles
-	static void Simulation::heatInitializer(void* data, Particle& p);
-
-	/// normalize the heat of the particles
-	void Simulation::normalizeHeat();
-
-	/// whether or not the heat is currently being updated
-	/// because the heat may have to be adapted in incremental steps
-	/// it does not suffice to just use a modulo calculation
-	static bool updatingHeat;
-
-	/// used by the velocitySumAcquirer to store the kinetic energies in
-	static double sumOfKineticEnergies;
-
-	/// used by the heatNormalizer
-	static double heatNormalizationFactor;
-
-	/// the Brownian Motion, used for initialization of the heat
-	/// not the actual brownian motion, but a helper variable that still
-	/// needs to be divided by sqrt(mass) later
-	static double dBrownianMotionMassless;
-
-	/// used to normalize the heat of the particles
-	/// determines the current sum of the velocities of all particles, which is used to determine the heat
-	static void velocitySumAcquirer(void*, Particle& p);
-	
-	/// used to normalize the heat of the particles
-	/// applies a factor to the velocity of each particle
-	static void heatNormalizer(void*, Particle& p);
-
 	/// plot the particles to a xyz-file
 	/// @param iteration the number of this iteration
 	void					plotParticles(int iteration);
+
+	/// calculates kinetic energy of the system and outputs into a double
+	static void				kineticEnergyCalculator(void* data, Particle& p);
+
+	/// calculates summed mass of all particles, data is a double pointer
+	static void				totalMassCalculator(void *data, Particle& p);
+
+	/// set Brownianmotion hard
+	static void				setBrownianMotionCalculator(void *data, Particle& p);
+
+	/// initialize particles to given temperature
+	void					initializeThermostat();
+
+	/// adjust temperature
+	void					adjustThermostat();
+
+	/// apply beta(Velocity Scale Factor) to particles
+	static void				applyTemperatureScalingFactor(void *data, Particle& p);
 
 public:
 	Simulation():particles(NULL)			{}

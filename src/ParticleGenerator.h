@@ -39,6 +39,7 @@ public:
 					   const double meshWidth,
 					   const double mass,
 					   const Vec3& vInitialVelocity,
+					   const double dBrownianMotion = 0.1,// set this later individual, use default value at the moment
 					   const int type = 0) 
 	{
 		// acknowledge that default constructor sets forces to zero...
@@ -58,6 +59,11 @@ public:
 					p.v		= vInitialVelocity;
 					p.type	= type;
 					p.m		= mass;
+
+					// apply Brownian motion via Boltzmann distribution
+
+					// at the moment only 2D !!!
+					MaxwellBoltzmannDistribution(p, dBrownianMotion, dim);
 					
 					// add it
 					pc.AddParticle(p);
@@ -80,7 +86,8 @@ public:
 							const double mass,
 							const unsigned int radius,
 							const double meshWidth,
-							const unsigned int dimensions,
+							const unsigned int dimensions = 2,
+							const double dBrownianMotion = 0.1,// set this later individual, use default value at the moment
 							const int type = 0)
 	{
 		assert(dimensions >=2 && dimensions <= 3);
@@ -105,6 +112,8 @@ public:
 						p.type		= type;
 						p.m			= mass;
 
+						// apply Brownian motion via Boltzmann distribution
+						MaxwellBoltzmannDistribution(p, dBrownianMotion, dimensions);
 						pc.AddParticle(p);
 					}
 				}
@@ -128,6 +137,8 @@ public:
 							p.type		= type;
 							p.m			= mass;
 
+							// apply Brownian motion via Boltzmann distribution
+							MaxwellBoltzmannDistribution(p, dBrownianMotion, dimensions);
 							pc.AddParticle(p);
 						}
 					}

@@ -40,7 +40,7 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 
 	if(FAILED(fr.readFile(filename)))return E_FILEERROR;
 
-	this->desc = fr.getDescription();
+	desc = fr.getDescription();
 
 	// get container
 	Release(); // to free mem
@@ -50,8 +50,11 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 	// is particles a valid pointer? - If not file has not been parsed correctly...
 	if(!particles)return E_FILEERROR;
 
-	//calc initial forces...
+	// calc initial forces...
 	calculateF();
+
+	// is a thermostat present? if yes, initialize it
+	if(desc.applyThermostat())initializeThermostat();
 
 	return S_OK;
 }
@@ -80,7 +83,6 @@ err_type Simulation::Run()
 	// initialize some values
 	double current_time = desc.start_time;
 	int iteration = 0;
-	updatingHeat = false;
 
 	// set common statistical values...
 	statistics.particle_count = particles->getParticleCount();
@@ -92,27 +94,18 @@ err_type Simulation::Run()
 	//start timer
 	utils::Timer timer;
 
-	// initiate heat for all particles
-	initiateHeat();
-
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time) {
 
+		// thermostat present? if yes apply(for iteration 0 thermostat is already set)
+		if(desc.applyThermostat())
+			if( iteration % desc.iterationsTillThermostatApplication == 0 && iteration != 0)
+				adjustThermostat();
+		
 		// perform one iteration step
 		performStep();
 
-	    // normalize v to get the heat you want
-	    // do this only every thousandth iteration
-		// unless the updating takes several iterations
-		if (desc.timestepsPerThermostatApplication > 0)
-		{
-	        if (iteration % desc.timestepsPerThermostatApplication == 0)
-		    	updatingHeat = true;
-		    if (updatingHeat)
-	            normalizeHeat();
-		}
-
-		// TODO: reset to 100
+	    // TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
 		if (iteration % desc.iterationsperoutput == 0) {
 			plotParticles(iteration);
@@ -145,7 +138,7 @@ err_type Simulation::Run()
 }
 
 err_type Simulation::Release()
-{
+{	
 	// delete Particle data
 	if(particles)particles->Clear();
 
@@ -166,7 +159,11 @@ void Simulation::calculateF() {
 	// call particles.IteratePairwise() on forceCalculator
 	particles->IteratePairwise(forceCalculator, (void*)&desc);
 
-	// apply Boundary conditions (force), if LinkedCell Algorithm is used...
+	// call gravityCalculator to add gravity force for each particle
+	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.
+		particles->Iterate(gravityCalculator, (void*)&desc);
+
+	// apply Boundary conditions, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
 	{
 		((LinkedCellParticleContainer*)particles)->ApplyReflectiveBoundaryConditions(forceCalculator, (void*)&desc);
@@ -192,10 +189,20 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 
 	SimulationDesc *desc = (SimulationDesc*)data;
 
+	// assert indices
+	assert(p1.type >= 0);
+	assert(p2.type >= 0);
+	assert(p1.type < desc->materials.size());
+	assert(p2.type < desc->materials.size());
+
+	// cache this later for better performance...
+	double epsilon = sqrt(desc->materials[p1.type].epsilon * desc->materials[p2.type].epsilon);
+	double sigma = (desc->materials[p1.type].sigma  + desc->materials[p2.type].sigma) * 0.5;
+
 	// calculate force via Lennard-Jones Potential
 	// these calculations are rather straightforward, looking at the formula
 	double dist = p1.x.distance(p2.x);
-	double temp1 = desc->sigma / dist;
+	double temp1 = sigma / dist;
 	// this is faster than power functions or manual multiplication
 	double pow2 = temp1 * temp1;
 	double pow3 = pow2 * temp1;
@@ -203,7 +210,7 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	double pow12 = pow6 * pow6;
 
 	double temp2 = pow6 - 2.0 * pow12;
-	double prefactor = 24.0 * desc->epsilon / dist / dist;
+	double prefactor = 24.0 * epsilon / dist / dist;
 	double factor = prefactor * temp2;
 	
 	// DEPRECATED
@@ -221,6 +228,19 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	
 	
 	p2.addForce(-1.0 * force);
+}
+
+void Simulation::gravityCalculator(void *data, Particle& p)
+{
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	// add gravitational force, based on G = m * g
+	utils::Vector<double, 3> grav_force;
+
+	// only y - component is affected...
+	grav_force[1] = p.m * desc->gravitational_constant;
+
+	p.addForce(grav_force);
 }
 
 void Simulation::calculateX() {
@@ -272,61 +292,6 @@ void Simulation::velCalculator(void* data, Particle& p) {
 	p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
 }
 
-bool Simulation::updatingHeat = false;
-double Simulation::sumOfKineticEnergies = 0.0;
-double Simulation::heatNormalizationFactor = 0.0;
-double Simulation::dBrownianMotionMassless = 0.0;
-
-void Simulation::initiateHeat() {
-	dBrownianMotionMassless = sqrt(desc.initialTemperature * desc.dimensions);
-	particles->Iterate(heatInitializer, (void*)&desc);
-}
-
-void Simulation::heatInitializer(void* data, Particle& p) {
-	#ifdef DEBUG
-	// assert data is a valid pointer!
-	if(!data)
-	{
-		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
-		return;
-	}
-#endif
-
-	SimulationDesc *desc = (SimulationDesc*)data;
-
-	// apply Brownian motion via Boltzmann distribution
-	MaxwellBoltzmannDistribution(p, dBrownianMotionMassless / sqrt(p.m), desc->dimensions);
-}
-
-void Simulation::normalizeHeat() {
-	// determine the current sum of kinetic energies
-	sumOfKineticEnergies = 0.0;
-	particles->Iterate(velocitySumAcquirer, (void*)&desc);
-	// determine the current heat
-	double currentHeat = sumOfKineticEnergies / particles->getParticleCount() / desc.dimensions * 2.0;
-	double currentTargetTemperature = desc.targetTemperature;
-	// ensure that the heat isn't adapted by too much at once
-	if (currentTargetTemperature > currentHeat + desc.temperatureDifferenceStepSize)
-		currentTargetTemperature = currentHeat + desc.temperatureDifferenceStepSize;
-	else if (currentTargetTemperature < currentHeat - desc.temperatureDifferenceStepSize)
-		currentTargetTemperature = currentHeat - desc.temperatureDifferenceStepSize;
-	else
-		updatingHeat = false;
-	// determine the factor and update the velocities
-	heatNormalizationFactor = sqrt(currentTargetTemperature / currentHeat);
-	std::cout << "Heat: " << currentHeat << std::endl;
-	std::cout << "Normalizing heat. Factor: " << heatNormalizationFactor << std::endl;
-	particles->Iterate(heatNormalizer, (void*)&desc);
-}
-
-void Simulation::velocitySumAcquirer(void* data, Particle& p) {
-	sumOfKineticEnergies += p.v.L2NormSq() * p.m * 0.5;
-}
-
-void Simulation::heatNormalizer(void* data, Particle& p) {
-	p.v = p.v * heatNormalizationFactor;
-}
-
 void Simulation::plotParticles(int iteration) {
 
 	assert(particles);
@@ -353,4 +318,82 @@ void Simulation::plotParticles(int iteration) {
 		{
 		}
 	}
+}
+
+void Simulation::kineticEnergyCalculator(void *data, Particle& p)
+{
+	double *eout = (double*)data;
+
+	// calc according to
+	// Task 1, Sheet 4
+	*eout += p.m * p.v.L2NormSq() * 0.5;
+}
+
+void Simulation::totalMassCalculator(void *data, Particle& p)
+{
+	double *sum = (double*)data;
+
+	*sum += p.m;
+}
+
+void Simulation::setBrownianMotionCalculator(void *data, Particle& p)
+{
+	double brownianMotionFactor = ((SimulationDesc*)data)->brownianMotionFactor;
+	unsigned int dim = ((SimulationDesc*)data)->dimensions;
+
+	// apply brownian Motion
+	MaxwellBoltzmannDistribution(p, brownianMotionFactor, dim);
+}
+
+void Simulation::applyTemperatureScalingFactor(void *data, Particle& p)
+{
+	double beta = *((double*)data);
+	p.v = p.v * beta;
+}
+
+void Simulation::initializeThermostat()
+{
+	assert(particles);
+
+	// calc kinetic Energy of the whole system
+	// temperature is start temperature
+	// currently we use a dimensionless method
+	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
+
+	// we need the total mass of all particles...
+	double totalMass = 0.0;
+	particles->Iterate(totalMassCalculator, (void*)&totalMass);
+
+	// calculate inital velocity that is set for each particle
+	desc.brownianMotionFactor = sqrt(2.0 * EnergyProposed / (desc.dimensions * totalMass));
+
+	// set brownianMotion to every particle
+	particles->Iterate(setBrownianMotionCalculator, (void*)&desc);
+
+}
+
+void Simulation::adjustThermostat()
+{
+	assert(particles);
+	
+	// inc temperature
+	desc.temperature += desc.temperatureStepSize;
+
+	// secure that temperature is not above target temperature
+	if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	// calc beta
+
+	//get energy of the system
+	double EnergyAtTheMoment = 0.0;
+	particles->Iterate(kineticEnergyCalculator, (double*)&EnergyAtTheMoment);
+
+	// proposed energy
+	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
+
+	// beta
+	double beta = sqrt(EnergyProposed / EnergyAtTheMoment);
+
+	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
+
+	
 }

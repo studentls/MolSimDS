@@ -99,6 +99,9 @@
     <ClInclude Include="src\XMLFile\simulationfile.h">
       <Filter>Quelldateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\Plane.h">
+      <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -168,7 +171,19 @@
     <None Include="Task3.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="ThermostatSmall.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="test.xml">
+      <Filter>XML</Filter>
+    </None>
     <None Include="periodicBoundaryTest.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="PeriodicBoundaries.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="FallingDrop.xml">
       <Filter>XML</Filter>
     </None>
   </ItemGroup>

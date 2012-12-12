@@ -61,7 +61,6 @@ public:
 	/// method to identify container
 	/// @return returns member of ParticleContainerType
 	virtual ParticleContainerType			getType() = 0;
-
 };
 
 #endif /* PARTICLE_CONTAINER_H_ */

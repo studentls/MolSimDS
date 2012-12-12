@@ -231,6 +231,7 @@ class params_t;
 class particle_t;
 class cuboid_t;
 class sphere_t;
+class material_t;
 class data_t;
 class simulationfile_t;
 class condition;
@@ -624,6 +625,20 @@ class algorithm_t: public ::xml_schema::type
 class params_t: public ::xml_schema::type
 {
   public:
+  // dimension
+  // 
+  typedef ::xml_schema::unsigned_int dimension_type;
+  typedef ::xsd::cxx::tree::traits< dimension_type, char > dimension_traits;
+
+  const dimension_type&
+  dimension () const;
+
+  dimension_type&
+  dimension ();
+
+  void
+  dimension (const dimension_type& x);
+
   // output
   // 
   typedef ::xml_schema::string output_type;
@@ -711,61 +726,113 @@ class params_t: public ::xml_schema::type
   void
   sigma (const sigma_type& x);
 
-  // timestepsPerThermostatApplication
+  // brownianMotionFactor
   // 
-  typedef ::xml_schema::int_ timestepsPerThermostatApplication_type;
-  typedef ::xsd::cxx::tree::traits< timestepsPerThermostatApplication_type, char > timestepsPerThermostatApplication_traits;
+  typedef ::xml_schema::decimal brownianMotionFactor_type;
+  typedef ::xsd::cxx::tree::optional< brownianMotionFactor_type > brownianMotionFactor_optional;
+  typedef ::xsd::cxx::tree::traits< brownianMotionFactor_type, char, ::xsd::cxx::tree::schema_type::decimal > brownianMotionFactor_traits;
 
-  const timestepsPerThermostatApplication_type&
-  timestepsPerThermostatApplication () const;
+  const brownianMotionFactor_optional&
+  brownianMotionFactor () const;
 
-  timestepsPerThermostatApplication_type&
-  timestepsPerThermostatApplication ();
+  brownianMotionFactor_optional&
+  brownianMotionFactor ();
 
   void
-  timestepsPerThermostatApplication (const timestepsPerThermostatApplication_type& x);
+  brownianMotionFactor (const brownianMotionFactor_type& x);
+
+  void
+  brownianMotionFactor (const brownianMotionFactor_optional& x);
+
+  // gravity
+  // 
+  typedef ::xml_schema::decimal gravity_type;
+  typedef ::xsd::cxx::tree::optional< gravity_type > gravity_optional;
+  typedef ::xsd::cxx::tree::traits< gravity_type, char, ::xsd::cxx::tree::schema_type::decimal > gravity_traits;
+
+  const gravity_optional&
+  gravity () const;
+
+  gravity_optional&
+  gravity ();
+
+  void
+  gravity (const gravity_type& x);
+
+  void
+  gravity (const gravity_optional& x);
+
+  // iterationsTillThermostatApplication
+  // 
+  typedef ::xml_schema::int_ iterationsTillThermostatApplication_type;
+  typedef ::xsd::cxx::tree::optional< iterationsTillThermostatApplication_type > iterationsTillThermostatApplication_optional;
+  typedef ::xsd::cxx::tree::traits< iterationsTillThermostatApplication_type, char > iterationsTillThermostatApplication_traits;
+
+  const iterationsTillThermostatApplication_optional&
+  iterationsTillThermostatApplication () const;
+
+  iterationsTillThermostatApplication_optional&
+  iterationsTillThermostatApplication ();
+
+  void
+  iterationsTillThermostatApplication (const iterationsTillThermostatApplication_type& x);
+
+  void
+  iterationsTillThermostatApplication (const iterationsTillThermostatApplication_optional& x);
 
   // initialTemperature
   // 
   typedef ::xml_schema::decimal initialTemperature_type;
+  typedef ::xsd::cxx::tree::optional< initialTemperature_type > initialTemperature_optional;
   typedef ::xsd::cxx::tree::traits< initialTemperature_type, char, ::xsd::cxx::tree::schema_type::decimal > initialTemperature_traits;
 
-  const initialTemperature_type&
+  const initialTemperature_optional&
   initialTemperature () const;
 
-  initialTemperature_type&
+  initialTemperature_optional&
   initialTemperature ();
 
   void
   initialTemperature (const initialTemperature_type& x);
 
+  void
+  initialTemperature (const initialTemperature_optional& x);
+
   // targetTemperature
   // 
   typedef ::xml_schema::decimal targetTemperature_type;
+  typedef ::xsd::cxx::tree::optional< targetTemperature_type > targetTemperature_optional;
   typedef ::xsd::cxx::tree::traits< targetTemperature_type, char, ::xsd::cxx::tree::schema_type::decimal > targetTemperature_traits;
 
-  const targetTemperature_type&
+  const targetTemperature_optional&
   targetTemperature () const;
 
-  targetTemperature_type&
+  targetTemperature_optional&
   targetTemperature ();
 
   void
   targetTemperature (const targetTemperature_type& x);
 
-  // temperatureDifferenceStepSize
+  void
+  targetTemperature (const targetTemperature_optional& x);
+
+  // temperatureStepSize
   // 
-  typedef ::xml_schema::decimal temperatureDifferenceStepSize_type;
-  typedef ::xsd::cxx::tree::traits< temperatureDifferenceStepSize_type, char, ::xsd::cxx::tree::schema_type::decimal > temperatureDifferenceStepSize_traits;
+  typedef ::xml_schema::decimal temperatureStepSize_type;
+  typedef ::xsd::cxx::tree::optional< temperatureStepSize_type > temperatureStepSize_optional;
+  typedef ::xsd::cxx::tree::traits< temperatureStepSize_type, char, ::xsd::cxx::tree::schema_type::decimal > temperatureStepSize_traits;
 
-  const temperatureDifferenceStepSize_type&
-  temperatureDifferenceStepSize () const;
+  const temperatureStepSize_optional&
+  temperatureStepSize () const;
 
-  temperatureDifferenceStepSize_type&
-  temperatureDifferenceStepSize ();
+  temperatureStepSize_optional&
+  temperatureStepSize ();
 
   void
-  temperatureDifferenceStepSize (const temperatureDifferenceStepSize_type& x);
+  temperatureStepSize (const temperatureStepSize_type& x);
+
+  void
+  temperatureStepSize (const temperatureStepSize_optional& x);
 
   // t_start
   // 
@@ -817,30 +884,24 @@ class params_t: public ::xml_schema::type
 
   // Constructors.
   //
-  params_t (const output_type&,
+  params_t (const dimension_type&,
+            const output_type&,
             const iterationsperoutput_type&,
             const delta_t_type&,
             const t_end_type&,
             const epsilon_type&,
             const sigma_type&,
-            const timestepsPerThermostatApplication_type&,
-            const initialTemperature_type&,
-            const targetTemperature_type&,
-            const temperatureDifferenceStepSize_type&,
             const t_start_type&,
             const outputfmt_type&,
             const algorithm_type&);
 
-  params_t (const output_type&,
+  params_t (const dimension_type&,
+            const output_type&,
             const iterationsperoutput_type&,
             const delta_t_type&,
             const t_end_type&,
             const epsilon_type&,
             const sigma_type&,
-            const timestepsPerThermostatApplication_type&,
-            const initialTemperature_type&,
-            const targetTemperature_type&,
-            const temperatureDifferenceStepSize_type&,
             const t_start_type&,
             const outputfmt_type&,
             ::std::auto_ptr< algorithm_type >&);
@@ -868,16 +929,19 @@ class params_t: public ::xml_schema::type
          ::xml_schema::flags);
 
   protected:
+  ::xsd::cxx::tree::one< dimension_type > dimension_;
   ::xsd::cxx::tree::one< output_type > output_;
   ::xsd::cxx::tree::one< iterationsperoutput_type > iterationsperoutput_;
   ::xsd::cxx::tree::one< delta_t_type > delta_t_;
   ::xsd::cxx::tree::one< t_end_type > t_end_;
   ::xsd::cxx::tree::one< epsilon_type > epsilon_;
   ::xsd::cxx::tree::one< sigma_type > sigma_;
-  ::xsd::cxx::tree::one< timestepsPerThermostatApplication_type > timestepsPerThermostatApplication_;
-  ::xsd::cxx::tree::one< initialTemperature_type > initialTemperature_;
-  ::xsd::cxx::tree::one< targetTemperature_type > targetTemperature_;
-  ::xsd::cxx::tree::one< temperatureDifferenceStepSize_type > temperatureDifferenceStepSize_;
+  brownianMotionFactor_optional brownianMotionFactor_;
+  gravity_optional gravity_;
+  iterationsTillThermostatApplication_optional iterationsTillThermostatApplication_;
+  initialTemperature_optional initialTemperature_;
+  targetTemperature_optional targetTemperature_;
+  temperatureStepSize_optional temperatureStepSize_;
   ::xsd::cxx::tree::one< t_start_type > t_start_;
   ::xsd::cxx::tree::one< outputfmt_type > outputfmt_;
   ::xsd::cxx::tree::one< algorithm_type > algorithm_;
@@ -934,6 +998,27 @@ class particle_t: public ::xml_schema::type
   void
   m (const m_type& x);
 
+  // material
+  // 
+  typedef ::xml_schema::string material_type;
+  typedef ::xsd::cxx::tree::optional< material_type > material_optional;
+  typedef ::xsd::cxx::tree::traits< material_type, char > material_traits;
+
+  const material_optional&
+  material () const;
+
+  material_optional&
+  material ();
+
+  void
+  material (const material_type& x);
+
+  void
+  material (const material_optional& x);
+
+  void
+  material (::std::auto_ptr< material_type > p);
+
   // Constructors.
   //
   particle_t (const X_type&,
@@ -966,6 +1051,7 @@ class particle_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< X_type > X_;
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< m_type > m_;
+  material_optional material_;
 };
 
 class cuboid_t: public ::xml_schema::type
@@ -1050,6 +1136,27 @@ class cuboid_t: public ::xml_schema::type
   void
   m (const m_type& x);
 
+  // material
+  // 
+  typedef ::xml_schema::string material_type;
+  typedef ::xsd::cxx::tree::optional< material_type > material_optional;
+  typedef ::xsd::cxx::tree::traits< material_type, char > material_traits;
+
+  const material_optional&
+  material () const;
+
+  material_optional&
+  material ();
+
+  void
+  material (const material_type& x);
+
+  void
+  material (const material_optional& x);
+
+  void
+  material (::std::auto_ptr< material_type > p);
+
   // Constructors.
   //
   cuboid_t (const X_type&,
@@ -1086,6 +1193,7 @@ class cuboid_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< N_type > N_;
   ::xsd::cxx::tree::one< h_type > h_;
   ::xsd::cxx::tree::one< m_type > m_;
+  material_optional material_;
 };
 
 class sphere_t: public ::xml_schema::type
@@ -1181,6 +1289,27 @@ class sphere_t: public ::xml_schema::type
   void
   dimensions (const dimensions_type& x);
 
+  // material
+  // 
+  typedef ::xml_schema::string material_type;
+  typedef ::xsd::cxx::tree::optional< material_type > material_optional;
+  typedef ::xsd::cxx::tree::traits< material_type, char > material_traits;
+
+  const material_optional&
+  material () const;
+
+  material_optional&
+  material ();
+
+  void
+  material (const material_type& x);
+
+  void
+  material (const material_optional& x);
+
+  void
+  material (::std::auto_ptr< material_type > p);
+
   // Constructors.
   //
   sphere_t (const X_type&,
@@ -1219,6 +1348,99 @@ class sphere_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< h_type > h_;
   ::xsd::cxx::tree::one< m_type > m_;
   ::xsd::cxx::tree::one< dimensions_type > dimensions_;
+  material_optional material_;
+};
+
+class material_t: public ::xml_schema::type
+{
+  public:
+  // name
+  // 
+  typedef ::xml_schema::string name_type;
+  typedef ::xsd::cxx::tree::optional< name_type > name_optional;
+  typedef ::xsd::cxx::tree::traits< name_type, char > name_traits;
+
+  const name_optional&
+  name () const;
+
+  name_optional&
+  name ();
+
+  void
+  name (const name_type& x);
+
+  void
+  name (const name_optional& x);
+
+  void
+  name (::std::auto_ptr< name_type > p);
+
+  // epsilon
+  // 
+  typedef ::xml_schema::decimal epsilon_type;
+  typedef ::xsd::cxx::tree::optional< epsilon_type > epsilon_optional;
+  typedef ::xsd::cxx::tree::traits< epsilon_type, char, ::xsd::cxx::tree::schema_type::decimal > epsilon_traits;
+
+  const epsilon_optional&
+  epsilon () const;
+
+  epsilon_optional&
+  epsilon ();
+
+  void
+  epsilon (const epsilon_type& x);
+
+  void
+  epsilon (const epsilon_optional& x);
+
+  // sigma
+  // 
+  typedef ::xml_schema::decimal sigma_type;
+  typedef ::xsd::cxx::tree::optional< sigma_type > sigma_optional;
+  typedef ::xsd::cxx::tree::traits< sigma_type, char, ::xsd::cxx::tree::schema_type::decimal > sigma_traits;
+
+  const sigma_optional&
+  sigma () const;
+
+  sigma_optional&
+  sigma ();
+
+  void
+  sigma (const sigma_type& x);
+
+  void
+  sigma (const sigma_optional& x);
+
+  // Constructors.
+  //
+  material_t ();
+
+  material_t (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  material_t (const material_t& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  virtual material_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~material_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  name_optional name_;
+  epsilon_optional epsilon_;
+  sigma_optional sigma_;
 };
 
 class data_t: public ::xml_schema::type
@@ -1292,6 +1514,23 @@ class data_t: public ::xml_schema::type
   void
   sphere (const sphere_sequence& s);
 
+  // material
+  // 
+  typedef ::material_t material_type;
+  typedef ::xsd::cxx::tree::sequence< material_type > material_sequence;
+  typedef material_sequence::iterator material_iterator;
+  typedef material_sequence::const_iterator material_const_iterator;
+  typedef ::xsd::cxx::tree::traits< material_type, char > material_traits;
+
+  const material_sequence&
+  material () const;
+
+  material_sequence&
+  material ();
+
+  void
+  material (const material_sequence& s);
+
   // Constructors.
   //
   data_t ();
@@ -1323,6 +1562,7 @@ class data_t: public ::xml_schema::type
   inputfile_sequence inputfile_;
   cuboid_sequence cuboid_;
   sphere_sequence sphere_;
+  material_sequence material_;
 };
 
 class simulationfile_t: public ::xml_schema::type
@@ -1403,33 +1643,53 @@ class condition: public ::xml_schema::string
   // value
   // 
   typedef ::xml_schema::string value_type;
-  typedef ::xsd::cxx::tree::optional< value_type > value_optional;
   typedef ::xsd::cxx::tree::traits< value_type, char > value_traits;
 
-  const value_optional&
+  const value_type&
   value () const;
 
-  value_optional&
+  value_type&
   value ();
 
   void
   value (const value_type& x);
 
   void
-  value (const value_optional& x);
+  value (::std::auto_ptr< value_type > p);
+
+  // type
+  // 
+  typedef ::xml_schema::string type_type;
+  typedef ::xsd::cxx::tree::optional< type_type > type_optional;
+  typedef ::xsd::cxx::tree::traits< type_type, char > type_traits;
+
+  const type_optional&
+  type () const;
+
+  type_optional&
+  type ();
 
   void
-  value (::std::auto_ptr< value_type > p);
+  type (const type_type& x);
+
+  void
+  type (const type_optional& x);
+
+  void
+  type (::std::auto_ptr< type_type > p);
 
   // Constructors.
   //
-  condition ();
+  condition (const value_type&);
 
-  condition (const char*);
+  condition (const char*,
+             const value_type&);
 
-  condition (const ::std::string&);
+  condition (const ::std::string&,
+             const value_type&);
 
-  condition (const ::xml_schema::string&);
+  condition (const ::xml_schema::string&,
+             const value_type&);
 
   condition (const ::xercesc::DOMElement& e,
              ::xml_schema::flags f = 0,
@@ -1454,7 +1714,8 @@ class condition: public ::xml_schema::string
          ::xml_schema::flags);
 
   protected:
-  value_optional value_;
+  ::xsd::cxx::tree::one< value_type > value_;
+  type_optional type_;
 };
 
 class outputfmt: public ::xml_schema::string

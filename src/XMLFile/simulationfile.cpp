@@ -311,6 +311,24 @@ LinkedCell (::std::auto_ptr< LinkedCell_type > x)
 // params_t
 // 
 
+const params_t::dimension_type& params_t::
+dimension () const
+{
+  return this->dimension_.get ();
+}
+
+params_t::dimension_type& params_t::
+dimension ()
+{
+  return this->dimension_.get ();
+}
+
+void params_t::
+dimension (const dimension_type& x)
+{
+  this->dimension_.set (x);
+}
+
 const params_t::output_type& params_t::
 output () const
 {
@@ -425,34 +443,88 @@ sigma (const sigma_type& x)
   this->sigma_.set (x);
 }
 
-const params_t::timestepsPerThermostatApplication_type& params_t::
-timestepsPerThermostatApplication () const
+const params_t::brownianMotionFactor_optional& params_t::
+brownianMotionFactor () const
 {
-  return this->timestepsPerThermostatApplication_.get ();
+  return this->brownianMotionFactor_;
 }
 
-params_t::timestepsPerThermostatApplication_type& params_t::
-timestepsPerThermostatApplication ()
+params_t::brownianMotionFactor_optional& params_t::
+brownianMotionFactor ()
 {
-  return this->timestepsPerThermostatApplication_.get ();
+  return this->brownianMotionFactor_;
 }
 
 void params_t::
-timestepsPerThermostatApplication (const timestepsPerThermostatApplication_type& x)
+brownianMotionFactor (const brownianMotionFactor_type& x)
 {
-  this->timestepsPerThermostatApplication_.set (x);
+  this->brownianMotionFactor_.set (x);
 }
 
-const params_t::initialTemperature_type& params_t::
+void params_t::
+brownianMotionFactor (const brownianMotionFactor_optional& x)
+{
+  this->brownianMotionFactor_ = x;
+}
+
+const params_t::gravity_optional& params_t::
+gravity () const
+{
+  return this->gravity_;
+}
+
+params_t::gravity_optional& params_t::
+gravity ()
+{
+  return this->gravity_;
+}
+
+void params_t::
+gravity (const gravity_type& x)
+{
+  this->gravity_.set (x);
+}
+
+void params_t::
+gravity (const gravity_optional& x)
+{
+  this->gravity_ = x;
+}
+
+const params_t::iterationsTillThermostatApplication_optional& params_t::
+iterationsTillThermostatApplication () const
+{
+  return this->iterationsTillThermostatApplication_;
+}
+
+params_t::iterationsTillThermostatApplication_optional& params_t::
+iterationsTillThermostatApplication ()
+{
+  return this->iterationsTillThermostatApplication_;
+}
+
+void params_t::
+iterationsTillThermostatApplication (const iterationsTillThermostatApplication_type& x)
+{
+  this->iterationsTillThermostatApplication_.set (x);
+}
+
+void params_t::
+iterationsTillThermostatApplication (const iterationsTillThermostatApplication_optional& x)
+{
+  this->iterationsTillThermostatApplication_ = x;
+}
+
+const params_t::initialTemperature_optional& params_t::
 initialTemperature () const
 {
-  return this->initialTemperature_.get ();
+  return this->initialTemperature_;
 }
 
-params_t::initialTemperature_type& params_t::
+params_t::initialTemperature_optional& params_t::
 initialTemperature ()
 {
-  return this->initialTemperature_.get ();
+  return this->initialTemperature_;
 }
 
 void params_t::
@@ -461,16 +533,22 @@ initialTemperature (const initialTemperature_type& x)
   this->initialTemperature_.set (x);
 }
 
-const params_t::targetTemperature_type& params_t::
-targetTemperature () const
+void params_t::
+initialTemperature (const initialTemperature_optional& x)
 {
-  return this->targetTemperature_.get ();
+  this->initialTemperature_ = x;
 }
 
-params_t::targetTemperature_type& params_t::
+const params_t::targetTemperature_optional& params_t::
+targetTemperature () const
+{
+  return this->targetTemperature_;
+}
+
+params_t::targetTemperature_optional& params_t::
 targetTemperature ()
 {
-  return this->targetTemperature_.get ();
+  return this->targetTemperature_;
 }
 
 void params_t::
@@ -479,22 +557,34 @@ targetTemperature (const targetTemperature_type& x)
   this->targetTemperature_.set (x);
 }
 
-const params_t::temperatureDifferenceStepSize_type& params_t::
-temperatureDifferenceStepSize () const
+void params_t::
+targetTemperature (const targetTemperature_optional& x)
 {
-  return this->temperatureDifferenceStepSize_.get ();
+  this->targetTemperature_ = x;
 }
 
-params_t::temperatureDifferenceStepSize_type& params_t::
-temperatureDifferenceStepSize ()
+const params_t::temperatureStepSize_optional& params_t::
+temperatureStepSize () const
 {
-  return this->temperatureDifferenceStepSize_.get ();
+  return this->temperatureStepSize_;
+}
+
+params_t::temperatureStepSize_optional& params_t::
+temperatureStepSize ()
+{
+  return this->temperatureStepSize_;
 }
 
 void params_t::
-temperatureDifferenceStepSize (const temperatureDifferenceStepSize_type& x)
+temperatureStepSize (const temperatureStepSize_type& x)
 {
-  this->temperatureDifferenceStepSize_.set (x);
+  this->temperatureStepSize_.set (x);
+}
+
+void params_t::
+temperatureStepSize (const temperatureStepSize_optional& x)
+{
+  this->temperatureStepSize_ = x;
 }
 
 const params_t::t_start_type& params_t::
@@ -633,6 +723,36 @@ m (const m_type& x)
   this->m_.set (x);
 }
 
+const particle_t::material_optional& particle_t::
+material () const
+{
+  return this->material_;
+}
+
+particle_t::material_optional& particle_t::
+material ()
+{
+  return this->material_;
+}
+
+void particle_t::
+material (const material_type& x)
+{
+  this->material_.set (x);
+}
+
+void particle_t::
+material (const material_optional& x)
+{
+  this->material_ = x;
+}
+
+void particle_t::
+material (::std::auto_ptr< material_type > x)
+{
+  this->material_.set (x);
+}
+
 
 // cuboid_t
 // 
@@ -743,6 +863,36 @@ void cuboid_t::
 m (const m_type& x)
 {
   this->m_.set (x);
+}
+
+const cuboid_t::material_optional& cuboid_t::
+material () const
+{
+  return this->material_;
+}
+
+cuboid_t::material_optional& cuboid_t::
+material ()
+{
+  return this->material_;
+}
+
+void cuboid_t::
+material (const material_type& x)
+{
+  this->material_.set (x);
+}
+
+void cuboid_t::
+material (const material_optional& x)
+{
+  this->material_ = x;
+}
+
+void cuboid_t::
+material (::std::auto_ptr< material_type > x)
+{
+  this->material_.set (x);
 }
 
 
@@ -869,6 +1019,118 @@ dimensions (const dimensions_type& x)
   this->dimensions_.set (x);
 }
 
+const sphere_t::material_optional& sphere_t::
+material () const
+{
+  return this->material_;
+}
+
+sphere_t::material_optional& sphere_t::
+material ()
+{
+  return this->material_;
+}
+
+void sphere_t::
+material (const material_type& x)
+{
+  this->material_.set (x);
+}
+
+void sphere_t::
+material (const material_optional& x)
+{
+  this->material_ = x;
+}
+
+void sphere_t::
+material (::std::auto_ptr< material_type > x)
+{
+  this->material_.set (x);
+}
+
+
+// material_t
+// 
+
+const material_t::name_optional& material_t::
+name () const
+{
+  return this->name_;
+}
+
+material_t::name_optional& material_t::
+name ()
+{
+  return this->name_;
+}
+
+void material_t::
+name (const name_type& x)
+{
+  this->name_.set (x);
+}
+
+void material_t::
+name (const name_optional& x)
+{
+  this->name_ = x;
+}
+
+void material_t::
+name (::std::auto_ptr< name_type > x)
+{
+  this->name_.set (x);
+}
+
+const material_t::epsilon_optional& material_t::
+epsilon () const
+{
+  return this->epsilon_;
+}
+
+material_t::epsilon_optional& material_t::
+epsilon ()
+{
+  return this->epsilon_;
+}
+
+void material_t::
+epsilon (const epsilon_type& x)
+{
+  this->epsilon_.set (x);
+}
+
+void material_t::
+epsilon (const epsilon_optional& x)
+{
+  this->epsilon_ = x;
+}
+
+const material_t::sigma_optional& material_t::
+sigma () const
+{
+  return this->sigma_;
+}
+
+material_t::sigma_optional& material_t::
+sigma ()
+{
+  return this->sigma_;
+}
+
+void material_t::
+sigma (const sigma_type& x)
+{
+  this->sigma_.set (x);
+}
+
+void material_t::
+sigma (const sigma_optional& x)
+{
+  this->sigma_ = x;
+}
+
 
 // data_t
 // 
@@ -945,6 +1207,24 @@ sphere (const sphere_sequence& s)
   this->sphere_ = s;
 }
 
+const data_t::material_sequence& data_t::
+material () const
+{
+  return this->material_;
+}
+
+data_t::material_sequence& data_t::
+material ()
+{
+  return this->material_;
+}
+
+void data_t::
+material (const material_sequence& s)
+{
+  this->material_ = s;
+}
+
 
 // simulationfile_t
 // 
@@ -1001,16 +1281,16 @@ data (::std::auto_ptr< data_type > x)
 // condition
 // 
 
-const condition::value_optional& condition::
+const condition::value_type& condition::
 value () const
 {
-  return this->value_;
+  return this->value_.get ();
 }
 
-condition::value_optional& condition::
+condition::value_type& condition::
 value ()
 {
-  return this->value_;
+  return this->value_.get ();
 }
 
 void condition::
@@ -1020,15 +1300,39 @@ value (const value_type& x)
 }
 
 void condition::
-value (const value_optional& x)
-{
-  this->value_ = x;
-}
-
-void condition::
 value (::std::auto_ptr< value_type > x)
 {
   this->value_.set (x);
+}
+
+const condition::type_optional& condition::
+type () const
+{
+  return this->type_;
+}
+
+condition::type_optional& condition::
+type ()
+{
+  return this->type_;
+}
+
+void condition::
+type (const type_type& x)
+{
+  this->type_.set (x);
+}
+
+void condition::
+type (const type_optional& x)
+{
+  this->type_ = x;
+}
+
+void condition::
+type (::std::auto_ptr< type_type > x)
+{
+  this->type_.set (x);
 }
 
 
@@ -1568,30 +1872,30 @@ algorithm_t::
 //
 
 params_t::
-params_t (const output_type& output,
+params_t (const dimension_type& dimension,
+          const output_type& output,
           const iterationsperoutput_type& iterationsperoutput,
           const delta_t_type& delta_t,
           const t_end_type& t_end,
           const epsilon_type& epsilon,
           const sigma_type& sigma,
-          const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
-          const initialTemperature_type& initialTemperature,
-          const targetTemperature_type& targetTemperature,
-          const temperatureDifferenceStepSize_type& temperatureDifferenceStepSize,
           const t_start_type& t_start,
           const outputfmt_type& outputfmt,
           const algorithm_type& algorithm)
 : ::xml_schema::type (),
+  dimension_ (dimension, ::xml_schema::flags (), this),
   output_ (output, ::xml_schema::flags (), this),
   iterationsperoutput_ (iterationsperoutput, ::xml_schema::flags (), this),
   delta_t_ (delta_t, ::xml_schema::flags (), this),
   t_end_ (t_end, ::xml_schema::flags (), this),
   epsilon_ (epsilon, ::xml_schema::flags (), this),
   sigma_ (sigma, ::xml_schema::flags (), this),
-  timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
-  initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
-  targetTemperature_ (targetTemperature, ::xml_schema::flags (), this),
-  temperatureDifferenceStepSize_ (temperatureDifferenceStepSize, ::xml_schema::flags (), this),
+  brownianMotionFactor_ (::xml_schema::flags (), this),
+  gravity_ (::xml_schema::flags (), this),
+  iterationsTillThermostatApplication_ (::xml_schema::flags (), this),
+  initialTemperature_ (::xml_schema::flags (), this),
+  targetTemperature_ (::xml_schema::flags (), this),
+  temperatureStepSize_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
@@ -1599,30 +1903,30 @@ params_t (const output_type& output,
 }
 
 params_t::
-params_t (const output_type& output,
+params_t (const dimension_type& dimension,
+          const output_type& output,
           const iterationsperoutput_type& iterationsperoutput,
           const delta_t_type& delta_t,
           const t_end_type& t_end,
           const epsilon_type& epsilon,
           const sigma_type& sigma,
-          const timestepsPerThermostatApplication_type& timestepsPerThermostatApplication,
-          const initialTemperature_type& initialTemperature,
-          const targetTemperature_type& targetTemperature,
-          const temperatureDifferenceStepSize_type& temperatureDifferenceStepSize,
           const t_start_type& t_start,
           const outputfmt_type& outputfmt,
           ::std::auto_ptr< algorithm_type >& algorithm)
 : ::xml_schema::type (),
+  dimension_ (dimension, ::xml_schema::flags (), this),
   output_ (output, ::xml_schema::flags (), this),
   iterationsperoutput_ (iterationsperoutput, ::xml_schema::flags (), this),
   delta_t_ (delta_t, ::xml_schema::flags (), this),
   t_end_ (t_end, ::xml_schema::flags (), this),
   epsilon_ (epsilon, ::xml_schema::flags (), this),
   sigma_ (sigma, ::xml_schema::flags (), this),
-  timestepsPerThermostatApplication_ (timestepsPerThermostatApplication, ::xml_schema::flags (), this),
-  initialTemperature_ (initialTemperature, ::xml_schema::flags (), this),
-  targetTemperature_ (targetTemperature, ::xml_schema::flags (), this),
-  temperatureDifferenceStepSize_ (temperatureDifferenceStepSize, ::xml_schema::flags (), this),
+  brownianMotionFactor_ (::xml_schema::flags (), this),
+  gravity_ (::xml_schema::flags (), this),
+  iterationsTillThermostatApplication_ (::xml_schema::flags (), this),
+  initialTemperature_ (::xml_schema::flags (), this),
+  targetTemperature_ (::xml_schema::flags (), this),
+  temperatureStepSize_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
@@ -1634,16 +1938,19 @@ params_t (const params_t& x,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
+  dimension_ (x.dimension_, f, this),
   output_ (x.output_, f, this),
   iterationsperoutput_ (x.iterationsperoutput_, f, this),
   delta_t_ (x.delta_t_, f, this),
   t_end_ (x.t_end_, f, this),
   epsilon_ (x.epsilon_, f, this),
   sigma_ (x.sigma_, f, this),
-  timestepsPerThermostatApplication_ (x.timestepsPerThermostatApplication_, f, this),
+  brownianMotionFactor_ (x.brownianMotionFactor_, f, this),
+  gravity_ (x.gravity_, f, this),
+  iterationsTillThermostatApplication_ (x.iterationsTillThermostatApplication_, f, this),
   initialTemperature_ (x.initialTemperature_, f, this),
   targetTemperature_ (x.targetTemperature_, f, this),
-  temperatureDifferenceStepSize_ (x.temperatureDifferenceStepSize_, f, this),
+  temperatureStepSize_ (x.temperatureStepSize_, f, this),
   t_start_ (x.t_start_, f, this),
   outputfmt_ (x.outputfmt_, f, this),
   algorithm_ (x.algorithm_, f, this)
@@ -1655,16 +1962,19 @@ params_t (const ::xercesc::DOMElement& e,
           ::xml_schema::flags f,
           ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  dimension_ (f, this),
   output_ (f, this),
   iterationsperoutput_ (f, this),
   delta_t_ (f, this),
   t_end_ (f, this),
   epsilon_ (f, this),
   sigma_ (f, this),
-  timestepsPerThermostatApplication_ (f, this),
+  brownianMotionFactor_ (f, this),
+  gravity_ (f, this),
+  iterationsTillThermostatApplication_ (f, this),
   initialTemperature_ (f, this),
   targetTemperature_ (f, this),
-  temperatureDifferenceStepSize_ (f, this),
+  temperatureStepSize_ (f, this),
   t_start_ (f, this),
   outputfmt_ (f, this),
   algorithm_ (f, this)
@@ -1685,6 +1995,17 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     const ::xercesc::DOMElement& i (p.cur_element ());
     const ::xsd::cxx::xml::qualified_name< char > n (
       ::xsd::cxx::xml::dom::name< char > (i));
+
+    // dimension
+    //
+    if (n.name () == "dimension" && n.namespace_ ().empty ())
+    {
+      if (!dimension_.present ())
+      {
+        this->dimension_.set (dimension_traits::create (i, f, this));
+        continue;
+      }
+    }
 
     // output
     //
@@ -1755,13 +2076,35 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // timestepsPerThermostatApplication
+    // brownianMotionFactor
     //
-    if (n.name () == "timestepsPerThermostatApplication" && n.namespace_ ().empty ())
+    if (n.name () == "brownianMotionFactor" && n.namespace_ ().empty ())
     {
-      if (!timestepsPerThermostatApplication_.present ())
+      if (!this->brownianMotionFactor_)
       {
-        this->timestepsPerThermostatApplication_.set (timestepsPerThermostatApplication_traits::create (i, f, this));
+        this->brownianMotionFactor_.set (brownianMotionFactor_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // gravity
+    //
+    if (n.name () == "gravity" && n.namespace_ ().empty ())
+    {
+      if (!this->gravity_)
+      {
+        this->gravity_.set (gravity_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // iterationsTillThermostatApplication
+    //
+    if (n.name () == "iterationsTillThermostatApplication" && n.namespace_ ().empty ())
+    {
+      if (!this->iterationsTillThermostatApplication_)
+      {
+        this->iterationsTillThermostatApplication_.set (iterationsTillThermostatApplication_traits::create (i, f, this));
         continue;
       }
     }
@@ -1770,7 +2113,7 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     //
     if (n.name () == "initialTemperature" && n.namespace_ ().empty ())
     {
-      if (!initialTemperature_.present ())
+      if (!this->initialTemperature_)
       {
         this->initialTemperature_.set (initialTemperature_traits::create (i, f, this));
         continue;
@@ -1781,20 +2124,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     //
     if (n.name () == "targetTemperature" && n.namespace_ ().empty ())
     {
-      if (!targetTemperature_.present ())
+      if (!this->targetTemperature_)
       {
         this->targetTemperature_.set (targetTemperature_traits::create (i, f, this));
         continue;
       }
     }
 
-    // temperatureDifferenceStepSize
+    // temperatureStepSize
     //
-    if (n.name () == "temperatureDifferenceStepSize" && n.namespace_ ().empty ())
+    if (n.name () == "temperatureStepSize" && n.namespace_ ().empty ())
     {
-      if (!temperatureDifferenceStepSize_.present ())
+      if (!this->temperatureStepSize_)
       {
-        this->temperatureDifferenceStepSize_.set (temperatureDifferenceStepSize_traits::create (i, f, this));
+        this->temperatureStepSize_.set (temperatureStepSize_traits::create (i, f, this));
         continue;
       }
     }
@@ -1841,6 +2184,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     break;
   }
 
+  if (!dimension_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "dimension",
+      "");
+  }
+
   if (!output_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
@@ -1880,34 +2230,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   {
     throw ::xsd::cxx::tree::expected_element< char > (
       "sigma",
-      "");
-  }
-
-  if (!timestepsPerThermostatApplication_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "timestepsPerThermostatApplication",
-      "");
-  }
-
-  if (!initialTemperature_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "initialTemperature",
-      "");
-  }
-
-  if (!targetTemperature_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "targetTemperature",
-      "");
-  }
-
-  if (!temperatureDifferenceStepSize_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "temperatureDifferenceStepSize",
       "");
   }
 
@@ -1955,7 +2277,8 @@ particle_t (const X_type& X,
 : ::xml_schema::type (),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
-  m_ (m, ::xml_schema::flags (), this)
+  m_ (m, ::xml_schema::flags (), this),
+  material_ (::xml_schema::flags (), this)
 {
 }
 
@@ -1966,7 +2289,8 @@ particle_t (const particle_t& x,
 : ::xml_schema::type (x, f, c),
   X_ (x.X_, f, this),
   V_ (x.V_, f, this),
-  m_ (x.m_, f, this)
+  m_ (x.m_, f, this),
+  material_ (x.material_, f, this)
 {
 }
 
@@ -1977,7 +2301,8 @@ particle_t (const ::xercesc::DOMElement& e,
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   X_ (f, this),
   V_ (f, this),
-  m_ (f, this)
+  m_ (f, this),
+  material_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -2035,6 +2360,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
+    // material
+    //
+    if (n.name () == "material" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< material_type > r (
+        material_traits::create (i, f, this));
+
+      if (!this->material_)
+      {
+        this->material_.set (r);
+        continue;
+      }
+    }
+
     break;
   }
 
@@ -2086,7 +2425,8 @@ cuboid_t (const X_type& X,
   V_ (V, ::xml_schema::flags (), this),
   N_ (N, ::xml_schema::flags (), this),
   h_ (h, ::xml_schema::flags (), this),
-  m_ (m, ::xml_schema::flags (), this)
+  m_ (m, ::xml_schema::flags (), this),
+  material_ (::xml_schema::flags (), this)
 {
 }
 
@@ -2099,7 +2439,8 @@ cuboid_t (const cuboid_t& x,
   V_ (x.V_, f, this),
   N_ (x.N_, f, this),
   h_ (x.h_, f, this),
-  m_ (x.m_, f, this)
+  m_ (x.m_, f, this),
+  material_ (x.material_, f, this)
 {
 }
 
@@ -2112,7 +2453,8 @@ cuboid_t (const ::xercesc::DOMElement& e,
   V_ (f, this),
   N_ (f, this),
   h_ (f, this),
-  m_ (f, this)
+  m_ (f, this),
+  material_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -2195,6 +2537,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
+    // material
+    //
+    if (n.name () == "material" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< material_type > r (
+        material_traits::create (i, f, this));
+
+      if (!this->material_)
+      {
+        this->material_.set (r);
+        continue;
+      }
+    }
+
     break;
   }
 
@@ -2262,7 +2618,8 @@ sphere_t (const X_type& X,
   r_ (r, ::xml_schema::flags (), this),
   h_ (h, ::xml_schema::flags (), this),
   m_ (m, ::xml_schema::flags (), this),
-  dimensions_ (dimensions, ::xml_schema::flags (), this)
+  dimensions_ (dimensions, ::xml_schema::flags (), this),
+  material_ (::xml_schema::flags (), this)
 {
 }
 
@@ -2276,7 +2633,8 @@ sphere_t (const sphere_t& x,
   r_ (x.r_, f, this),
   h_ (x.h_, f, this),
   m_ (x.m_, f, this),
-  dimensions_ (x.dimensions_, f, this)
+  dimensions_ (x.dimensions_, f, this),
+  material_ (x.material_, f, this)
 {
 }
 
@@ -2290,7 +2648,8 @@ sphere_t (const ::xercesc::DOMElement& e,
   r_ (f, this),
   h_ (f, this),
   m_ (f, this),
-  dimensions_ (f, this)
+  dimensions_ (f, this),
+  material_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -2381,6 +2740,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
+    // material
+    //
+    if (n.name () == "material" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< material_type > r (
+        material_traits::create (i, f, this));
+
+      if (!this->material_)
+      {
+        this->material_.set (r);
+        continue;
+      }
+    }
+
     break;
   }
 
@@ -2439,6 +2812,90 @@ sphere_t::
 {
 }
 
+// material_t
+//
+
+material_t::
+material_t ()
+: ::xml_schema::type (),
+  name_ (::xml_schema::flags (), this),
+  epsilon_ (::xml_schema::flags (), this),
+  sigma_ (::xml_schema::flags (), this)
+{
+}
+
+material_t::
+material_t (const material_t& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  name_ (x.name_, f, this),
+  epsilon_ (x.epsilon_, f, this),
+  sigma_ (x.sigma_, f, this)
+{
+}
+
+material_t::
+material_t (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  name_ (f, this),
+  epsilon_ (f, this),
+  sigma_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+    this->parse (p, f);
+  }
+}
+
+void material_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  while (p.more_attributes ())
+  {
+    const ::xercesc::DOMAttr& i (p.next_attribute ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    if (n.name () == "name" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< name_type > r (
+        name_traits::create (i, f, this));
+
+      this->name_.set (r);
+      continue;
+    }
+
+    if (n.name () == "epsilon" && n.namespace_ ().empty ())
+    {
+      this->epsilon_.set (epsilon_traits::create (i, f, this));
+      continue;
+    }
+
+    if (n.name () == "sigma" && n.namespace_ ().empty ())
+    {
+      this->sigma_.set (sigma_traits::create (i, f, this));
+      continue;
+    }
+  }
+}
+
+material_t* material_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class material_t (*this, f, c);
+}
+
+material_t::
+~material_t ()
+{
+}
+
 // data_t
 //
 
@@ -2448,7 +2905,8 @@ data_t ()
   particle_ (::xml_schema::flags (), this),
   inputfile_ (::xml_schema::flags (), this),
   cuboid_ (::xml_schema::flags (), this),
-  sphere_ (::xml_schema::flags (), this)
+  sphere_ (::xml_schema::flags (), this),
+  material_ (::xml_schema::flags (), this)
 {
 }
 
@@ -2460,7 +2918,8 @@ data_t (const data_t& x,
   particle_ (x.particle_, f, this),
   inputfile_ (x.inputfile_, f, this),
   cuboid_ (x.cuboid_, f, this),
-  sphere_ (x.sphere_, f, this)
+  sphere_ (x.sphere_, f, this),
+  material_ (x.material_, f, this)
 {
 }
 
@@ -2472,7 +2931,8 @@ data_t (const ::xercesc::DOMElement& e,
   particle_ (f, this),
   inputfile_ (f, this),
   cuboid_ (f, this),
-  sphere_ (f, this)
+  sphere_ (f, this),
+  material_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -2532,6 +2992,17 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
         sphere_traits::create (i, f, this));
 
       this->sphere_.push_back (r);
+      continue;
+    }
+
+    // material
+    //
+    if (n.name () == "material" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< material_type > r (
+        material_traits::create (i, f, this));
+
+      this->material_.push_back (r);
       continue;
     }
 
@@ -2669,30 +3140,37 @@ simulationfile_t::
 //
 
 condition::
-condition ()
+condition (const value_type& value)
 : ::xml_schema::string (),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
 condition::
-condition (const char* _xsd_string_base)
+condition (const char* _xsd_string_base,
+           const value_type& value)
 : ::xml_schema::string (_xsd_string_base),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
 condition::
-condition (const ::std::string& _xsd_string_base)
+condition (const ::std::string& _xsd_string_base,
+           const value_type& value)
 : ::xml_schema::string (_xsd_string_base),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
 condition::
-condition (const ::xml_schema::string& _xsd_string_base)
+condition (const ::xml_schema::string& _xsd_string_base,
+           const value_type& value)
 : ::xml_schema::string (_xsd_string_base),
-  value_ (::xml_schema::flags (), this)
+  value_ (value, ::xml_schema::flags (), this),
+  type_ (::xml_schema::flags (), this)
 {
 }
 
@@ -2701,7 +3179,8 @@ condition (const condition& x,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
 : ::xml_schema::string (x, f, c),
-  value_ (x.value_, f, this)
+  value_ (x.value_, f, this),
+  type_ (x.type_, f, this)
 {
 }
 
@@ -2710,7 +3189,8 @@ condition (const ::xercesc::DOMElement& e,
            ::xml_schema::flags f,
            ::xml_schema::container* c)
 : ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
-  value_ (f, this)
+  value_ (f, this),
+  type_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -2737,6 +3217,22 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       this->value_.set (r);
       continue;
     }
+
+    if (n.name () == "type" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< type_type > r (
+        type_traits::create (i, f, this));
+
+      this->type_.set (r);
+      continue;
+    }
+  }
+
+  if (!value_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_attribute< char > (
+      "value",
+      "");
   }
 }
 

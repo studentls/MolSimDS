@@ -90,108 +90,42 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 	}
 }
 
-std::vector<Particle> LinkedCellParticleContainer::getBoundaryParticles()
-{
-	std::vector<Particle> boundary;
-
-
-	// the halo particles are the ones where indices are extreme values
-	switch(dim)
-	{
-	case 2:
-		{
-			// grid |------------|
-			//      |            |
-			//      |------------|
-			// note that construction ensures, that halo layer has at least 3 cells in each direction!
-
-			// ------- upper
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, 0), cellCount[0] - 2, AXIS_X);
-			// ------- lower
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 2, 0), cellCount[0] - 2, AXIS_X);
-			// |
-			// |
-			// | left
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 2, 0), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
-			//        |
-			//        |
-			// right  | 
-			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 2, 1, 0), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
-
-			break;
-		}
-	case 3:
-		{
-			// do it the same way as in 2D
-
-			// first two 2D planes
-
-			//front plane
-
-			// ------- upper
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, 1), cellCount[0] - 2, AXIS_X);
-			// ------- lower
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 2, 1), cellCount[0] - 2, AXIS_X);
-			// |
-			// |
-			// | left
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 2, 1), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
-			//        |
-			//        |
-			// right  | 
-			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 2, 1, 1), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
-
-			//back plane
-
-			// ------- upper
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, cellCount[2] - 2), cellCount[0] - 2, AXIS_X);
-			// ------- lower
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 2, cellCount[2] - 2), cellCount[0] - 2, AXIS_X);
-			// |
-			// |
-			// | left
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 2, cellCount[2] - 2), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
-			//        |
-			//        |
-			// right  | 
-			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 2, 1, cellCount[2] - 2), cellCount[1] > 3 ? cellCount[1] - 4 : 0, AXIS_Y);
-
-			// sides...
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
-			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 1, 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
-			getParticlesOfCellsAlongLine(boundary, makeTriple(1, cellCount[1] - 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
-			getParticlesOfCellsAlongLine(boundary, makeTriple(cellCount[0] - 1, cellCount[1] - 1, 1),  cellCount[2] > 3 ? cellCount[2] - 4 : 0, AXIS_Z);
-
-			break;
-		}
-	default:
-		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
-	}
-
-	return boundary;
-}
-
 void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
 {
-	// go through boundaries...
-	for (std::vector<utils::Vector<double, 4> >::iterator it = reflectiveBoundaryCells.begin(); it != reflectiveBoundaryCells.end(); it++)
-	{
-		utils::Vector<double, 4>& elem = *it;
-		std::vector<Particle>& cell = Cells[(int)(elem[0])];
-		int axis = (int)(elem[1]);
-		double direction = elem[2];
-		double border = elem[3];
-		for (std::vector<Particle>::iterator it = cell.begin() ; it < cell.end(); it++) {
-			Particle& p = *it;
-			double dist = direction * (border - p.x[axis]);
-			// skip the particle if it is too far away from the border
-			if (dist > reflectiveBoundaryDistance)
-				continue;
-			// create a temporary, virtual Particle
-			// a copy of the current particle, but located at the border
-			Particle vp(p);
-			vp.x[axis] = border;
-			(*func)(data, p, vp);
+	using namespace std;
+	using namespace utils;
+	
+	
+	
+		// go through boundary cells
+		for(vector<unsigned int>::iterator it = boundaryIndices.begin(); it != boundaryIndices.end(); it++)
+		{
+			if(Cells[*it].empty())continue;
+
+			// go through boundary cell
+			for(vector<Particle>::iterator pt = Cells[*it].begin(); pt != Cells[*it].end(); pt++)
+			{
+				
+				// go through boundaries (max. 6)
+				for(vector<Boundary>::iterator bt = boundaries.begin(); bt != boundaries.end(); bt++)
+				{
+					double dist = bt->p.distance(pt->x);
+				
+					// skip the particle if it is too far away from the border
+					if (abs(dist) > reflectiveBoundaryDistance)
+						continue;
+
+					// determine boundary type
+					if(bt->type == BT_REFLECTIVE)
+					{
+						// create a temporary, virtual Particle
+						// a copy of the current particle, but located on the boundary
+						Particle vp(*pt);
+						vp.x = vp.x - dist * bt->p.n;
+						(*func)(data, *pt, vp);				
+					}
+					
+			}
 		}
 	}
 
@@ -199,6 +133,8 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 	// In Task 3 it is mentioned that each boundary shall specified if it reflects or outflows the particle
 	// as there is currently no interaction with halo at all, the particles will be simply deleted if a global
 	// outflow flag is set
+	
+	// TODO: test if periodic conditions are there, cause clearHaloParticles fails in this case!
 
 	// if BC_OUTFLOW is set, delete halo particles
 	if(boundaryConditions & BC_OUTFLOW)clearHaloParticles();
@@ -272,125 +208,6 @@ void	LinkedCellParticleContainer::generatePairs()
 }
 
 
-void	LinkedCellParticleContainer::SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-					bool frontReflectiveBoundary, bool backReflectiveBoundary,
-					// these two will be ignored in the two-dimensional case
-					bool bottomReflectiveBoundary, bool topReflectiveBoundary)
-{
-	// TODO: testing and debugging
-	if (dim == 2) {
-		if (leftReflectiveBoundary || rightReflectiveBoundary)
-			for (int y = 0; y < cellCount[1]; y++) {
-				if (leftReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(0, y);
-					vec[1] = 0;
-					vec[2] = -1.0;
-					vec[3] = frontLowerLeftCorner[0];
-					reflectiveBoundaryCells.push_back(vec);
-				}
-				if (rightReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(cellCount[0] - 1, y);;
-					vec[1] = 0;
-					vec[2] = 1.0;
-					vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
-					this->reflectiveBoundaryCells.push_back(vec);
-				}
-			}
-		if (frontReflectiveBoundary || backReflectiveBoundary)
-			for (int x = 0; x < cellCount[0]; x++) {
-				if (frontReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(x, 0);
-					vec[1] = 1;
-					vec[2] = -1.0;
-					vec[3] = frontLowerLeftCorner[1];
-					this->reflectiveBoundaryCells.push_back(vec);
-				}
-				if (backReflectiveBoundary) {
-					// temp variable
-					utils::Vector<double, 4> vec;
-					vec[0] = Index2DTo1D(x, cellCount[1] - 1);
-					vec[1] = 1;
-					vec[2] = 1.0;
-					vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
-					this->reflectiveBoundaryCells.push_back(vec);
-				}
-			}
-	}
-else if (dim == 3) {
-		if (leftReflectiveBoundary || rightReflectiveBoundary)
-			for (int y = 0; y < cellCount[1]; y++)
-				for (int z = 0; z < cellCount[2]; z++) {
-					if (leftReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(0, y, z);
-						vec[1] = 0;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[0];
-						this->reflectiveBoundaryCells.push_back(vec);
-					}
-					if (rightReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(cellCount[0] - 1, y, z);
-						vec[1] = 0;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[0] + calcSimulationAreaExtent()[0];
-						this->reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-	if (frontReflectiveBoundary || backReflectiveBoundary)
-			for (int x = 0; x < cellCount[0]; x++)
-				for (int z = 0; z < cellCount[2]; z++) {
-					if (frontReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, 0, z);
-						vec[1] = 1;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[1];
-						this->reflectiveBoundaryCells.push_back(vec);
-					}
-					if (backReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, cellCount[1] - 1, z);
-						vec[1] = 1;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[1] + calcSimulationAreaExtent()[1];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-		if (bottomReflectiveBoundary || topReflectiveBoundary)
-			for (int x = 0; x < cellCount[0]; x++)
-				for (int y = 0; y < cellCount[1]; y++) {
-					if (bottomReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, y, 0);
-						vec[1] = 2;
-						vec[2] = -1.0;
-						vec[3] = frontLowerLeftCorner[2];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-					if (topReflectiveBoundary) {
-						// temp variable
-						utils::Vector<double, 4> vec;
-						vec[0] = Index3DTo1D(x, y, cellCount[2] - 1);
-						vec[1] = 2;
-						vec[2] = 1.0;
-						vec[3] = frontLowerLeftCorner[2] + calcSimulationAreaExtent()[2];
-						reflectiveBoundaryCells.push_back(vec);
-					}
-				}
-	}
-}
 
 void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, bool zAxis)
 {
@@ -558,11 +375,142 @@ void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsMovement()
 	}
 }
 
+void	LinkedCellParticleContainer::SetReflectiveBoundaries()
+{
+	using namespace utils;
+
+
+	Boundary boundary;
+	boundary.type = 0;
+
+	// insert boundaries
+	// additionally create normals of planes such as all normals point into the cuboidal simulation area
+
+	if(boundaryConditions & BC_LEFT || boundaryConditions & BC_LEFT_PERIODIC)
+	{		
+		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0], 0.0, 0.0), Vector<double, 3>(1.0, 0.0, 0.0));
+		boundary.type = boundaryConditions & BC_LEFT ? BT_REFLECTIVE : BT_PERIODIC;
+		boundaries.push_back(boundary);
+	}
+	if(boundaryConditions & BC_RIGHT || boundaryConditions & BC_RIGHT_PERIODIC)
+	{		
+		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0] + (cellCount[0] - 2) * cellSize[0], 0.0, 0.0), Vector<double, 3>(-1.0, 0.0, 0.0));
+		boundary.type = boundaryConditions & BC_RIGHT ? BT_REFLECTIVE : BT_PERIODIC;
+		boundaries.push_back(boundary);
+	}
+	if(boundaryConditions & BC_FRONT || boundaryConditions & BC_FRONT_PERIODIC)
+	{		
+		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1], 0.0), Vector<double, 3>(0.0, 1.0, 0.0));
+		boundary.type = boundaryConditions & BC_FRONT ? BT_REFLECTIVE : BT_PERIODIC;
+		boundaries.push_back(boundary);
+	}
+	if(boundaryConditions & BC_BACK || boundaryConditions & BC_BACK_PERIODIC)
+	{		
+		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1] + (cellCount[1] - 2) * cellSize[1], 0.0), Vector<double, 3>(0.0, -1.0, 0.0));
+		boundary.type = boundaryConditions & BC_BACK ? BT_REFLECTIVE : BT_PERIODIC;
+		boundaries.push_back(boundary);
+	}
+
+	if(dim > 2)
+	{	
+		if(boundaryConditions & BC_BOTTOM || boundaryConditions & BC_BOTTOM_PERIODIC)
+		{		
+			boundary.p.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2]), Vector<double, 3>(0.0, 0.0, 1.0));
+			boundary.type = boundaryConditions & BC_BOTTOM ? BT_REFLECTIVE : BT_PERIODIC;
+			boundaries.push_back(boundary);
+		}
+		if(boundaryConditions & BC_TOP || boundaryConditions & BC_TOP_PERIODIC)
+		{		
+			boundary.p.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2] + (cellCount[2] - 2) * cellSize[2]), Vector<double, 3>(0.0, 0.0, -1.0));
+			boundary.type = boundaryConditions & BC_TOP ? BT_REFLECTIVE : BT_PERIODIC;
+			boundaries.push_back(boundary);
+		}
+	}
+
+	// note: for performance reasons, maybe index lists can be now generated to make iteration faster
+}
+
+void LinkedCellParticleContainer::clearHaloParticles()
+{
+	// check if indices exist
+	assert(!haloIndices.empty());
+
+	// go through halo cells, and clear cells if not empty
+	for(std::vector<unsigned int>::iterator it = haloIndices.begin(); it != haloIndices.end(); it++)
+	{
+		// assert index
+		assert(*it < getCellCount());
+
+		if(Cells[*it].empty())continue;
+
+		Cells[*it].clear();
+	}
+}
+
 std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
 {
-	std::vector<Particle> halo;
+	std::vector<Particle> particles;
 
-	// the halo particles are the ones where indices are extreme values
+	// check if indices exist
+	assert(!haloIndices.empty());
+
+	// go through halo cells, and add to particles if not empty
+	for(std::vector<unsigned int>::iterator it = haloIndices.begin(); it != haloIndices.end(); it++)
+	{
+		// assert index
+		assert(*it < getCellCount());
+
+		if(Cells[*it].empty())continue;
+
+		particles.insert(particles.end(), Cells[*it].begin(), Cells[*it].end());
+	}
+
+	return particles;
+}
+
+std::vector<Particle> LinkedCellParticleContainer::getBoundaryParticles()
+{
+	std::vector<Particle> particles;
+
+	// check if indices exist
+	assert(!haloIndices.empty());
+
+	// go through boundary cells, and add to particles if not empty
+	for(std::vector<unsigned int>::iterator it = boundaryIndices.begin(); it != boundaryIndices.end(); it++)
+	{
+		// assert index
+		assert(*it < getCellCount());
+
+		if(Cells[*it].empty())continue;
+
+		particles.insert(particles.end(), Cells[*it].begin(), Cells[*it].end());
+	}
+
+	return particles;
+}
+
+void LinkedCellParticleContainer::calcIndices()
+{
+	// first generate Pairs
+	generatePairs();
+
+	// second calculate indices for halo & boundary cells
+	if(!haloIndices.empty())haloIndices.clear();
+	if(!boundaryIndices.empty())boundaryIndices.clear();
+
+	calcFrameIndices(haloIndices, 0);
+	calcFrameIndices(boundaryIndices, 1);
+}
+
+void LinkedCellParticleContainer::calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r)
+{
+	int m = cellCount[0];
+	int n = cellCount[1];
+	int o = cellCount[2];
+
+	// getting the r-th layer of a grid
+
+	// calc Boundary Cells' indices similiar to halo
 	switch(dim)
 	{
 	case 2:
@@ -573,17 +521,27 @@ std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
 			// note that construction ensures, that halo layer has at least 3 cells in each direction!
 
 			// ------- upper
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, 0, 0),					cellCount[0] - 2, AXIS_X);
-			// ------- lower
-			getParticlesOfCellsAlongLine(halo, makeTriple(1, cellCount[1] - 1, 0),	cellCount[0] - 2, AXIS_X);
+			for(int x = r + 1; x <= m - r - 2; x++)
+				out.push_back(Index3DTo1D(x, r, 0));
+
+			// handle special case
+			if(r != n - r - 1)
+				// ------- lower
+				for(int x = r + 1; x <= m - r - 2; x++)
+					out.push_back(Index3DTo1D(x, n - r - 1, 0));
 			// |
 			// |
 			// | left
-			getParticlesOfCellsAlongLine(halo, makeTriple(0, 0, 0),					cellCount[1], AXIS_Y);
-			//        |
-			//        |
-			// right  | 
-			getParticlesOfCellsAlongLine(halo, makeTriple(cellCount[0] - 1, 0, 0),	cellCount[1], AXIS_Y);
+			for(int y = r; y <= n - r - 1; y++)
+				out.push_back(Index3DTo1D(r, y, 0));
+			
+			// handle special case
+			if(r != m - r - 1)
+				//        |
+				//        |
+				// right  | 
+				for(int y = r; y <= n - r - 1; y++)
+					out.push_back(Index3DTo1D(m - r - 1, y, 0));
 
 			break;
 		}
@@ -593,223 +551,46 @@ std::vector<Particle> LinkedCellParticleContainer::getHaloParticles()
 
 			// for a cube there are 6 faces!
 			// top face
-			getParticlesOfCellsAlongRectangle(halo, makeTriple(0, 0, 0), makePair(cellCount[0], cellCount[1]), AXIS_XY);
-			// bottom face
-			getParticlesOfCellsAlongRectangle(halo, makeTriple(0, 0, cellCount[2] - 1), makePair(cellCount[0], cellCount[1]), AXIS_XY);
-			//front face
-			getParticlesOfCellsAlongRectangle(halo, makeTriple(0, 0, 1), makePair(cellCount[0], cellCount[2] - 2), AXIS_XZ);
-			//back face
-			getParticlesOfCellsAlongRectangle(halo, makeTriple(0, cellCount[1] - 1, 1), makePair(cellCount[0], cellCount[2] - 2), AXIS_XZ);
-			//left face
-			getParticlesOfCellsAlongRectangle(halo, makeTriple(1, 1, 1), makePair(cellCount[1] - 2, cellCount[2] - 2), AXIS_YZ);
-			//right face
-			getParticlesOfCellsAlongRectangle(halo, makeTriple(cellCount[0] - 1, 1, 1), makePair(cellCount[1] - 2, cellCount[2] - 2), AXIS_YZ);
+			for(int x = r; x <= m - r - 1; x++)
+				for(int y = r; y <= n - r - 1; y++)
+					out.push_back(Index3DTo1D(x, y, r));	
+
+			// handle special case
+			if(r != o - r - 1)
+				// bottom face
+				for(int x = r; x <= m - r - 1; x++)
+					for(int y = r; y <= n - r - 1; y++)
+						out.push_back(Index3DTo1D(x, y, o - r - 1));
+
 			
+			//front face
+			for(int x = r; x <= m - r - 1; x++)
+				for(int z = r + 1; z <= o - r - 2; z++)
+					out.push_back(Index3DTo1D(x, r, z));
+			
+			// handle special case
+			if(r != n - r - 1)
+				//back face
+				for(int x = r; x <= m - r - 1; x++)
+					for(int z = r + 1; z <= o - r - 2; z++)
+						out.push_back(Index3DTo1D(x, n - r - 1, z));
+
+			
+			//left face
+			for(int y = r + 1; y <= n - r - 2; y++)
+				for(int z = r + 1; z <= o - r - 2; z++)
+					out.push_back(Index3DTo1D(r, y, z));
+
+			// handle special case
+			if(r != m - r - 1)
+				//right face
+				for(int y = r + 1; y <= n - r - 2; y++)
+					for(int z = r + 1; z <= o - r - 2; z++)
+						out.push_back(Index3DTo1D(m - r - 1, y, z));
+
 			break;
 		}
 	default:
 		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
-	}
-
-	return halo;
-}
-
-void	LinkedCellParticleContainer::getParticlesOfCellsAlongLine(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, unsigned int count, unsigned int axis)
-{
-	// assert values
-	if(dim == 2)assert(axis == AXIS_X || axis == AXIS_Y);
-	if(dim == 3)assert(axis == AXIS_X || axis == AXIS_Y || axis == AXIS_Z);
-
-	
-	// short, because values of AXIS_X, AXIS_Y, AXIS_Z are 0, 1, 2!
-	// maybe better write it long to avoid errors
-	for(int i = 0; i < dim; i++)
-	{
-		assert(count <= cellCount[i]);
-		assert(start[i] < cellCount[i]);
-	}
-
-	// now get particles
-	switch(axis)
-	{
-	case AXIS_X:
-		{
-			for(int i = 0; i < count; i++)
-			{
-				int index = dim == 2 ? Index2DTo1D(start[0] + i, start[1]) : Index3DTo1D(start[0] + i, start[1], start[2]);
-
-				if(Cells[index].empty())continue;
-
-				out.insert(out.end(), Cells[index].begin(), Cells[index].end());
-			}
-			break;
-		}
-	case AXIS_Y:
-		{
-			for(int i = 0; i < count; i++)
-			{
-				int index = dim == 2 ? Index2DTo1D(start[0], start[1] + i) : Index3DTo1D(start[0], start[1] + i, start[2]);
-
-				if(Cells[index].empty())continue;
-				
-				out.insert(out.end(), Cells[index].begin(), Cells[index].end());
-			}
-			break;
-		}
-	case AXIS_Z:
-		{
-			for(int i = 0; i < count; i++)
-			{
-				int index = Index3DTo1D(start[0], start[1], start[2] + i);
-
-				if(Cells[index].empty())continue;
-				
-				out.insert(out.end(), Cells[index].begin(), Cells[index].end());
-			}
-			break;
-		}
-	default:
-		LOG4CXX_ERROR(generalOutputLogger, "unknown axis");
-
-	}
-}
-
-void	LinkedCellParticleContainer::clearParticlesOfCellsAlongLine(const utils::Vector<unsigned int, 3> start, const unsigned int count, const unsigned int axis)
-{
-	// assert values
-	if(dim == 2)assert(axis == AXIS_X || axis == AXIS_Y);
-	if(dim == 3)assert(axis == AXIS_X || axis == AXIS_Y || axis == AXIS_Z);
-
-	
-	// short, because values of AXIS_X, AXIS_Y, AXIS_Z are 0, 1, 2!
-	// maybe better write it long to avoid errors
-	for(int i = 0; i < dim; i++)
-	{
-		assert(count <= cellCount[i]);
-		assert(start[i] < cellCount[i]);
-	}
-
-
-	// now get particles
-	switch(axis)
-	{
-	case AXIS_X:
-		{
-			for(int i = 0; i < count; i++)
-			{
-				int index = dim == 2 ? Index2DTo1D(start[0] + i, start[1]) : Index3DTo1D(start[0] + i, start[1], start[2]);
-
-				if(Cells[index].empty())continue;
-
-				Cells[index].clear();
-			}
-			break;
-		}
-	case AXIS_Y:
-		{
-			for(int i = 0; i < count; i++)
-			{
-				int index = dim == 2 ? Index2DTo1D(start[0], start[1] + i) : Index3DTo1D(start[0], start[1] + i, start[2]);
-
-				if(Cells[index].empty())continue;
-				
-				Cells[index].clear();
-			}
-			break;
-		}
-	case AXIS_Z:
-		{
-			for(int i = 0; i < count; i++)
-			{
-				int index = Index3DTo1D(start[0], start[1], start[2] + i);
-
-				if(Cells[index].empty())continue;
-				
-				Cells[index].clear();
-			}
-			break;
-		}
-	default:
-		LOG4CXX_ERROR(generalOutputLogger, "unknown axis");
-
-	}
-}
-
-
-void LinkedCellParticleContainer::clearHaloParticles()
-{
-	LOG4CXX_ERROR(generalOutputLogger, "not implemented yet!");
-}
-
-void	LinkedCellParticleContainer::getParticlesOfCellsAlongRectangle(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, const utils::Vector<unsigned int, 2> count, unsigned int axis)
-{
-	// assert values
-	assert(dim == 3);
-	if(dim == 3)assert(axis == AXIS_XY || axis == AXIS_XZ || axis == AXIS_YZ);
-	
-	
-	// assert values
-	if(axis == AXIS_XY)
-	{
-		assert(start[0] + count[0] <= cellCount[0]);
-		assert(start[1] + count[1] <= cellCount[1]);
-	}
-	if(axis == AXIS_XZ)
-	{
-		assert(start[0] + count[0] <= cellCount[0]);
-		assert(start[2] + count[1] <= cellCount[2]);
-	}
-	if(axis == AXIS_YZ)
-	{
-		assert(start[1] + count[0] <= cellCount[1]);
-		assert(start[2] + count[1] <= cellCount[2]);
-	}
-
-	// now get particles
-	switch(axis)
-	{
-	case AXIS_XY:
-		{
-			for(int i = 0; i < count[0]; i++)
-				for(int j = 0; j < count[1]; j++)
-				{
-					int index = Index3DTo1D(start[0] + i, start[1] + j, start[2]);
-
-					if(Cells[index].empty())continue;
-
-					out.insert(out.end(), Cells[index].begin(), Cells[index].end());
-				}
-
-			break;
-		}
-	case AXIS_XZ:
-		{
-			for(int i = 0; i < count[0]; i++)
-				for(int j = 0; j < count[1]; j++)
-				{
-					int index = Index3DTo1D(start[0] + i, start[1], start[2] + j);
-
-					if(Cells[index].empty())continue;
-
-					out.insert(out.end(), Cells[index].begin(), Cells[index].end());
-				}
-			break;
-		}
-	case AXIS_YZ:
-		{
-			for(int i = 0; i < count[0]; i++)
-				for(int j = 0; j < count[1]; j++)
-				{
-					int index = Index3DTo1D(start[0], start[1] + i, start[2] + j);
-
-					if(Cells[index].empty())continue;
-
-					out.insert(out.end(), Cells[index].begin(), Cells[index].end());
-				}
-			break;
-		}
-	default:
-		LOG4CXX_ERROR(generalOutputLogger, "unknown axis");
-
 	}
 }

@@ -19,6 +19,7 @@
 
 // use flag System for Boundaries
 // to combine flags use e.g. BC_RIGHT | BC_LEFT
+// reflective boundaries
 #define BC_NONE			0
 #define BC_OUTFLOW		0x1000
 #define BC_ALL			0x3F		// right | left |...|back
@@ -28,6 +29,26 @@
 #define BC_BOTTOM		0x8
 #define BC_FRONT		0x10
 #define BC_BACK			0x20
+
+// special periodic boundaries
+#define BC_RIGHT_PERIODIC	0x100
+#define BC_LEFT_PERIODIC	0x200
+#define BC_TOP_PERIODIC		0x400
+#define BC_BOTTOM_PERIODIC	0x800
+#define BC_FRONT_PERIODIC	0x1000
+#define BC_BACK_PERIODIC	0x2000
+
+
+// boundary type
+#define BT_REFLECTIVE   0x1
+#define BT_PERIODIC		0x2
+
+/// helper struct for a boundary
+struct Boundary
+{
+	utils::Plane p;			/// plane to store where the boundary is
+	unsigned int type;	/// type of boundary
+};
 
 /// a class that is used to store Particles and iterate over them
 /// utilizes Linked-Cell algorithm for improved performance (O(n) instead of O(n^2))
@@ -65,18 +86,24 @@ private:
 	/// |-----|-----|-----|-----|-----|
 	/// |     |     |     |     |     |
 	/// v-----|-----|-----|-----|-----|
-	utils::Vector<double, 3>			frontLowerLeftCorner;
+	utils::Vector<double, 3>						frontLowerLeftCorner;
 
 	/// a dynamic array, containing all Cells encoded in a 1D array
 	/// note that we will encode in this array also a halo cell frame
 	/// so the grid has size (x+2)(y+2)(z+2) after construction
-	std::vector<Particle>				*Cells;
+	std::vector<Particle>							*Cells;
 	
 	
 	/// Array of Pairs of Cell Indices, e.g. (1, 2) is the pair adressing Cell 1 and Cell 2
 	/// where 1, 2 are the index of the Cells array
 	/// note that here the space is very important, as g++ has problems otherwise parsing it
 	std::vector<utils::Vector<unsigned int, 2> >	cellPairs;
+
+	/// array of indices of halo cells
+	std::vector<unsigned int>						haloIndices;
+
+	/// array of indices of boundary cells
+	std::vector<unsigned int>						boundaryIndices;
 
 	/// little helper function, to create fast a pair
 	/// @param i1 first index
@@ -114,14 +141,6 @@ private:
 	/// boundary conditions encoded as flags
 	unsigned int boundaryConditions;
 
-	/// store what cells have reflective boundaries and of what type
-	/// each double in the Vector means something different
-	/// 0, int: the cell
-	/// 1, int: the axis
-	/// 2, double: the direction. -1.0 if the border is on the lower side, 1.0 on the positive side
-	/// 3, double: the border's coordinate on the given axis, in the given direction
-	std::vector<utils::Vector<double, 4> >	reflectiveBoundaryCells;
-	
 	/// store groups of values that make it easier to apply periodicBoundaryConditions
 	/// each double in the Vector means something different
 	/// 0, int: cell1
@@ -133,6 +152,9 @@ private:
 
 	/// stores at which axis a periodic boundary exists
 	utils::Vector<bool, 3> periodicBoundaries;
+
+	// store reflective boundaries as planes
+	std::vector<Boundary> boundaries;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
@@ -148,6 +170,86 @@ private:
 		return x + cellCount[0] * (y + z * cellCount[1]);
 	}
 
+	/// helper function to convert 1D index to 2D indices
+	/// @return pair of 2D indices (x, y)
+	inline utils::Vector<unsigned int, 2> Index1DTo2D(const unsigned int index)
+	{
+		utils::Vector<unsigned int, 2> res;
+		
+		// make assertion
+		assert(index < getCellCount());
+
+		res[0] = index % cellCount[0];	// x
+		res[1] = index / cellCount[0];  // y
+
+		return res;
+	}
+
+	/// helper function to convert 1D index to 3D indices
+	/// @return pair of 3D indices (x, y)
+	inline utils::Vector<unsigned int, 3> Index1DTo3D(const unsigned int index)
+	{
+		utils::Vector<unsigned int, 3> res;
+		
+		// make assertion
+		assert(index < getCellCount());
+
+		
+		res[0] = index % cellCount[0];	// x
+		
+		// y, z
+		unsigned int temp = index / cellCount[0]; // == y + z * cellCount[1]
+
+		res[1] = temp % cellCount[1]; // y
+		res[2] = temp / cellCount[1]; // z
+		
+		return res;
+	}
+
+	/// get opposite HaloCell index
+	/// @param index the index for which the opposite halo cell shall be found
+	/// @return returns index of the opposite halo cell
+	inline unsigned int getOppositeHaloCellIndex(unsigned int index)
+	{
+		unsigned int res = 0;
+
+		assert(index < getCellCount());
+
+		// extract x, y, z
+		unsigned int x = dim == 2 ? Index1DTo2D(index)[0] : Index1DTo3D(index)[0];
+		unsigned int y = dim == 2 ? Index1DTo2D(index)[1] : Index1DTo3D(index)[1];
+		unsigned int z = dim == 2 ? 0 : Index1DTo3D(index)[2];
+
+		unsigned int newx = x;
+		unsigned int newy = y;
+		unsigned int newz = z;
+
+		unsigned int xmax = cellCount[0] - 1;
+		unsigned int ymax = cellCount[1] - 1;
+		unsigned int zmax = cellCount[2] - 1;
+
+		// method is, if x, y, z are halo cells, then mirror indices ( that is for x e.g. newx = xmax - x   )
+
+		if(dim == 2)
+		{
+			if(x == 0 || x == xmax)newx = xmax - x;
+			if(y == 0 || y == ymax)newy = ymax - y;
+
+			res = Index2DTo1D(newx, newy);
+		}
+		else if(dim == 3)
+		{
+			if(x == 0 || x == xmax)newx = xmax - x;
+			if(y == 0 || y == ymax)newy = ymax - y;
+			if(z == 0 || z == zmax)newz = zmax - z;
+
+			res = Index3DTo1D(newx, newy, newz);
+		}
+		else LOG4CXX_ERROR(generalOutputLogger, "dimension error");
+
+		return res;
+	}
+
 	/// helper function to calculate the extent of the simulation area
 	/// @return returns the extent of the Simulation area as a 3D vector, note that even if a 2D Grid is used a 3D Vector will be returned
 	utils::Vector<double, 3> calcSimulationAreaExtent()
@@ -157,7 +259,7 @@ private:
 		// calc based on number of cells in each dimension and their individual extent
 		for(int i = 0; i < dim; i++)
 		{
-			res[i] = cellCount[i] * cellSize[i];
+			res[i] = (cellCount[i] - 2) * cellSize[i];
 		}
 
 		return res;
@@ -167,12 +269,8 @@ private:
 	/// before the halo-layer was added
 	utils::Vector<double, 3> originalSimulationAreaExtent;
 	
-	/// define the reflective boundary cells
-	/// for easier iteration later
-	void SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-					bool frontReflectiveBoundary, bool backReflectiveBoundary,
-					// these two will be ignored in the two-dimensional case
-					bool bottomReflectiveBoundary, bool topReflectiveBoundary);
+	/// set boundaries
+	void SetReflectiveBoundaries();
 
 	/// set periodic boundary cells
 	/// for easier iteration later
@@ -201,28 +299,16 @@ private:
 
 	}
 
-	/// function to get particles along a line of cells in direction of an axis in the grid
-	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
-	/// @param start point of start of the cells' line segment
-	/// @param count how many cells shall be visited?
-	/// @param axis axis, can be AXIS_X, AXIS_Y, AXIS_Z
-	///				note that if AXIS_Z is used for dim = 2 there will be an error
-	void	getParticlesOfCellsAlongLine(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, unsigned int count, unsigned int axis);
+	/// function which will calculate all necessary index array
+	void	calcIndices();
 
-	/// function to get particles along a line of cells in direction of an axis in the grid
-	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
-	/// @param start point of start of the cells' line segment, note that if you use e.g. AXIS_XZ the start vector should have form (x, 0, z)
-	/// @param count how many cells shall be visited? (vector pair)
-	/// @param axis axis, can be AXIS_XY, AXIS_XZ, AXIS_YZ
-	void	getParticlesOfCellsAlongRectangle(std::vector<Particle> &out, const utils::Vector<unsigned int, 3> start, const utils::Vector<unsigned int, 2> count, unsigned int axis);
+	/// function to calculate indices of the r-th frame from the outside
+	/// e.g. r = 0 will return indices of the halo frame
+	///		 r = 1 the indices of the boundary cells
+	/// @param r the r-th frame from the outside(starting by zero)
+	/// @param out index conatiner where indices will be stored
+	void	calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r);
 
-	/// function to clear particles along a line of cells in direction of an axis in the grid
-	/// @param out a vector of particles, where particles in the Cells in the line segment are added to
-	/// @param start point of start of the cells' line segment
-	/// @param count how many cells shall be visited?
-	/// @param axis axis, can be AXIS_X, AXIS_Y, AXIS_Z
-	///				note that if AXIS_Z is used for dim = 2 there will be an error
-	void	clearParticlesOfCellsAlongLine(const utils::Vector<unsigned int, 3> start, const unsigned int count, const unsigned int axis);
 
 public:
 	/// default constructor, set everthing to good values
@@ -309,23 +395,17 @@ public:
 
 		if(!Cells)LOG4CXX_ERROR(generalOutputLogger, "memory allocation for cells failed!");
 		
-		// generate pairs
-		generatePairs();
+		// calc Indices (pairs, halo, boundary)
+		calcIndices();
 
 		// assign the particles to their initial cells
 		AssignParticles(particles);
 
 		// set the reflective boundary conditions
-		SetReflectiveBoundaries(boundaryConditions & BC_LEFT,
-								boundaryConditions & BC_RIGHT,
-								boundaryConditions & BC_FRONT,
-								boundaryConditions & BC_BACK,
-								boundaryConditions & BC_BOTTOM,
-								boundaryConditions & BC_TOP);
+		SetReflectiveBoundaries();
 		
 		// set the periodic boundary conditions
 		SetPeriodicBoundaries(true, true, true);
-		periodicBoundaryGroups;
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
@@ -560,9 +640,6 @@ public:
 		// clear if necessary
 		if(!p.empty())p.clear();
 
-		// add halo...
-		//p.insert(p.end(), halo.begin(), halo.end());
-
 		assert(Cells);
 
 		//go through cells
@@ -576,6 +653,7 @@ public:
 				p.push_back(*it);
 			}
 		}
+
 		return p;
 	}
 
@@ -652,6 +730,10 @@ public:
 	/// get all boundary particles
 	/// @return new vector of boundary particles
 	std::vector<Particle>			getBoundaryParticles();
+
+
+	// befriend with ParticleContainerTest in order to test private functions
+	friend class					ParticleContainerTest;
 };
 
 #endif 

@@ -61,10 +61,32 @@ public:
 		}
 	}
 
-	Vector(type arg) {
+	Vector(const type& arg) {
 		for (int i = 0; i < length; i++) {
 			content[i] = arg;
 		}
+	}
+
+	// useful constructors
+	Vector(const type& x_1, const type& x_2)
+	{
+		assert(length >= 2);
+
+		content[0] = x_1;
+		content[1] = x_2;
+
+		for(int i = 2; i < length; i++)content[i] = 0;
+	}
+
+	Vector(const type& x_1, const type& x_2, const type& x_3)
+	{
+		assert(length >= 3);
+
+		content[0] = x_1;
+		content[1] = x_2;
+		content[2] = x_3;
+
+		for(int i = 3; i < length; i++)content[i] = 0;
 	}
 
 	// improve performance by reducing senseless copy calls...
@@ -129,6 +151,7 @@ public:
 		return sqrt(square_sum);
 	}
 
+	/// @return Norm squared, so dot product of v with v
 	double L2NormSq() const {
 		double square_sum = 0;
 		for (int i = 0; i < length; i++) {
@@ -141,7 +164,7 @@ public:
 	/// @param to distance between caller vector and vector to
 	/// @return returns distance of vector to given vector
 	///
-	double distance(const Vector& to)
+	inline double distance(const Vector& to)
 	{
 		Vector r = to - *this;
 		return r.L2Norm();
@@ -152,13 +175,24 @@ public:
 	/// can be useful as sqrt is a very expensive operation
 	/// @return returns distance of vector to given vector
 	///
-	double distanceSq(const Vector& to)
+	inline double distanceSq(const Vector& to)
 	{
 		Vector r = to - *this;
 
 		// dot product
 		return r * r;
 	}
+
+	/// normalize vector, changes components so euclidean norm of the vector is now 1
+	/// @return returns normalized vector
+	Vector normalize()
+	{
+		double norm = L2Norm();
+		for(int i = 0; i < length; i++)
+			content[i] /= norm;
+		return *this;
+	}
+
 
 	bool equals(const Vector& rhs) const {
 		for (int i = 0; i < length; i++) {

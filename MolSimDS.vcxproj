@@ -63,7 +63,6 @@
       <AdditionalDependencies>log4cxx.lib;cppunitd.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);opengl32.lib;glut32.lib;glu32.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
-    <CXX_Tree_Mapping_Rule />
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -102,6 +101,7 @@
     <ClInclude Include="src\Simulation.h" />
     <ClInclude Include="src\utils\Base.h" />
     <ClInclude Include="src\utils\Helper.h" />
+    <ClInclude Include="src\utils\Plane.h" />
     <ClInclude Include="src\utils\Timer.h" />
     <ClInclude Include="src\utils\utils.h" />
     <ClInclude Include="src\utils\Vector.h" />
@@ -160,15 +160,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="example.xml" />
+    <None Include="FallingDrop.xml" />
     <None Include="listexample.xml" />
-    <None Include="periodicBoundaryTest.xml">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="PeriodicBoundaries.xml" />
+    <None Include="periodicBoundaryTest.xml" />
     <None Include="sphereexample.xml" />
     <None Include="Task2.xml" />
     <None Include="Task3.xml">
       <SubType>Designer</SubType>
     </None>
+    <None Include="test.xml" />
+    <None Include="ThermostatSmall.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
