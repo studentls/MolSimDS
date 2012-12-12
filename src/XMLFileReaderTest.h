@@ -57,6 +57,7 @@ private:
 						"<simulationfile xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n" \
 						"	   xsi:noNamespaceSchemaLocation=\"simulationfile.xsd\">\n" \
 						"	  <params>\n" \
+						"		<dimension>2</dimension>" \
 						"	<output>out</output>\n" \
     					"		<iterationsperoutput>10</iterationsperoutput>\n" \
 						"	<brownianMotionFactor> 0.1 </brownianMotionFactor> \n"   

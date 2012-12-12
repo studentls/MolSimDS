@@ -159,6 +159,86 @@ private:
 		return x + cellCount[0] * (y + z * cellCount[1]);
 	}
 
+	/// helper function to convert 1D index to 2D indices
+	/// @return pair of 2D indices (x, y)
+	inline utils::Vector<unsigned int, 2> Index1DTo2D(const unsigned int index)
+	{
+		utils::Vector<unsigned int, 2> res;
+		
+		// make assertion
+		assert(index < getCellCount());
+
+		res[0] = index % cellCount[0];	// x
+		res[1] = index / cellCount[0];  // y
+
+		return res;
+	}
+
+	/// helper function to convert 1D index to 3D indices
+	/// @return pair of 3D indices (x, y)
+	inline utils::Vector<unsigned int, 3> Index1DTo3D(const unsigned int index)
+	{
+		utils::Vector<unsigned int, 3> res;
+		
+		// make assertion
+		assert(index < getCellCount());
+
+		
+		res[0] = index % cellCount[0];	// x
+		
+		// y, z
+		unsigned int temp = index / cellCount[0]; // == y + z * cellCount[1]
+
+		res[1] = temp % cellCount[1]; // y
+		res[2] = temp / cellCount[1]; // z
+		
+		return res;
+	}
+
+	/// get opposite HaloCell index
+	/// @param index the index for which the opposite halo cell shall be found
+	/// @return returns index of the opposite halo cell
+	inline unsigned int getOppositeHaloCellIndex(unsigned int index)
+	{
+		unsigned int res = 0;
+
+		assert(index < getCellCount());
+
+		// extract x, y, z
+		unsigned int x = dim == 2 ? Index1DTo2D(index)[0] : Index1DTo3D(index)[0];
+		unsigned int y = dim == 2 ? Index1DTo2D(index)[1] : Index1DTo3D(index)[1];
+		unsigned int z = dim == 2 ? 0 : Index1DTo3D(index)[2];
+
+		unsigned int newx = x;
+		unsigned int newy = y;
+		unsigned int newz = z;
+
+		unsigned int xmax = cellCount[0] - 1;
+		unsigned int ymax = cellCount[1] - 1;
+		unsigned int zmax = cellCount[2] - 1;
+
+		// method is, if x, y, z are halo cells, then mirror indices ( that is for x e.g. newx = xmax - x   )
+
+		if(dim == 2)
+		{
+			if(x == 0 || x == xmax)newx = xmax - x;
+			if(y == 0 || y == ymax)newy = ymax - y;
+
+			res = Index2DTo1D(newx, newy);
+		}
+		else if(dim == 3)
+		{
+			if(x == 0 || x == xmax)newx = xmax - x;
+			if(y == 0 || y == ymax)newy = ymax - y;
+			if(z == 0 || z == zmax)newz = zmax - z;
+
+			res = Index3DTo1D(newx, newy, newz);
+		}
+		else LOG4CXX_ERROR(generalOutputLogger, "dimension error");
+
+		return res;
+	}
+
 	/// helper function to calculate the extent of the simulation area
 	/// @return returns the extent of the Simulation area as a 3D vector, note that even if a 2D Grid is used a 3D Vector will be returned
 	utils::Vector<double, 3> calcSimulationAreaExtent()
@@ -174,11 +254,8 @@ private:
 		return res;
 	}
 	
-	/// define the reflective boundary cells
-	void SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-					bool frontReflectiveBoundary, bool backReflectiveBoundary,
-					// these two will be ignored in the two-dimensional case
-					bool bottomReflectiveBoundary, bool topReflectiveBoundary);
+	/// set boundaries
+	void SetBoundaries();
 
 
 	/// function to assign a vector of particles to formerly properly initialized cells
@@ -306,12 +383,7 @@ public:
 		AssignParticles(particles);
 
 		// set the reflective boundary conditions
-		SetReflectiveBoundaries(this->boundaryConditions & BC_LEFT,
-								this->boundaryConditions & BC_RIGHT,
-								this->boundaryConditions & BC_FRONT,
-								this->boundaryConditions & BC_BACK,
-								this->boundaryConditions & BC_BOTTOM,
-								this->boundaryConditions & BC_TOP);
+		SetBoundaries();
 	}
 	
 	/// applies the reflective boundary condition to all cells that apply
@@ -555,6 +627,18 @@ public:
 			}
 		}
 
+		// for test reasons, apply second type of particles...
+		// grid
+		for(int x = 0; x < cellCount[0]; x++)
+			for(int y = 0; y < cellCount[1]; y++)
+			{
+				Particle pt;
+				pt.x[0] = this->frontLowerLeftCorner[0] + x * cellSize[0];
+				pt.x[1] = this->frontLowerLeftCorner[1] + y * cellSize[1];
+
+				p.push_back(pt);
+			}
+
 		return p;
 	}
 
@@ -627,6 +711,10 @@ public:
 	/// get all boundary particles
 	/// @return new vector of boundary particles
 	std::vector<Particle>			getBoundaryParticles();
+
+
+	// befriend with ParticleContainerTest in order to test private functions
+	friend class ParticleContainerTest;
 };
 
 #endif 

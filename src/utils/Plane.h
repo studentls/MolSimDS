@@ -58,7 +58,7 @@ namespace utils
 
 		Vector<double, 3> normalize()	{return n.normalize();}
 
-		double				absdistance(const Vector<double, 3>& point)	{return abs(n * point - d);/*vector dot product, note that n is normalized*/}
+		double				absdistance(const Vector<double, 3>& point)	{return abs(n * point + d);/*vector dot product, note that n is normalized*/}
 		double				distance(const Vector<double, 3>& point)	{return n * point + d;/*vector dot product, note that n is normalized*/}
 		
 	

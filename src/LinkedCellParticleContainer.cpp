@@ -116,11 +116,19 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 						continue;
 
 
-					// create a temporary, virtual Particle
-					// a copy of the current particle, but located on the boundary
-					Particle vp(*pt);
-					vp.x = vp.x - dist * bt->p.n;
-					(*func)(data, *pt, vp);				
+					// determine boundary type
+					if(bt->type == BT_REFLECTIVE)
+					{
+						// create a temporary, virtual Particle
+						// a copy of the current particle, but located on the boundary
+						Particle vp(*pt);
+						vp.x = vp.x - dist * bt->p.n;
+						(*func)(data, *pt, vp);				
+					}
+					else if(bt->type == BT_PERIODIC)
+					{
+								
+					}
 			}
 		}
 	}
@@ -202,48 +210,53 @@ void	LinkedCellParticleContainer::generatePairs()
 }
 
 
-void	LinkedCellParticleContainer::SetReflectiveBoundaries(bool leftReflectiveBoundary, bool rightReflectiveBoundary,
-					bool frontReflectiveBoundary, bool backReflectiveBoundary,
-					// these two will be ignored in the two-dimensional case
-					bool bottomReflectiveBoundary, bool topReflectiveBoundary)
+void	LinkedCellParticleContainer::SetBoundaries()
 {
 	using namespace utils;
 
 	Boundary boundary;
-	boundary.type = BT_REFLECTIVE;
+	boundary.type = 0;
 
 	// insert boundaries
-	if(leftReflectiveBoundary)
+	// additionally create normals of planes such as all normals point into the cuboidal simulation area
+
+	if(boundaryConditions & BC_LEFT || boundaryConditions & BC_LEFT_PERIODIC)
 	{		
 		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0], 0.0, 0.0), Vector<double, 3>(1.0, 0.0, 0.0));
+		boundary.type = boundaryConditions & BC_LEFT ? BT_REFLECTIVE : BT_PERIODIC;
 		boundaries.push_back(boundary);
 	}
-	if(rightReflectiveBoundary)
+	if(boundaryConditions & BC_RIGHT || boundaryConditions & BC_RIGHT_PERIODIC)
 	{		
-		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0] + (cellCount[0] - 2) * cellSize[0], 0.0, 0.0), Vector<double, 3>(1.0, 0.0, 0.0));
+		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0] + (cellCount[0] - 2) * cellSize[0], 0.0, 0.0), Vector<double, 3>(-1.0, 0.0, 0.0));
+		boundary.type = boundaryConditions & BC_RIGHT ? BT_REFLECTIVE : BT_PERIODIC;
 		boundaries.push_back(boundary);
 	}
-	if(frontReflectiveBoundary)
+	if(boundaryConditions & BC_FRONT || boundaryConditions & BC_FRONT_PERIODIC)
 	{		
 		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1], 0.0), Vector<double, 3>(0.0, 1.0, 0.0));
+		boundary.type = boundaryConditions & BC_FRONT ? BT_REFLECTIVE : BT_PERIODIC;
 		boundaries.push_back(boundary);
 	}
-	if(backReflectiveBoundary)
+	if(boundaryConditions & BC_BACK || boundaryConditions & BC_BACK_PERIODIC)
 	{		
-		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1] + (cellCount[1] - 2) * cellSize[1], 0.0), Vector<double, 3>(0.0, 1.0, 0.0));
+		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1] + (cellCount[1] - 2) * cellSize[1], 0.0), Vector<double, 3>(0.0, -1.0, 0.0));
+		boundary.type = boundaryConditions & BC_BACK ? BT_REFLECTIVE : BT_PERIODIC;
 		boundaries.push_back(boundary);
 	}
+
 	if(dim > 2)
 	{	
-		if(bottomReflectiveBoundary)
+		if(boundaryConditions & BC_BOTTOM || boundaryConditions & BC_BOTTOM_PERIODIC)
 		{		
 			boundary.p.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2]), Vector<double, 3>(0.0, 0.0, 1.0));
+			boundary.type = boundaryConditions & BC_BOTTOM ? BT_REFLECTIVE : BT_PERIODIC;
 			boundaries.push_back(boundary);
 		}
-		if(topReflectiveBoundary)
+		if(boundaryConditions & BC_TOP || boundaryConditions & BC_TOP_PERIODIC)
 		{		
-			boundary.p 
-				.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2] + (cellCount[2] - 2) * cellSize[2]), Vector<double, 3>(0.0, 0.0, 1.0));
+			boundary.p.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2] + (cellCount[2] - 2) * cellSize[2]), Vector<double, 3>(0.0, 0.0, -1.0));
+			boundary.type = boundaryConditions & BC_TOP ? BT_REFLECTIVE : BT_PERIODIC;
 			boundaries.push_back(boundary);
 		}
 	}

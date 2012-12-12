@@ -33,7 +33,7 @@ author: F.Dietz & L.Spiegelberg
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
-          <condition value="left" type="periodic"></condition>
+          <condition value="left" type="periodic"></condition> 
           <condition value="right" type="periodic"></condition>
           <condition value="bottom" type="reflective"></condition>
         </conditions>
@@ -48,7 +48,7 @@ author: F.Dietz & L.Spiegelberg
     
     <!-- one single particle -->
     <particle>
-      <X>5.0 5.0 0.0</X>
+      <X>1.4 5.0 0.0</X>
       <V>-10.0 0.0 0.0</V>
       <m>1.0</m>
       <material>sphereMat</material>

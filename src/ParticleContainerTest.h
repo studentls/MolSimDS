@@ -56,6 +56,7 @@ class ParticleContainerTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testListParticleContainerIterationPairwise);
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo);	
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetBoundary);	
+	CPPUNIT_TEST(testLinkedCellParticleContainerIndices);
 	CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -92,6 +93,36 @@ private:
 			
 			particles.push_back(p);
 		}
+	}
+
+	/// create simple LinkedCellContainer with a cuboid in it
+	LinkedCellParticleContainer* createSimpleLC(const unsigned int dimx, const unsigned int dimy, const unsigned int dimz)
+	{
+		ListParticleContainer lpc;
+		utils::Vector<double, 3> vel;
+		utils::Vector<double, 3> extent;
+		utils::Vector<unsigned int, 3> N;
+		utils::Vector<double, 3> lowercorner;
+		ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+
+		int dim = dimz == 0 ? 2 : 3;
+		lowercorner[0] = 0.0;
+		lowercorner[1] = 0.0;
+		lowercorner[2] = 0.0; 
+
+		N[0] = dimx;
+		N[1] = dimy;
+		N[2] = dimz;
+
+		for(int i = 0; i < dim; i++)
+			{
+				extent[i] = N[i] - 2;
+			}
+
+		//construct container...
+		LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(dim, lpc.getParticles(), 1.0, lowercorner, extent, BC_NONE, 1.0);
+
+		return pc;
 	}
 
 public:
@@ -311,6 +342,42 @@ public:
 			}
 		}
 
+	}
+
+	void testLinkedCellParticleContainerIndices()
+	{
+		using namespace utils;
+		int index = 0;
+		int dimx = 20;
+		int dimy = 20;
+		int dimz = 20;
+
+		// create a linkedcell particle container
+		LinkedCellParticleContainer *pc2D = this->createSimpleLC(dimx, dimy, 0);
+		LinkedCellParticleContainer *pc3D = this->createSimpleLC(dimx, dimy, dimz);
+
+		// 2D
+		for(int x = 0; x < dimx; x++)
+			for(int y = 0; y < dimy; y++)
+			{
+				index = pc2D->Index2DTo1D(x, y);
+				CPPUNIT_ASSERT(pc2D->Index1DTo2D(index)[0] == x);
+				CPPUNIT_ASSERT(pc2D->Index1DTo2D(index)[1] == y);
+			}
+
+		// 3D
+		for(int x = 0; x < dimx; x++)
+			for(int y = 0; y < dimy; y++)
+				for(int z = 0; z < dimz; z++)
+				{
+					index = pc3D->Index3DTo1D(x, y, z);
+					CPPUNIT_ASSERT(pc3D->Index1DTo3D(index)[0] == x);
+					CPPUNIT_ASSERT(pc3D->Index1DTo3D(index)[1] == y);
+					CPPUNIT_ASSERT(pc3D->Index1DTo3D(index)[2] == z);
+				}		
+
+		SAFE_DELETE(pc2D);
+		SAFE_DELETE(pc3D);
 	}
 };
 
