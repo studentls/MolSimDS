@@ -37,7 +37,9 @@ author: F.Dietz & L.Spiegelberg
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
-          <condition value="all"></condition>
+          <condition value="front" type="reflective"></condition>
+          <condition value="left" type="periodic"></condition>
+          <condition value="right" type="periodic"></condition>
         </conditions>
       </LinkedCell>
     </algorithm>
