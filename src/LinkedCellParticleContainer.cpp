@@ -107,24 +107,19 @@ void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(
 			{
 				
 				// go through boundaries (max. 6)
-				for(vector<Boundary>::iterator bt = boundaries.begin(); bt != boundaries.end(); bt++)
+				for(vector<Plane>::iterator bt = reflectiveBoundaries.begin(); bt != reflectiveBoundaries.end(); bt++)
 				{
-					double dist = bt->p.distance(pt->x);
+					double dist = bt->distance(pt->x);
 				
 					// skip the particle if it is too far away from the border
 					if (abs(dist) > reflectiveBoundaryDistance)
 						continue;
 
-					// determine boundary type
-					if(bt->type == BT_REFLECTIVE)
-					{
-						// create a temporary, virtual Particle
+					    // create a temporary, virtual Particle
 						// a copy of the current particle, but located on the boundary
 						Particle vp(*pt);
-						vp.x = vp.x - dist * bt->p.n;
-						(*func)(data, *pt, vp);				
-					}
-					
+						vp.x = vp.x - dist * bt->n;
+						(*func)(data, *pt, vp);								
 			}
 		}
 	}
@@ -211,9 +206,17 @@ void	LinkedCellParticleContainer::generatePairs()
 
 void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, bool zAxis)
 {
+	// clear container if not empty
+	if(!periodicBoundaryGroups.empty())periodicBoundaryGroups.clear();
+
+	// set axises
 	periodicBoundaries[0] = xAxis;
 	periodicBoundaries[1] = yAxis;
 	periodicBoundaries[2] = zAxis;
+
+	// get extent of simulation area
+	utils::Vector<double, 3> SimulationAreaExtent = calcSimulationAreaExtent();
+
 	if (dim == 2)
 	{
 		for (int x1 = 0; x1 < cellCount[0]; x1++)
@@ -254,13 +257,14 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 									continue;
 								
 								// if the algorithm gets till here, it is a pair of indirect neighbours. store it.
-								utils::Vector<double, 5> vec;
-								vec[0] = index1;
-								vec[1] = index2;
-								vec[2] = xOpposite ? (originalSimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
-								vec[3] = yOpposite ? (originalSimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
-								vec[4] = 0;
-								periodicBoundaryGroups.push_back(vec);
+								PeriodicBoundary b;
+								b.cell1 = index1;
+								b.cell2 = index2;
+								b.xAxis = xOpposite ? (SimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
+								b.yAxis = yOpposite ? (SimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
+								b.zAxis = 0.0;
+
+								periodicBoundaryGroups.push_back(b);
 							}
 					}
 	}
@@ -311,37 +315,48 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 												continue;
 								
 											// if the algorithm gets till here, it is a pair of indirect neighbours. store it.
-											utils::Vector<double, 5> vec;
-											vec[0] = index1;
-											vec[1] = index2;
-											vec[2] = xOpposite ? (originalSimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
-											vec[3] = yOpposite ? (originalSimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
-											vec[4] = zOpposite ? (originalSimulationAreaExtent[2] * ((z1 == 0) ? 1.0 : -1.0)) : 0;
-											periodicBoundaryGroups.push_back(vec);
+											PeriodicBoundary b;
+											b.cell1 = index1;
+											b.cell2 = index2;
+											b.xAxis = xOpposite ? (SimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
+											b.yAxis = yOpposite ? (SimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
+											b.zAxis = zOpposite ? (SimulationAreaExtent[2] * ((z1 == 0) ? 1.0 : -1.0)) : 0;
+											periodicBoundaryGroups.push_back(b);
 										}
 							}
 	}
 }
 
-void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsForce(void(*func)(void*, Particle&, Particle&), void *data)
+void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
 {
-	for (std::vector<utils::Vector<double, 5> >::iterator it = periodicBoundaryGroups.begin(); it != periodicBoundaryGroups.end(); it++)
+	for (std::vector<PeriodicBoundary>::iterator it = periodicBoundaryGroups.begin(); it != periodicBoundaryGroups.end(); it++)
 	{
-		utils::Vector<double, 5>& elem = *it;
-		std::vector<Particle>& cell1 = Cells[(int)(elem[0])];
-		std::vector<Particle>& cell2 = Cells[(int)(elem[1])];
-		double axis1 = (int)(elem[2]);
-		double axis2 = (int)(elem[3]);
-		double axis3 = (int)(elem[4]);
-		for (std::vector<Particle>::iterator it = cell2.begin() ; it < cell2.end(); it++) {
+		PeriodicBoundary& b = *it;
+
+		std::vector<Particle>& cell1 = Cells[b.cell1];
+		std::vector<Particle>& cell2 = Cells[b.cell2];
+		double axis1 = b.xAxis;
+		double axis2 = b.yAxis;
+		double axis3 = b.zAxis;
+
+		// interact cells
+		// to achieve this, temporarily shift coordinates
+		for (std::vector<Particle>::iterator it = cell2.begin() ; it < cell2.end(); it++)
+		{
 			Particle& p2 = *it;
+
+			// start shift
 			p2.x[0] -= axis1;
 			p2.x[1] -= axis2;
 			p2.x[2] -= axis3;
-			for (std::vector<Particle>::iterator it = cell1.begin() ; it < cell1.end(); it++) {
+
+			for (std::vector<Particle>::iterator it = cell1.begin() ; it < cell1.end(); it++)
+			{
 				Particle& p1 = *it;
 				func(data, p1, p2);
 			}
+
+			// end shift
 			p2.x[0] += axis1;
 			p2.x[1] += axis2;
 			p2.x[2] += axis3;
@@ -349,11 +364,13 @@ void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsForce(void(*fun
 	}
 }
 
-void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsMovement()
+void LinkedCellParticleContainer::ReassignHaloForPeriodicConditions()
 {
 	// skip this function if no periodic boundaries are used
 	if (!periodicBoundaries[0] && !periodicBoundaries[1] && !periodicBoundaries[2])
 		return;
+
+	utils::Vector<double, 3> SimulationAreaExtent = calcSimulationAreaExtent();
 
 	// go through all Cells...
 	for(int i = 0; i < getCellCount(); i++)
@@ -367,9 +384,9 @@ void LinkedCellParticleContainer::ApplyPeriodicBoundaryConditionsMovement()
 				if (periodicBoundaries[i])
 				{
 					if (p.x[i] < this->frontLowerLeftCorner[i])
-						p.x[i] += this->originalSimulationAreaExtent[i];
-					else if (p.x[i] > this->frontLowerLeftCorner[i] + this->originalSimulationAreaExtent[i])
-						p.x[i] -= this->originalSimulationAreaExtent[i];
+						p.x[i] += SimulationAreaExtent[i];
+					else if (p.x[i] > this->frontLowerLeftCorner[i] + SimulationAreaExtent[i])
+						p.x[i] -= SimulationAreaExtent[i];
 				}
 		}
 	}
@@ -380,50 +397,43 @@ void	LinkedCellParticleContainer::SetReflectiveBoundaries()
 	using namespace utils;
 
 
-	Boundary boundary;
-	boundary.type = 0;
+	Plane boundary;
 
 	// insert boundaries
 	// additionally create normals of planes such as all normals point into the cuboidal simulation area
 
-	if(boundaryConditions & BC_LEFT || boundaryConditions & BC_LEFT_PERIODIC)
+	if(boundaryConditions & BC_LEFT)
 	{		
-		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0], 0.0, 0.0), Vector<double, 3>(1.0, 0.0, 0.0));
-		boundary.type = boundaryConditions & BC_LEFT ? BT_REFLECTIVE : BT_PERIODIC;
-		boundaries.push_back(boundary);
+		boundary.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0], 0.0, 0.0), Vector<double, 3>(1.0, 0.0, 0.0));		
+		reflectiveBoundaries.push_back(boundary);
 	}
-	if(boundaryConditions & BC_RIGHT || boundaryConditions & BC_RIGHT_PERIODIC)
+	if(boundaryConditions & BC_RIGHT)
 	{		
-		boundary.p.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0] + (cellCount[0] - 2) * cellSize[0], 0.0, 0.0), Vector<double, 3>(-1.0, 0.0, 0.0));
-		boundary.type = boundaryConditions & BC_RIGHT ? BT_REFLECTIVE : BT_PERIODIC;
-		boundaries.push_back(boundary);
+		boundary.constructFromPoint(Vector<double, 3>(frontLowerLeftCorner[0] + (cellCount[0] - 2) * cellSize[0], 0.0, 0.0), Vector<double, 3>(-1.0, 0.0, 0.0));
+		reflectiveBoundaries.push_back(boundary);
 	}
-	if(boundaryConditions & BC_FRONT || boundaryConditions & BC_FRONT_PERIODIC)
+	if(boundaryConditions & BC_FRONT)
 	{		
-		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1], 0.0), Vector<double, 3>(0.0, 1.0, 0.0));
-		boundary.type = boundaryConditions & BC_FRONT ? BT_REFLECTIVE : BT_PERIODIC;
-		boundaries.push_back(boundary);
+		boundary.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1], 0.0), Vector<double, 3>(0.0, 1.0, 0.0));
+		reflectiveBoundaries.push_back(boundary);
 	}
-	if(boundaryConditions & BC_BACK || boundaryConditions & BC_BACK_PERIODIC)
+	if(boundaryConditions & BC_BACK)
 	{		
-		boundary.p.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1] + (cellCount[1] - 2) * cellSize[1], 0.0), Vector<double, 3>(0.0, -1.0, 0.0));
-		boundary.type = boundaryConditions & BC_BACK ? BT_REFLECTIVE : BT_PERIODIC;
-		boundaries.push_back(boundary);
+		boundary.constructFromPoint(Vector<double, 3>(0.0, frontLowerLeftCorner[1] + (cellCount[1] - 2) * cellSize[1], 0.0), Vector<double, 3>(0.0, -1.0, 0.0));
+		reflectiveBoundaries.push_back(boundary);
 	}
 
 	if(dim > 2)
 	{	
-		if(boundaryConditions & BC_BOTTOM || boundaryConditions & BC_BOTTOM_PERIODIC)
+		if(boundaryConditions & BC_BOTTOM)
 		{		
-			boundary.p.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2]), Vector<double, 3>(0.0, 0.0, 1.0));
-			boundary.type = boundaryConditions & BC_BOTTOM ? BT_REFLECTIVE : BT_PERIODIC;
-			boundaries.push_back(boundary);
+			boundary.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2]), Vector<double, 3>(0.0, 0.0, 1.0));
+			reflectiveBoundaries.push_back(boundary);
 		}
-		if(boundaryConditions & BC_TOP || boundaryConditions & BC_TOP_PERIODIC)
+		if(boundaryConditions & BC_TOP)
 		{		
-			boundary.p.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2] + (cellCount[2] - 2) * cellSize[2]), Vector<double, 3>(0.0, 0.0, -1.0));
-			boundary.type = boundaryConditions & BC_TOP ? BT_REFLECTIVE : BT_PERIODIC;
-			boundaries.push_back(boundary);
+			boundary.constructFromPoint(Vector<double, 3>(0, 0.0, frontLowerLeftCorner[2] + (cellCount[2] - 2) * cellSize[2]), Vector<double, 3>(0.0, 0.0, -1.0));
+			reflectiveBoundaries.push_back(boundary);
 		}
 	}
 

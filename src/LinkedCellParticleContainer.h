@@ -31,23 +31,17 @@
 #define BC_BACK			0x20
 
 // special periodic boundaries
-#define BC_RIGHT_PERIODIC	0x100
-#define BC_LEFT_PERIODIC	0x200
-#define BC_TOP_PERIODIC		0x400
-#define BC_BOTTOM_PERIODIC	0x800
-#define BC_FRONT_PERIODIC	0x1000
-#define BC_BACK_PERIODIC	0x2000
+#define BC_PERIODIC_XAXIS	0x100
+#define BC_PERIODIC_YAXIS	0x200
+#define BC_PERIODIC_ZAXIS	0x400
 
-
-// boundary type
-#define BT_REFLECTIVE   0x1
-#define BT_PERIODIC		0x2
-
-/// helper struct for a boundary
-struct Boundary
+struct PeriodicBoundary
 {
-	utils::Plane p;			/// plane to store where the boundary is
-	unsigned int type;	/// type of boundary
+	unsigned int cell1;	/// index for first cell
+	unsigned int cell2;	/// index for second cell
+	double	xAxis;		/// distance on x - axis (0 or length of area on axis)
+	double	yAxis;		/// distance on y - axis (0 or length of area on axis)
+	double	zAxis;		/// distance on y - axis (0 or length of area on axis)
 };
 
 /// a class that is used to store Particles and iterate over them
@@ -142,19 +136,13 @@ private:
 	unsigned int boundaryConditions;
 
 	/// store groups of values that make it easier to apply periodicBoundaryConditions
-	/// each double in the Vector means something different
-	/// 0, int: cell1
-	/// 1, int: cell2
-	/// 2, double: axis1 (0 or length of area on axis)
-	/// 3, double: axis2 (0 or length of area on axis)
-	/// 4, double: axis3 (0 or length of area on axis)
-	std::vector<utils::Vector<double, 5> > periodicBoundaryGroups;
+	std::vector<PeriodicBoundary > periodicBoundaryGroups;
 
 	/// stores at which axis a periodic boundary exists
 	utils::Vector<bool, 3> periodicBoundaries;
 
 	// store reflective boundaries as planes
-	std::vector<Boundary> boundaries;
+	std::vector<utils::Plane> reflectiveBoundaries;
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
@@ -264,10 +252,6 @@ private:
 
 		return res;
 	}
-
-	/// store the original extent of the simulation area as a three dimensional vector
-	/// before the halo-layer was added
-	utils::Vector<double, 3> originalSimulationAreaExtent;
 	
 	/// set boundaries
 	void SetReflectiveBoundaries();
@@ -308,6 +292,75 @@ private:
 	/// @param r the r-th frame from the outside(starting by zero)
 	/// @param out index conatiner where indices will be stored
 	void	calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r);
+
+	/// applies the reflective boundary condition to all cells that apply
+	/// @param func function pointer, to calculate interaction with boundary particle
+	/// @data optional data given to func
+	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
+	
+	/// applies forces between particles on opposite sides of periodic boundaries
+	/// @param func function pointer, to calculate interaction with boundary particle on the other side
+	/// @data optional data given to func
+	void ApplyPeriodicBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
+
+	/// ensure that particles that leave a periodic boundary are correctly entered on the opposite side
+	void ReassignHaloForPeriodicConditions();
+
+	/// inline method to quickly calculate an index for reassignment
+	/// @return returns index for grid including halo cells
+	inline int PositionToIndex2D(const utils::Vector<double, 3>& pos)
+	{
+		int xIndex = 0, yIndex = 0;
+
+		// calc Index
+		double x = (pos[0] - frontLowerLeftCorner[0]) / cellSize[0];
+		double y = (pos[1] - frontLowerLeftCorner[1]) / cellSize[1];
+				
+		// is particle contained in grid or halo?
+		// note that the regular grid starts with (1, 1)
+		
+		if(x < 0)xIndex = 0;
+		else xIndex =(int)x + 1;
+		if(y < 0)yIndex = 0;
+		else yIndex =(int)y + 1;
+		
+		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;
+		if(yIndex > cellCount[1] - 2)yIndex = cellCount[1] - 1;
+
+				
+		// make index
+		return Index2DTo1D(xIndex, yIndex);
+	}
+
+	/// inline method to quickly calculate an index for reassignment
+	/// @return returns index for grid including halo cells
+	inline int PositionToIndex3D(const utils::Vector<double, 3>& pos)
+	{
+		int xIndex = 0, yIndex = 0, zIndex = 0;
+
+		// calc Index
+		double x = (pos[0] - frontLowerLeftCorner[0]) / cellSize[0];
+		double y = (pos[1] - frontLowerLeftCorner[1]) / cellSize[1];
+		double z = (pos[2] - frontLowerLeftCorner[2]) / cellSize[2];
+				
+		// is particle contained in grid or halo?
+		// note that the regular grid starts with (1, 1, 1)
+		
+		if(x < 0)xIndex = 0;
+		else xIndex =(int)x + 1;
+		if(y < 0)yIndex = 0;
+		else yIndex =(int)y + 1;
+		if(z < 0)zIndex = 0;
+		else zIndex =(int)z + 1;
+		
+		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;
+		if(yIndex > cellCount[1] - 2)yIndex = cellCount[1] - 1;
+		if(zIndex > cellCount[2] - 2)zIndex = cellCount[2] - 1;
+
+				
+		// make index
+		return Index3DTo1D(xIndex, yIndex, zIndex);
+	}
 
 
 public:
@@ -366,7 +419,6 @@ public:
 		this->frontLowerLeftCorner = frontLowerLeftCorner;
 		this->reflectiveBoundaryDistance = sigma * 1.1225;
 		this->boundaryConditions = boundaryConditions;
-		this->originalSimulationAreaExtent = simulationAreaExtent;
 
 		// calc number of cells in each dimension, note that we are rounding down
 		// this is done because the number of cells that fit in the designated area may not be a natural number
@@ -405,76 +457,9 @@ public:
 		SetReflectiveBoundaries();
 		
 		// set the periodic boundary conditions
-		SetPeriodicBoundaries(true, true, true);
-	}
-	
-	/// applies the reflective boundary condition to all cells that apply
-	/// @param func function pointer, to calculate interaction with boundary particle
-	/// @data optional data given to func
-	void ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data);
-	
-	/// applies forces between particles on opposite sides of periodic boundaries
-	/// @param func function pointer, to calculate interaction with boundary particle on the other side
-	/// @data optional data given to func
-	void ApplyPeriodicBoundaryConditionsForce(void(*func)(void*, Particle&, Particle&), void *data);
-
-	/// ensure that particles that leave a periodic boundary are correctly entered on the opposite side
-	void ApplyPeriodicBoundaryConditionsMovement();
-
-	/// inline method to quickly calculate an index for reassignment
-	/// @return returns index for grid including halo cells
-	inline int PositionToIndex2D(const utils::Vector<double, 3>& pos)
-	{
-		int xIndex = 0, yIndex = 0;
-
-		// calc Index
-		double x = (pos[0] - frontLowerLeftCorner[0]) / cellSize[0];
-		double y = (pos[1] - frontLowerLeftCorner[1]) / cellSize[1];
-				
-		// is particle contained in grid or halo?
-		// note that the regular grid starts with (1, 1)
-		
-		if(x < 0)xIndex = 0;
-		else xIndex =(int)x + 1;
-		if(y < 0)yIndex = 0;
-		else yIndex =(int)y + 1;
-		
-		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;
-		if(yIndex > cellCount[1] - 2)yIndex = cellCount[1] - 1;
-
-				
-		// make index
-		return Index2DTo1D(xIndex, yIndex);
-	}
-
-	/// inline method to quickly calculate an index for reassignment
-	/// @return returns index for grid including halo cells
-	inline int PositionToIndex3D(const utils::Vector<double, 3>& pos)
-	{
-		int xIndex = 0, yIndex = 0, zIndex = 0;
-
-		// calc Index
-		double x = (pos[0] - frontLowerLeftCorner[0]) / cellSize[0];
-		double y = (pos[1] - frontLowerLeftCorner[1]) / cellSize[1];
-		double z = (pos[2] - frontLowerLeftCorner[2]) / cellSize[2];
-				
-		// is particle contained in grid or halo?
-		// note that the regular grid starts with (1, 1, 1)
-		
-		if(x < 0)xIndex = 0;
-		else xIndex =(int)x + 1;
-		if(y < 0)yIndex = 0;
-		else yIndex =(int)y + 1;
-		if(z < 0)zIndex = 0;
-		else zIndex =(int)z + 1;
-		
-		if(xIndex > cellCount[0] - 2)xIndex = cellCount[0] - 1;
-		if(yIndex > cellCount[1] - 2)yIndex = cellCount[1] - 1;
-		if(zIndex > cellCount[2] - 2)zIndex = cellCount[2] - 1;
-
-				
-		// make index
-		return Index3DTo1D(xIndex, yIndex, zIndex);
+		SetPeriodicBoundaries(this->boundaryConditions & BC_PERIODIC_XAXIS,
+							  this->boundaryConditions & BC_PERIODIC_YAXIS,
+							  this->boundaryConditions & BC_PERIODIC_ZAXIS);
 	}
 
 	/// a method to add a Particle to the LinkedCellParticleContainer
@@ -495,6 +480,17 @@ public:
 			index = PositionToIndex3D(particle.x);
 			Cells[index].push_back(particle);
 		}
+	}
+
+	/// applies boundary conditions if they are present(both periodic & reflective conditions)
+	void	ApplyBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
+	{
+		if(boundaryConditions & BC_PERIODIC_XAXIS ||
+		   boundaryConditions & BC_PERIODIC_XAXIS ||
+		   boundaryConditions & BC_PERIODIC_XAXIS)
+		   ApplyPeriodicBoundaryConditions(func, data);
+		if(boundaryConditions != 0)
+			ApplyReflectiveBoundaryConditions(func, data);
 	}
 
 	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles
@@ -665,7 +661,7 @@ public:
 	void ReassignParticles()
 	{
 		// ensure that particles that leave a periodic boundary enter on the other side
-		ApplyPeriodicBoundaryConditionsMovement();
+		ReassignHaloForPeriodicConditions();
 
 		int index = 0;
 

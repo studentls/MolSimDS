@@ -318,12 +318,12 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 					if(strcmp(it->type().get().c_str(), "periodic") == 0)
 					{
 						// set flags
-						if(strcmp(val.c_str(), "left")		== 0)bc	|= BC_LEFT_PERIODIC;
-						if(strcmp(val.c_str(), "right")		== 0)bc	|= BC_RIGHT_PERIODIC;
-						if(strcmp(val.c_str(), "top")		== 0)bc	|= BC_TOP_PERIODIC;
-						if(strcmp(val.c_str(), "bottom")	== 0)bc	|= BC_BOTTOM_PERIODIC;
-						if(strcmp(val.c_str(), "front")		== 0)bc	|= BC_FRONT_PERIODIC;				
-						if(strcmp(val.c_str(), "back")		== 0)bc	|= BC_BACK_PERIODIC;
+						if(strcmp(val.c_str(), "left")		== 0)bc	|= BC_PERIODIC_XAXIS;
+						if(strcmp(val.c_str(), "right")		== 0)bc	|= BC_PERIODIC_XAXIS;
+						if(strcmp(val.c_str(), "top")		== 0)bc	|= BC_PERIODIC_ZAXIS;
+						if(strcmp(val.c_str(), "bottom")	== 0)bc	|= BC_PERIODIC_ZAXIS;
+						if(strcmp(val.c_str(), "front")		== 0)bc	|= BC_PERIODIC_YAXIS;				
+						if(strcmp(val.c_str(), "back")		== 0)bc	|= BC_PERIODIC_YAXIS;
 					}
 					else if(strcmp(it->type().get().c_str(), "reflective") == 0)
 					{
