@@ -99,6 +99,9 @@ typedef unsigned char	byte;
 #define E_FILENOTFOUND		-5
 #define E_NOTINITIALIZED	-6
 #define E_FILEERROR		-7
+#define E_PARSEERROR		-8
+
+
 #define S_OK				1
 
 #else
@@ -109,7 +112,7 @@ typedef unsigned char	byte;
 #define E_FILENOTFOUND		-5
 #define E_NOTINITIALIZED	-6
 #define E_FILEERROR			-7
-
+#define E_PARSEERROR		-8
 #endif
 
 

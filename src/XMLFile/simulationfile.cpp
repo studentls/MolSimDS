@@ -3292,11 +3292,11 @@ _xsd_outputfmt_convert () const
   ::xsd::cxx::tree::enum_comparator< char > c (_xsd_outputfmt_literals_);
   const value* i (::std::lower_bound (
                     _xsd_outputfmt_indexes_,
-                    _xsd_outputfmt_indexes_ + 3,
+                    _xsd_outputfmt_indexes_ + 4,
                     *this,
                     c));
 
-  if (i == _xsd_outputfmt_indexes_ + 3 || _xsd_outputfmt_literals_[*i] != *this)
+  if (i == _xsd_outputfmt_indexes_ + 4 || _xsd_outputfmt_literals_[*i] != *this)
   {
     throw ::xsd::cxx::tree::unexpected_enumerator < char > (*this);
   }
@@ -3305,17 +3305,19 @@ _xsd_outputfmt_convert () const
 }
 
 const char* const outputfmt::
-_xsd_outputfmt_literals_[3] =
+_xsd_outputfmt_literals_[4] =
 {
   "None",
   "VTK",
-  "XYZ"
+  "XYZ",
+  "TXT"
 };
 
 const outputfmt::value outputfmt::
-_xsd_outputfmt_indexes_[3] =
+_xsd_outputfmt_indexes_[4] =
 {
   ::outputfmt::None,
+  ::outputfmt::TXT,
   ::outputfmt::VTK,
   ::outputfmt::XYZ
 };

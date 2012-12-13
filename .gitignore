@@ -53,3 +53,6 @@ molsim.log.1
 
 #test files
 test.xml
+
+#txt files
+*.txt

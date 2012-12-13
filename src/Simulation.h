@@ -29,7 +29,8 @@ enum SimulationOutputFormat
 {
 	SOF_NONE,
 	SOF_VTK,
-	SOF_XYZ
+	SOF_XYZ,
+	SOF_TXT
 };
 
 /// struct to hold information about a material, that is assigned to a particle with type

@@ -17,7 +17,7 @@
 #include "outputWriter/VTKWriter.h"
 #include "outputWriter/XYZWriter.h"
 #include "XMLFileReader.h"
-
+#include "TXTFile.h"
 
 using namespace std;
 
@@ -312,6 +312,14 @@ void Simulation::plotParticles(int iteration) {
 			outputWriter::XYZWriter writer;
 			writer.plotParticles(particles->getParticles(), desc.outname, iteration);
 			break;
+		}
+	case SOF_TXT:
+		{
+			// set txt output
+			TXTFile file;
+			stringstream strstr;
+			strstr<<desc.outname << "_" << (iteration < 10 ? "000" : (iteration < 100 ? "00" : ( iteration < 1000 ? "0" : "") )) << iteration << ".txt";
+			file.writeFile(strstr.str().c_str(), particles->getParticles(), desc.materials);
 		}
 	default:
 		{

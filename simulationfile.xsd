@@ -102,6 +102,7 @@ author: Leonhard Spiegelberg & Florian Dietz
             <xsd:enumeration value="None"></xsd:enumeration>
             <xsd:enumeration value="VTK"></xsd:enumeration>
             <xsd:enumeration value="XYZ"></xsd:enumeration>
+            <xsd:enumeration value="TXT"></xsd:enumeration>
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>

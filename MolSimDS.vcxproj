@@ -99,6 +99,7 @@
     <ClInclude Include="src\ParticleContainerTest.h" />
     <ClInclude Include="src\ParticleGenerator.h" />
     <ClInclude Include="src\Simulation.h" />
+    <ClInclude Include="src\TXTFile.h" />
     <ClInclude Include="src\utils\Base.h" />
     <ClInclude Include="src\utils\Helper.h" />
     <ClInclude Include="src\utils\Plane.h" />
@@ -124,6 +125,7 @@
     <ClCompile Include="src\outputWriter\XYZWriter.cpp" />
     <ClCompile Include="src\Particle.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
+    <ClCompile Include="src\TXTFile.cpp" />
     <ClCompile Include="src\XMLFileReader.cpp" />
     <ClCompile Include="src\XMLFile\simulationfile.cpp" />
   </ItemGroup>

@@ -247,7 +247,7 @@ private:
 		// calc based on number of cells in each dimension and their individual extent
 		for(int i = 0; i < dim; i++)
 		{
-			res[i] = (cellCount[i] - 2) * cellSize[i];
+			res[i] = this->frontLowerLeftCorner[i] + (cellCount[i] - 2) * cellSize[i];
 		}
 
 		return res;
@@ -485,12 +485,13 @@ public:
 	/// applies boundary conditions if they are present(both periodic & reflective conditions)
 	void	ApplyBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
 	{
+		if(boundaryConditions != 0)
+			ApplyReflectiveBoundaryConditions(func, data);
 		if(boundaryConditions & BC_PERIODIC_XAXIS ||
 		   boundaryConditions & BC_PERIODIC_XAXIS ||
 		   boundaryConditions & BC_PERIODIC_XAXIS)
 		   ApplyPeriodicBoundaryConditions(func, data);
-		if(boundaryConditions != 0)
-			ApplyReflectiveBoundaryConditions(func, data);
+		
 	}
 
 	/// a method that takes a void(*func)(void*, Particle) and uses it to iterate over all Particles

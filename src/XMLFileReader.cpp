@@ -18,6 +18,7 @@
 #include "LinkedCellParticleContainer.h"
 #include "ListParticleContainer.h"
 #include "ParticleGenerator.h"
+#include "TXTFile.h"
 
 //delete later
 static const double maxsigma = 1.0; 
@@ -57,6 +58,7 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	//compare strings
 	if(strcmp(file->params().outputfmt().c_str(), "VTK") == 0)desc.output_fmt = SOF_VTK;
 	else if(strcmp(file->params().outputfmt().c_str(), "XYZ") == 0)desc.output_fmt = SOF_XYZ;
+	else if(strcmp(file->params().outputfmt().c_str(), "TXT") == 0)desc.output_fmt = SOF_TXT;
 	else desc.output_fmt = SOF_NONE;
 	
 	desc.start_time				= file->params().t_start();
@@ -145,13 +147,19 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 	for(::data_t::inputfile_const_iterator it = file->data().inputfile().begin();
 		it != file->data().inputfile().end(); it++)
 	{
-		// quick read per ListParticleContainer
-		// better make a new class for reading .txt files
-		ListParticleContainer pc;
-		pc.AddParticlesFromFileNew(it->c_str());
+		// use new txtfile
+		// at the moment we simply ignore the material chunk
+		TXTFile txt;
+		txt.readFile(it->c_str());
 
-		vector<Particle> temp = pc.getParticles();
-		particles.insert(particles.begin(), temp.begin(), temp.end());
+		particles.insert(particles.begin(), txt.getParticles().begin(), txt.getParticles().end());
+
+		// test for correct particle index
+		for(std::vector<Particle>::const_iterator it = txt.getParticles().begin(); it != txt.getParticles().end(); it++)
+		{
+			if(it->type < 0)LOG4CXX_ERROR(generalOutputLogger, "invalid index!");
+			if(it->type >= desc.materials.size())LOG4CXX_ERROR(generalOutputLogger, "material not known for type = "<<it->type);
+		}
 	}
 
 	// go through particles...

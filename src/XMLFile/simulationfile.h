@@ -1725,7 +1725,8 @@ class outputfmt: public ::xml_schema::string
   {
     None,
     VTK,
-    XYZ
+    XYZ,
+    TXT
   };
 
   outputfmt (value v);
@@ -1771,8 +1772,8 @@ class outputfmt: public ::xml_schema::string
   _xsd_outputfmt_convert () const;
 
   public:
-  static const char* const _xsd_outputfmt_literals_[3];
-  static const value _xsd_outputfmt_indexes_[3];
+  static const char* const _xsd_outputfmt_literals_[4];
+  static const value _xsd_outputfmt_indexes_[4];
 };
 
 #include <iosfwd>
