@@ -198,20 +198,34 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	double epsilon = sqrt(desc->materials[p1.type].epsilon * desc->materials[p2.type].epsilon);
 	double sigma = (desc->materials[p1.type].sigma  + desc->materials[p2.type].sigma) * 0.5;
 
-	// calculate force via Lennard-Jones Potential
-	// these calculations are rather straightforward, looking at the formula
-	double dist = p1.x.distance(p2.x);
-	double temp1 = sigma / dist;
-	// this is faster than power functions or manual multiplication
-	double pow2 = temp1 * temp1;
-	double pow3 = pow2 * temp1;
-	double pow6 = pow3 * pow3;
+	// slow version
+	//// calculate force via Lennard-Jones Potential
+	//// these calculations are rather straightforward, looking at the formula
+	//double dist = p1.x.distance(p2.x);
+	//double temp1 = sigma / dist;
+	//// this is faster than power functions or manual multiplication
+	//double pow2 = temp1 * temp1;
+	//double pow3 = pow2 * temp1;
+	//double pow6 = pow3 * pow3;
+	//double pow12 = pow6 * pow6;
+
+	//double temp2 = pow6 - 2.0 * pow12;
+	//double prefactor = 24.0 * epsilon / dist / dist;
+	//double factor = prefactor * temp2;
+	
+
+	// optimized version
+	double distSq  = p1.x.distanceSq(p2.x);
+	double sigmaSq = sigma * sigma;
+	double temp1 = sigmaSq / distSq; // cache this for better performance
+	double pow6 = temp1 * temp1 * temp1;
 	double pow12 = pow6 * pow6;
 
 	double temp2 = pow6 - 2.0 * pow12;
-	double prefactor = 24.0 * epsilon / dist / dist;
+
+	double prefactor = 24.0 * epsilon / distSq; // cache also here values...
 	double factor = prefactor * temp2;
-	
+
 	// DEPRECATED
 	// using simple force calculation model
 	//double invdist = 1.0 / p1.x.distance(p2.x);
