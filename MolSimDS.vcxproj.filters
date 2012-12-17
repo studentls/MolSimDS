@@ -192,5 +192,11 @@
     <None Include="FallingDrop.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="ThermostatBig.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="PerformanceTest.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>

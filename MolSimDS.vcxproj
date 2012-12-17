@@ -164,6 +164,7 @@
     <None Include="example.xml" />
     <None Include="FallingDrop.xml" />
     <None Include="listexample.xml" />
+    <None Include="PerformanceTest.xml" />
     <None Include="PeriodicBoundaries.xml" />
     <None Include="periodicBoundaryTest.xml" />
     <None Include="sphereexample.xml" />
@@ -171,7 +172,10 @@
     <None Include="Task3.xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="test.xml" />
+    <None Include="test.xml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ThermostatBig.xml" />
     <None Include="ThermostatSmall.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
