@@ -48,7 +48,14 @@ struct Material
 	}
 };
 
-/// a struct that describes common Simulation params
+/// struct, used to cache materials fast
+struct CachedMaterial
+{
+	double sigmaSq; // sigma * sigma
+	double epsilon24; // 24.0 * epsilon
+};
+
+/// a class that describes common Simulation params
 /// @param delta_t step size
 /// @param start_time start time of simulation
 /// @param end_time end time of simulation
@@ -63,8 +70,13 @@ struct Material
 /// @param output_fmt specify OutputFormat, use SOF_NONE for no output
 /// @param iterationsperoutput after iterationsperoutput iterations, the simulation will output data
 /// @param outname filename for output
-struct SimulationDesc
+class SimulationDesc
 {
+private:
+	CachedMaterial	*cached_mat;
+	unsigned int	cachesize;
+	unsigned int	cacheline;
+public:
 	double					delta_t;
 	double					start_time;
 	double					end_time;
@@ -104,9 +116,6 @@ struct SimulationDesc
 		targetTemperature = 0;
 		temperatureStepSize = 0;
 
-
-		dimensions = 2;
-
 		iterationsperoutput = 10;
 		dimensions = 0;
 
@@ -114,13 +123,116 @@ struct SimulationDesc
 		
 		// no gravitational force per default
 		gravitational_constant = 0.0;
+
+		cached_mat = NULL;
+		cachesize = 0;
+		cacheline = 0;
+	}
+
+	/// copy constructor
+	SimulationDesc(const SimulationDesc& desc)
+	{
+		delta_t = desc.delta_t;
+		start_time = desc.start_time;
+		end_time = desc.end_time;
+		output_fmt = desc.output_fmt;
+		
+		brownianMotionFactor = desc.brownianMotionFactor;
+		
+		iterationsTillThermostatApplication = desc.iterationsTillThermostatApplication;
+		temperature = desc.temperature;
+		targetTemperature = desc.targetTemperature;
+		temperatureStepSize = desc.temperatureStepSize;
+
+
+		dimensions = desc.dimensions;
+
+		iterationsperoutput = desc.iterationsperoutput;
+
+		outname =  desc.outname;
+		
+		gravitational_constant = desc.gravitational_constant;
+
+		// copy materials
+		materials = desc.materials;
+
+		// do not copy cache!
+		cached_mat = NULL;
+	}
+
+	~SimulationDesc()
+	{
+		SAFE_DELETE_A(cached_mat);
+	}
+
+	SimulationDesc& operator=(const SimulationDesc& desc)
+	{
+		delta_t = desc.delta_t;
+		start_time = desc.start_time;
+		end_time = desc.end_time;
+		output_fmt = desc.output_fmt;
+		
+		brownianMotionFactor = desc.brownianMotionFactor;
+		
+		iterationsTillThermostatApplication = desc.iterationsTillThermostatApplication;
+		temperature = desc.temperature;
+		targetTemperature = desc.targetTemperature;
+		temperatureStepSize = desc.temperatureStepSize;
+
+
+		dimensions = desc.dimensions;
+
+		iterationsperoutput = desc.iterationsperoutput;
+
+		outname =  desc.outname;
+		
+		gravitational_constant = desc.gravitational_constant;
+
+		// copy materials
+		materials = desc.materials;
+
+		// do not copy cache!
+		cached_mat = NULL;
+
+		return *this;
 	}
 
 	/// function to test if a thermostat is present and should be applied
 	/// @return true if thermostat is present and should be applied
 	bool		applyThermostat()	{return iterationsTillThermostatApplication != 0;}
-};
 
+	/// generate Cache values
+	void		generateCache()	
+	{
+		// delete if necessary
+		SAFE_DELETE_A(cached_mat);
+
+		// use a squared array to store values
+		cachesize = materials.size() * materials.size(); // sacve size
+		cacheline = materials.size();
+		cached_mat = new CachedMaterial[cachesize];
+
+		// go through mats and calculate pairs(actually one could save half the space, as only an upper/lower triangle matrix is needed, but for performance we
+		// don't care for this tiny space saving
+		int i = 0, j = 0;
+		for(int i = 0; i < cacheline; i++)
+		{
+			for(int j = 0; j < cacheline; j++)
+			{
+				// mix materials
+				double epsilon = sqrt(materials[i].epsilon * materials[j].epsilon);
+				double sigma = (materials[i].sigma  + materials[j].sigma) * 0.5;
+
+				// calc factors
+				cached_mat[i + j * cacheline].epsilon24 = 24.0 * epsilon;
+				cached_mat[i + j * cacheline].sigmaSq = sigma * sigma;
+			}
+		}
+	}
+
+	inline double getSigmaSq(const unsigned int& type1, const unsigned int& type2)	{assert(type1 < materials.size()); assert(type2 < materials.size()); return cached_mat[type1 + cacheline * type2].sigmaSq;}
+	inline double getEpsilon24(const unsigned int& type1, const unsigned int& type2)	{assert(type1 < materials.size()); assert(type2 < materials.size()); return cached_mat[type1 + cacheline * type2].epsilon24;}
+};
 
 /// a struct to hold statistical data of a simulation
 struct SimulationStatistics

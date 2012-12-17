@@ -42,6 +42,9 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 
 	desc = fr.getDescription();
 
+	// generate Cache
+	desc.generateCache();
+
 	// get container
 	Release(); // to free mem
 
@@ -194,9 +197,9 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	assert(p1.type < desc->materials.size());
 	assert(p2.type < desc->materials.size());
 
-	// cache this later for better performance...
-	double epsilon = sqrt(desc->materials[p1.type].epsilon * desc->materials[p2.type].epsilon);
-	double sigma = (desc->materials[p1.type].sigma  + desc->materials[p2.type].sigma) * 0.5;
+	//// cache this later for better performance...
+	//double epsilon = sqrt(desc->materials[p1.type].epsilon * desc->materials[p2.type].epsilon);
+	//double sigma = (desc->materials[p1.type].sigma  + desc->materials[p2.type].sigma) * 0.5;
 
 	// slow version
 	//// calculate force via Lennard-Jones Potential
@@ -213,17 +216,19 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	//double prefactor = 24.0 * epsilon / dist / dist;
 	//double factor = prefactor * temp2;
 	
+	double eps24 = desc->getEpsilon24(p1.type, p2.type);
+	double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
 
 	// optimized version
 	double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
-	double sigmaSq = sigma * sigma;
-	double temp1 = sigmaSq * invdistSq; // cache this for better performance
+				// cache this for better performance
+	double temp1 = sigmaSq * invdistSq; 
 	double pow6 = temp1 * temp1 * temp1;
 	double pow12 = pow6 * pow6;
 
 	double temp2 = pow6 - 2.0 * pow12;
 
-	double prefactor = 24.0 * epsilon * invdistSq; // cache also here values...
+	double prefactor = eps24 * invdistSq; // cache also here values...
 	double factor = prefactor * temp2;
 
 	// DEPRECATED
