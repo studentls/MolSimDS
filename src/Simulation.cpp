@@ -215,15 +215,15 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	
 
 	// optimized version
-	double distSq  = p1.x.distanceSq(p2.x);
+	double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
 	double sigmaSq = sigma * sigma;
-	double temp1 = sigmaSq / distSq; // cache this for better performance
+	double temp1 = sigmaSq * invdistSq; // cache this for better performance
 	double pow6 = temp1 * temp1 * temp1;
 	double pow12 = pow6 * pow6;
 
 	double temp2 = pow6 - 2.0 * pow12;
 
-	double prefactor = 24.0 * epsilon / distSq; // cache also here values...
+	double prefactor = 24.0 * epsilon * invdistSq; // cache also here values...
 	double factor = prefactor * temp2;
 
 	// DEPRECATED
