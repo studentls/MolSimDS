@@ -244,8 +244,8 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	// add individual particle to particle force to sum
 	p1.addForce(force);
 	
-
-	p2.addForce(-1.0 * force);
+	// new function to avoid unnecessary object construction
+	p2.substractForce(force);
 }
 
 void Simulation::gravityCalculator(void *data, Particle& p)
