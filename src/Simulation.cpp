@@ -110,24 +110,27 @@ err_type Simulation::Run()
 
 	    // TODO: reset to 100
 		// plot the particles on every hundredth iteration, beginning with the first
-		if (iteration % desc.iterationsperoutput == 0) {
-			plotParticles(iteration);
-			
-#ifndef DEBUG
-			// output that an iteration has finished
-			if(iteration % 25 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
-#else
-			// output that an iteration has finished
-			if(iteration % 5 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
-#endif
-		}
+//		if (iteration % desc.iterationsperoutput == 0) {
+//			plotParticles(iteration);
+//			
+//#ifndef DEBUG
+//			// output that an iteration has finished
+//			if(iteration % 25 == 0)
+//			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
+//#else
+//			// output that an iteration has finished
+//			if(iteration % 5 == 0)
+//			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
+//#endif
+//		}
 		
 		// increment loop values
 		iteration++;
 		current_time += desc.delta_t;
 	}
+
+	// TODO:
+	// create file containing the particles here
 
 	//generate statistical data
 	statistics.time = timer.getElapsedTime();

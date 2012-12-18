@@ -189,13 +189,13 @@
     <None Include="PeriodicBoundaries.xml">
       <Filter>XML</Filter>
     </None>
-    <None Include="FallingDrop.xml">
-      <Filter>XML</Filter>
-    </None>
     <None Include="ThermostatBig.xml">
       <Filter>XML</Filter>
     </None>
     <None Include="PerformanceTest.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="FallingDropInitialize.xml">
       <Filter>XML</Filter>
     </None>
   </ItemGroup>
