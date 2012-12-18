@@ -17,16 +17,16 @@ author: F.Dietz & L.Spiegelberg
     <targetTemperature>0.5</targetTemperature>
     <temperatureStepSize>0.01</temperatureStepSize>
     <gravity>-12.44</gravity>
-    <output>txt</output>
+    <output>out</output>
     
-    <iterationsperoutput>1000000000</iterationsperoutput>
+    <iterationsperoutput>10</iterationsperoutput>
    
     <delta_t>0.0005</delta_t>
     <epsilon>1.0</epsilon>
-    <outputfmt>TXT</outputfmt>
+    <outputfmt>VTK</outputfmt>
     <sigma>1.2</sigma>
     
-    <t_end>0.1</t_end>
+    <t_end>40.0</t_end>
     <t_start>0.0</t_start>
     
     <algorithm>
@@ -47,7 +47,9 @@ author: F.Dietz & L.Spiegelberg
   <data>
     <!-- material1-->
     <material epsilon="1.0" sigma="1.2" name="bassinMat"/>
-   
+
+    <inputfile>filename.txt</inputfile>
+
     <!-- C1 -->
     <cuboid>
       <h>1.1225</h>
@@ -57,6 +59,7 @@ author: F.Dietz & L.Spiegelberg
       <X>5.0 5.0 5.0</X>
       <material>bassinMat</material>
     </cuboid>
+    
   </data>
 
 </simulationfile>

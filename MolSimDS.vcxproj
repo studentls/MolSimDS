@@ -162,11 +162,14 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="example.xml" />
+    <None Include="FallingDrop.xml" />
     <None Include="FallingDropInitialize.xml">
       <SubType>Designer</SubType>
     </None>
     <None Include="listexample.xml" />
-    <None Include="PerformanceTest.xml" />
+    <None Include="PerformanceTest.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="PeriodicBoundaries.xml">
       <SubType>Designer</SubType>
     </None>
