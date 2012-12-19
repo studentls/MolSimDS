@@ -3,15 +3,15 @@
 
 # Compiler
 # --------
-CC=g++
-#CC=icpc
+#CC=g++
+CC=icpc
 
 include files.mk
 
 
 # Compiler flags
 # -------------------------------------------------------------------------
-CFLAGS=-I/opt/include -g -O3
+CFLAGS=-I/opt/include -g -O3 -ip -ipo -fast
 
 # Linker flags
 # ------------

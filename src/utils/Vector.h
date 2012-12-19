@@ -126,7 +126,7 @@ public:
 		return Vector(result);
 	}
 
-	Vector operator*(double scalar) const{
+	Vector operator*(const double& scalar) const{
 		type result[length];
 
 		for (int i = 0; i < length; i++) {
