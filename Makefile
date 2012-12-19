@@ -3,8 +3,8 @@
 
 # Compiler
 # --------
-CC=g++
-#CC=icpc
+#CC=g++
+CC=icpc
 
 include files.mk
 
@@ -12,18 +12,18 @@ include files.mk
 # Compiler flags
 # -------------------------------------------------------------------------
 ## intel flags
-#CFLAGS=-I/opt/include -g -O3 -ip -ipo -fast
+CFLAGS=-I/opt/include -g -O3 -ip -ipo -fast
 ## gcc flags
 #CFLAGS=-I/opt/include -g -O3
 ## gcc flags for gprof
-CFLAGS=-I/opt/include -g -O3 -pg
+#CFLAGS=-I/opt/include -g -O3 -pg
 
 # Linker flags
 # ------------
-#LDFLAGS= -L/opt/lib -lxerces-c -lrt -llog4cxx -lcppunit 
+LDFLAGS= -L/opt/lib -lxerces-c -lrt -llog4cxx -lcppunit 
 
 ## linker flags for gprof
-LDFLAGS=-L/opt/lib -lxerces-c -lrt -llog4cxx -lcppunit -pg
+#LDFLAGS=-L/opt/lib -lxerces-c -lrt -llog4cxx -lcppunit -pg
 
 INCLUDES= -I./src 
 
