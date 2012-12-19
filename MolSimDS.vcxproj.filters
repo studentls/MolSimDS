@@ -201,5 +201,8 @@
     <None Include="FallingDrop.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="FallingDropInitializeKopie.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -51,14 +51,10 @@ author: F.Dietz & L.Spiegelberg
     <inputfile>filename.txt</inputfile>
 
     <!-- C1 -->
-    <cuboid>
-      <h>1.1225</h>
-      <m>1</m>
-      <N>10 10 1</N>
-      <V>0.0 -10.0 0.0</V>
-      <X>5.0 5.0 5.0</X>
+    <sphere>
+      ...
       <material>bassinMat</material>
-    </cuboid>
+    </sphere>
     
   </data>
 

@@ -5,6 +5,10 @@
 file: FallingDrop.xml everything for Sheet4, has to be made!
 author: F.Dietz & L.Spiegelberg
 
+NOTE:
+This file exists to fix a problem because FallingDropInitialize was executed when it was bugged. This is no longer the case.
+This file can therefore be ignored.
+
 -->
 
 <simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -18,17 +22,17 @@ author: F.Dietz & L.Spiegelberg
     <temperatureStepSize>0.2</temperatureStepSize>
     <gravity>-12.44</gravity>
     <output>txt</output>
-    
+
     <iterationsperoutput>1000</iterationsperoutput>
-   
+
     <delta_t>0.0005</delta_t>
     <epsilon>1.0</epsilon>
-    <outputfmt>TXT</outputfmt>
+    <outputfmt>VTK</outputfmt>
     <sigma>1.2</sigma>
-    
-    <t_end>15.1</t_end>
+
+    <t_end>0.6</t_end>
     <t_start>0.0</t_start>
-    
+
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.5</cutoff_radius>
@@ -41,22 +45,14 @@ author: F.Dietz & L.Spiegelberg
         </conditions>
       </LinkedCell>
     </algorithm>
-    
+
   </params>
 
   <data>
     <!-- material1-->
     <material epsilon="1.0" sigma="1.2" name="bassinMat"/>
-   
-    <!-- C1 -->
-    <cuboid>
-      <h>1.1225</h>
-      <m>1</m>
-      <N>150 50 1</N>
-      <V>0.0 0.0 0.0</V>
-      <X>1.5 2.0 0.0</X>
-      <material>bassinMat</material>
-    </cuboid>
+    
+    <inputfile>C:\Users\Florian Dietz\Documents\GitHub\MolSimDS\txt_29000.txt</inputfile>
   </data>
 
 </simulationfile>
