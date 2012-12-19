@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
-#define C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
+#ifndef SIMULATIONFILE_H
+#define SIMULATIONFILE_H
 
 // Begin prologue.
 //
@@ -1882,4 +1882,4 @@ simulationfile (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 //
 // End epilogue.
 
-#endif // C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
+#endif // SIMULATIONFILE_H

@@ -5,6 +5,10 @@
 file: FallingDrop.xml everything for Sheet4, has to be made!
 author: F.Dietz & L.Spiegelberg
 
+NOTE:
+This file exists to fix a problem because FallingDropInitialize was executed when it was bugged. This is no longer the case.
+This file can therefore be ignored.
+
 -->
 
 <simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -15,20 +19,20 @@ author: F.Dietz & L.Spiegelberg
     <initialTemperature>40</initialTemperature>
     <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
     <targetTemperature>0.5</targetTemperature>
-    <temperatureStepSize>0.01</temperatureStepSize>
+    <temperatureStepSize>0.2</temperatureStepSize>
     <gravity>-12.44</gravity>
-    <output>out</output>
-    
-    <iterationsperoutput>10</iterationsperoutput>
-   
+    <output>Drop</output>
+
+    <iterationsperoutput>1000</iterationsperoutput>
+
     <delta_t>0.0005</delta_t>
     <epsilon>1.0</epsilon>
     <outputfmt>VTK</outputfmt>
     <sigma>1.2</sigma>
-    
-    <t_end>40.0</t_end>
+
+    <t_end>0.6</t_end>
     <t_start>0.0</t_start>
-    
+
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.5</cutoff_radius>
@@ -41,21 +45,14 @@ author: F.Dietz & L.Spiegelberg
         </conditions>
       </LinkedCell>
     </algorithm>
-    
+
   </params>
 
   <data>
     <!-- material1-->
     <material epsilon="1.0" sigma="1.2" name="bassinMat"/>
-
-    <inputfile>filename.txt</inputfile>
-
-    <!-- C1 -->
-    <sphere>
-      ...
-      <material>bassinMat</material>
-    </sphere>
     
+    <inputfile>TXT_29000.txt</inputfile>
   </data>
 
 </simulationfile>
