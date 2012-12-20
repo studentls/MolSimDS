@@ -141,8 +141,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 	vector<Particle> particles;
 
 	
-	// this method shall be later removed...
-	// at the moment particles from inputfiles have always the default material...
+	// at the moment inputfile is a simple particle list, materials have to be defined in the xml file separately!
 	// go through input files...
 	for(::data_t::inputfile_const_iterator it = file->data().inputfile().begin();
 		it != file->data().inputfile().end(); it++)
@@ -150,16 +149,22 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		// use new txtfile
 		// at the moment we simply ignore the material chunk
 		TXTFile txt;
-		txt.readFile(it->c_str());
-
-		particles.insert(particles.begin(), txt.getParticles().begin(), txt.getParticles().end());
+		if(FAILED(txt.readFile(it->c_str())))
+		{
+			LOG4CXX_ERROR(generalOutputLogger, "failed to read inputfile");
+			return E_FILEERROR;
+		}
 
 		// test for correct particle index
 		for(std::vector<Particle>::const_iterator it = txt.getParticles().begin(); it != txt.getParticles().end(); it++)
 		{
-			if(it->type < 0)LOG4CXX_ERROR(generalOutputLogger, "invalid index!");
-			if(it->type >= desc.materials.size())LOG4CXX_ERROR(generalOutputLogger, "material not known for type = "<<it->type);
+			if(it->type < 0){LOG4CXX_ERROR(generalOutputLogger, "invalid index!");return E_FILEERROR;}
+			if(it->type >= desc.materials.size()){LOG4CXX_ERROR(generalOutputLogger, "material not known for type = "<<it->type);return E_FILEERROR;}
 		}
+		
+		// add particles...
+		particles.insert(particles.begin(), txt.getParticles().begin(), txt.getParticles().end());
+		
 	}
 
 	// go through particles...

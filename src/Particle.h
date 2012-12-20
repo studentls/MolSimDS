@@ -75,7 +75,7 @@ public:
 	/// substracts force acting on the Particle
 	inline void substractForce(const utils::Vector<double, 3>& force)
 	{
-		//f = f + force;
+		//f = f - force;
 		// direct calculation for better performance
 		f[0] -= force[0];
 		f[1] -= force[1];

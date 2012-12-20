@@ -14,6 +14,7 @@
 //------------------------------------------------------------------------------------------------
 
 #include "TXTFile.h"
+#include <fstream>
 
 #define MODE_DATA		0x1
 #define MODE_MATERIAL	0x2
@@ -48,100 +49,117 @@ err_type TXTFile::readFile(const char *filename)
 		return E_FILENOTFOUND;
 	}
 
-	// open file (in ASCII mode)
-	pFile = fopen(filename, "r");
-	if(!pFile)return E_UNKNOWN;
+	std::ifstream file(filename);
 
 	// clear internal containers...
 	if(!particles.empty())particles.clear();
 	if(!materials.empty())materials.clear();
 
-	// go through file...
-	while(!feof(pFile))
+	// file opening sucessful?
+	if(file.is_open())
+		// go through file...
+		while(!file.eof())
+		{
+			memset(buffer, 0, 512 * sizeof(char));
+
+			// get line
+			file.getline(buffer, 512);
+
+			// empty line? skip it if so
+			if(buffer[0] == '\n' || buffer[0] == '\0')
+			{
+				line++;
+				continue;
+			}
+
+			// search for first #, because then it is a comment line
+			int pos = 0;
+			while(buffer[pos] == ' ' && pos < 512)pos++; // skip spaces
+
+			// skip comment line
+			if(buffer[pos] == '#')
+			{
+				line++;
+				continue;
+			}
+
+			// now it is a real line
+			// determine if the line contains
+			// material:
+			// or
+			// data:
+			// first set # and everything behind to zero
+			deletecomment(buffer, 512);
+
+		
+			//use strcmp
+			if(0 == strcmp(buffer, "material:"))
+			{
+				mode = MODE_MATERIAL;
+				continue;
+			}
+
+			if(0 == strcmp(buffer, "data:"))
+			{
+				mode = MODE_DATA;
+				continue;
+			}
+
+			// scan file
+			if(MODE_MATERIAL == mode)
+			{
+				Material mat;
+				char strbuf[256];
+				memset(strbuf, 0, 256 * sizeof(char));
+
+				// syntax is
+				//	   name epsilon sigma
+				// e.g mat 1.0 2.0
+				if(sscanf(buffer, "%s %lf %lf", strbuf, &mat.epsilon, &mat.sigma) <= 0)
+				{
+					LOG4CXX_ERROR(generalOutputLogger, "failed to parse file "<<filename<<" at line "<<line<<" correctly");
+					return E_PARSEERROR;
+				}
+
+				mat.name = strbuf;
+
+				materials.push_back(mat);
+			}
+
+			if(MODE_DATA == mode)
+			{
+				// only particles currently supported for simplicity reasons
+				Particle p;
+
+				// syntax is
+				//	   xyz, velocity, mass, type
+				//	   where xyz, velocity are 3D vectors and type is an index to the i-th material
+				// e.g 1.0 1.0 1.0, 0.0 -10.0 0.0, 1.0, 0
+				if(sscanf(buffer, "%lf %lf %lf, %lf %lf %lf, %lf, %d",
+					&p.x[0], &p.x[1], &p.x[2], &p.v[0], &p.v[1], &p.v[2],
+					&p.m, &p.type) <= 0)
+				{
+					LOG4CXX_ERROR(generalOutputLogger, "failed to parse file "<<filename<<" at line "<<line<<" correctly");
+					return E_PARSEERROR;
+				}
+
+				// push back#
+				particles.push_back(p);
+
+			}
+
+			// inc line pointer
+			line++;
+
+		}
+	else
 	{
-		memset(buffer, 0, 512 * sizeof(char));
-		fgets(buffer, 512, pFile);
-
-		// empty line? skip it if so
-		if(buffer[0] == '\n')continue;
-
-		// search for first #, because then it is a comment line
-		int pos = 0;
-		while(buffer[pos] == ' ' && pos < 512)pos++; // skip spaces
-
-		// skip comment line
-		if(buffer[pos] == '#')continue;
-
-		// now it is a real line
-		// determine if the line contains
-		// material:
-		// or
-		// data:
-		// first set # and everything behind to zero
-		deletecomment(buffer, 512);
-
-		//use strcmp
-		if(0 == strcmp(buffer, "material:"))
-		{
-			mode = MODE_MATERIAL;
-		}
-
-		if(0 == strcmp(buffer, "data:"))
-		{
-			mode = MODE_DATA;
-		}
-
-		// scan file
-		if(MODE_MATERIAL == mode)
-		{
-			Material mat;
-			char strbuf[256];
-			memset(buffer, 0, 256 * sizeof(char));
-
-			// syntax is
-			//	   name epsilon sigma
-			// e.g mat 1.0 2.0
-			if(sscanf(buffer, "%s %lf %lf", strbuf, &mat.epsilon, &mat.sigma) <= 0)
-			{
-				LOG4CXX_ERROR(generalOutputLogger, "failed to parse file "<<filename<<" at line "<<line<<" correctly");
-				return E_PARSEERROR;
-			}
-
-			mat.name = strbuf;
-
-			materials.push_back(mat);
-		}
-
-		if(MODE_DATA == mode)
-		{
-			// only particles currently supported for simplicity reasons
-			Particle p;
-
-			// syntax is
-			//	   xyz, velocity, mass, type
-			//	   where xyz, velocity are 3D vectors and type is an index to the i-th material
-			// e.g 1.0 1.0 1.0, 0.0 -10.0 0.0, 1.0, 0
-			if(sscanf(buffer, "%lf %lf %lf, %lf %lf %lf, %lf, %d",
-				&p.x[0], &p.x[1], &p.x[2], &p.v[0], &p.v[1], &p.v[2],
-				&p.m, &p.type) <= 0)
-			{
-				LOG4CXX_ERROR(generalOutputLogger, "failed to parse file "<<filename<<" at line "<<line<<" correctly");
-				return E_PARSEERROR;
-			}
-
-			// push back
-			particles.push_back(p);
-
-		}
-
-		// inc line pointer
-		line++;
-
+		LOG4CXX_ERROR(generalOutputLogger, "failed to open .txt file "<<filename);
+		return E_UNKNOWN;
 	}
 
 	// close file
-	fclose(pFile);
-
+	file.close();
 
 	// assert types
 	for(std::vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)

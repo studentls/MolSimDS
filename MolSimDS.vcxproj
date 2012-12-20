@@ -166,9 +166,6 @@
     <None Include="FallingDropInitialize.xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="FallingDropInitializeKopie.xml">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="listexample.xml" />
     <None Include="PerformanceTest.xml">
       <SubType>Designer</SubType>

@@ -24,6 +24,7 @@ obj/
 [Rr]elease*/
 _ReSharper*/
 ipch/
+*.csv
 
 #ignore thumbnails created by windows
 Thumbs.db

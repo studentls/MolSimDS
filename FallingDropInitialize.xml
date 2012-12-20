@@ -18,12 +18,12 @@ author: F.Dietz & L.Spiegelberg
     <temperatureStepSize>0.2</temperatureStepSize>
     <gravity>-12.44</gravity>
     <output>TXT</output>
-    
+    <outputfmt>TXT</outputfmt>
     <iterationsperoutput>1000</iterationsperoutput>
    
     <delta_t>0.0005</delta_t>
     <epsilon>1.0</epsilon>
-    <outputfmt>TXT</outputfmt>
+   
     <sigma>1.2</sigma>
     
     <t_end>15.1</t_end>
@@ -57,6 +57,7 @@ author: F.Dietz & L.Spiegelberg
       <X>1.5 2.0 0.0</X>
       <material>bassinMat</material>
     </cuboid>
+    
   </data>
 
 </simulationfile>
