@@ -95,7 +95,7 @@ public:
 		// check if valid and correct length!
 #ifdef DEBUG
 		assert(args);
-		assert(args[length - 1]); // valid array?		
+		//assert(args[length - 1]); // valid array?
 #endif
 		for (int i = 0; i < length; i++) {
 			content[i] = args[i];

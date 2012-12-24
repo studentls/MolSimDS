@@ -59,3 +59,13 @@ test.xml
 *.txt
 #gprof files
 *.out
+
+#xcode
+xcuserdata
+DerivedData/
+.DS_Store
+*.swp
+*.lock
+profile
+MolSimDS.build/
+MolSimDS/
