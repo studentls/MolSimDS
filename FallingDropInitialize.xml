@@ -52,7 +52,7 @@ author: F.Dietz & L.Spiegelberg
     <cuboid>
       <h>1.1225</h>
       <m>1</m>
-      <N>150 50 1</N>
+      <N>250 50 1</N>
       <V>0.0 0.0 0.0</V>
       <X>1.5 2.0 0.0</X>
       <material>bassinMat</material>
