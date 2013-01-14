@@ -23,6 +23,7 @@
 #include "ListParticleContainer.h"
 #include "ParticleGenerator.h"
 #include <vector>
+#include "Viewer.h"
 
 /// Output Format
 enum SimulationOutputFormat

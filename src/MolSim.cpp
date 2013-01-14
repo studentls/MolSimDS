@@ -56,9 +56,16 @@ err_type MolSim::Init(int argc, char *argsv[])
 	if(FAILED(sim->Init(desc)))return E_UNKNOWN;
 
 	// use xml file
-	if(FAILED(sim->CreateSimulationFromXMLFile(argsv[1])))return E_INVALIDPARAM;
+	if(FAILED(sim->CreateSimulationFromXMLFile(simFileName.c_str())))return E_INVALIDPARAM;
 
 	return S_OK;
+}
+
+// worker Thread, runs simulation
+void MolSim::workerMain(MolSim *molsim)
+{
+	// simply run it
+	molsim->sim->Run();
 }
 
 err_type MolSim::Run()
@@ -84,9 +91,27 @@ err_type MolSim::Run()
 		// valid pointer?
 		if(!sim)return E_NOTINITIALIZED;
 	
-		// run simulation...
-		err_type e = sim->Run();
-		if(FAILED(e))return e;
+		// if viewer is active(--viewer option enabled)
+		// run multithreaded
+		// else simply run simulation in one thread
+		if(Viewer::Instance().IsRunning())
+		{	
+			// create boost thread
+			 boost::thread workerThread(workerMain, this);
+
+			// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
+			// run viewer's message loop
+			Viewer::Instance().MessageLoop();
+
+			// join threads
+			workerThread.join();
+		}
+		else
+		{
+			// run simulation...
+			err_type e = sim->Run();
+			if(FAILED(e))return e;
+		}	
 
 		// show statistics...
 		SimulationStatistics &stats = sim->getStatistics();
@@ -112,7 +137,7 @@ err_type MolSim::Release()
 ///			returns E_FILENOTFOUND if no file exists
 err_type MolSim::parseLine(int argc, char *argsv[])
 {
-	// Syntax is molsim scene.xml
+	// Syntax is molsim scene.xml (--viewer)
 	// where t_end and delta_t denote a floating point value
 	if(argc != 2 && argc != 3)
 	{
@@ -130,31 +155,6 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_HELP;
 		else if(strcmp(argsv[1], "-showtests") == 0)
 			state = AS_SHOWTESTS;
-		else
-		{
-			// parse file
-
-			// check if file exists
-			if(!fileExists(argsv[1]))
-			{
-				LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
-				printUsage();
-				return E_FILENOTFOUND;
-			}
-
-			// has file correct ending?
-			if(strcmp(utils::getFileExtension(argsv[1]), "xml") != 0)
-			{
-				LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
-				printUsage();
-				return E_FILEERROR;
-			}
-
-			//everything ok...
-
-			//run Simulation
-			state = AS_SIMULATION;
-		}
 	}
 	else if(argc == 3)
 	{
@@ -163,12 +163,52 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_SINGLETEST;
 			strTestCase = argsv[2];
 		}
+		// can be displayed before or after the filename
+		else if(strcmp(argsv[1], "--viewer") == 0 || strcmp(argsv[2], "--viewer") == 0)
+		{
+			// initialize viewer
+			Viewer::Instance().InitAndDisplay();
+		}
 		else
 		{
 			LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid argument");
 			printUsage();
 			return E_INVALIDPARAM;
 		}
+	}
+
+	if(argc ==2 || argc == 3)
+	{
+		int index = 1;
+		
+		//set index according where a possible -- option may be set
+		if(argsv[1][0] == '-')index = 2;
+		else index = 1;
+
+		// parse file
+
+		// check if file exists
+		if(!fileExists(argsv[index]))
+		{
+			LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
+			printUsage();
+			return E_FILENOTFOUND;
+		}
+
+		// has file correct ending?
+		if(strcmp(utils::getFileExtension(argsv[index]), "xml") != 0)
+		{
+			LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
+			printUsage();
+			return E_FILEERROR;
+		}
+
+		// everything ok...
+		// set name
+		simFileName = argsv[index];
+
+		//run Simulation
+		state = AS_SIMULATION;
 	}
 
 	return S_OK;

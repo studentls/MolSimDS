@@ -97,8 +97,14 @@ err_type Simulation::Run()
 	//start timer
 	utils::Timer timer;
 
+	// additional running variable to finish if events occur
+	bool running = true;
+
+	// has the user requested a viewer to run?
+	bool viewer = Viewer::Instance().IsRunning();
+
 	// iterate until the end time is reached...
-	while (current_time < desc.end_time) {
+	while (current_time < desc.end_time && running) {
 
 		// thermostat present? if yes apply(for iteration 0 thermostat is already set)
 		if(desc.applyThermostat())
@@ -124,13 +130,20 @@ err_type Simulation::Run()
 #endif
 		}
 		
+		// is a viewer active?
+		if(viewer)
+		{
+			// update running dependend to the status of the viewer
+			running = Viewer::Instance().IsRunning();
+		}
+
 		// increment loop values
 		iteration++;
 		current_time += desc.delta_t;
 	}
 
-	// TODO:
-	// create file containing the particles here
+	// has the user aborted? is runnign set to false?
+	if(!running)LOG4CXX_INFO(simulationLogger, ">> simulation aborted by user");
 
 	//generate statistical data
 	statistics.time = timer.getElapsedTime();
