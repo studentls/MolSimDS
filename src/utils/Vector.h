@@ -265,4 +265,18 @@ std::ostream& operator << (std::ostream& stream, const Vector<type, length>& v) 
 typedef utils::Vector<double, 3> Vec3;
 typedef utils::Vector<double, 2> Vec2;
 
+namespace utils
+{
+
+/// simple struct to encapsulate size/area information
+struct BoundingBox
+{
+	Vector<double, 3> extent; /// extent of the BB
+	Vector<double, 3> center; /// center of the BB in absolute coordinates
+
+	BoundingBox()	{}
+};
+
+}
+
 #endif /* VECTOR_ */

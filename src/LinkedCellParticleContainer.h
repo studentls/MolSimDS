@@ -728,6 +728,23 @@ public:
 	/// @return new vector of boundary particles
 	std::vector<Particle>			getBoundaryParticles();
 
+	/// method to retrieve a Bounding Box, which surrounds all particles
+	/// @return returns a BoundingBox, which defines extent and center of all particles in the container(bounding box)
+	utils::BoundingBox				getBoundingBox()
+	{
+		using namespace utils;
+
+		// easy task here, everything is stored!
+		BoundingBox bb;
+
+		bb.extent = this->calcSimulationAreaExtent();
+		bb.center = bb.extent * 0.5 + frontLowerLeftCorner;
+		
+		return bb;
+	}
+
+	/// @return amount of cells in each direction
+	utils::Vector<unsigned int, 3>	getCellExtent()	{return this->cellCount - utils::Vector<unsigned int, 3>(2);}
 
 	// befriend with ParticleContainerTest in order to test private functions
 	friend class					ParticleContainerTest;

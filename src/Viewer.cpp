@@ -36,6 +36,7 @@ void	Viewer::InitAndDisplay()
     glfwGetWindowSize(&width, &height);
     glfwSetWindowSizeCallback(reshape);
     glfwSetMousePosCallback(mousePosFun);
+	glfwSetMouseWheelCallback(mouseWheelFun);
     
 	// set mouse position
 	int x = 0, y = 0;
@@ -43,21 +44,13 @@ void	Viewer::InitAndDisplay()
 	updateMousePos(x, y);
 	updateMousePos(x, y);
     
-    
-	//// put some random particles in the array...
-	//particle_size = 500;
-	//particles = new VParticle[500];
-	//for(int i = 0; i < particle_size; i++)
-	//{
-	//	particles[i].x = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
- //       particles[i].y = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
-	//	particles[i].z = 0;
-	//	particles[i].type = rand() % 30;
-	//}
+	// set mouse wheel
+	int pos = 0;
+	pos = glfwGetMouseWheel();
+	updateMouseWheel(pos);
+	updateMouseWheel(pos);
 
-
-
-	// init point sprite
+    // init point sprite
 	glGenTextures(1, &pointSpriteID);
     glBindTexture(GL_TEXTURE_2D, pointSpriteID);
     
@@ -79,19 +72,6 @@ void	Viewer::InitAndDisplay()
     delete [] data;
         
     glBindTexture(GL_TEXTURE_2D, pointSpriteID);
-    
-   // glEnable (GL_BLEND);
-   // glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_SRC_COLOR, GL_ONE);
-    //setupgl();
-    //
-    //pmutex.lock();
-    //createparticles();
-    //pmutex.unlock();*/
-    
-  
-    
-  //  releasegl();
 }
 
 bool	Viewer::MessageLoop()
@@ -101,6 +81,9 @@ bool	Viewer::MessageLoop()
     {
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
+		// process any data
+		Process();
         
 		// lock
 		mutex.lock();
@@ -118,23 +101,58 @@ bool	Viewer::MessageLoop()
 	return true;
 }
 
+void Viewer::Process()
+{
+	// handle mouse wheel delta
+	float factor = 0.15f;
+	int deltaw = mouseWheel - mouseOldWheel;
+	mouseOldWheel = mouseWheel;
+
+	zoomFactor *= powf(1.0f - factor, (float)deltaw);
+}
+
 void Viewer::Draw()
 {
-	glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
+	float w = (float)width;
+	float h = (float)height;
 
-	// translate by translation vector
-    glTranslatef(translation[0], translation[1], 0.0f);
-    
-    DrawInftyGrid(0.25f, 0.25f, 0.6f, 0.5f, 5, 5);
+	glViewport(0, 0, w, h);
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+
+	// scale factor
+	float s = zoomFactor;
+
+	if (w <= h)
+		gluOrtho2D (0.0 * s, s * 1.0, s * 0.0, s * 1.0*(GLfloat)h/(GLfloat)w);
+	else
+		gluOrtho2D (0.0 * s, s * 1.0*(GLfloat)w/(GLfloat)h, s *0.0, s*1.0);
+	
+	
+
+	glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();		
+	
+	
+    // translate by translation vector
+    glTranslatef(translation[0] * s, translation[1] * s, 0.0f);
+
+	
+	// fit to width
+	// scale a bit
+	float aspectratio = (float)width / (float)height;
+	float scalefactor = aspectratio / (grid.w);
+	glScalef(scalefactor, scalefactor, 1.0f);
+
+	// draw grid	
+	DrawInftyGrid(grid.x, grid.y, grid.w, grid.h, grid.xcount, grid.ycount);
     
    	// point sprites for a nice visualization
 	glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, pointSpriteID);
 
-	    glEnable (GL_BLEND);
+	glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	//glBlendFunc(GL_SRC_COLOR, GL_ONE);
 	glEnable(GL_COLOR_MATERIAL);
     glEnable(GL_POINT_SPRITE);
     glBindTexture(GL_POINT_SPRITE, pointSpriteID);
@@ -142,7 +160,9 @@ void Viewer::Draw()
 	glTexEnvi(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_MODULATE );
 	glTexEnvf(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_BLEND);
 
-    glPointSize(10.0f);
+	// set correct size
+	glPointSize(10.0f);
+
     glBegin(GL_POINTS);
     if(particles)
     for(int i = 0; i < particle_count; i++)
@@ -199,8 +219,8 @@ void Viewer::DrawInftyGrid(float x, float y, float w, float h, int xcount, int y
     
     //draw infty lines...
     
-    float posinfty = 999.9f;
-    float neginfty = -999.9f; // set later to viewport
+    float posinfty = 99999.9f;
+    float neginfty = -99999.9f; // set later to viewport
     
     glColor3f(0.95f, 0.95f, 0.95f);
     

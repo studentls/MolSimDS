@@ -347,6 +347,12 @@ public:
 
 	/// @return returns count of particles in the container
 	int						getParticleCount()	{return (particles) ? particles->getParticleCount() : 0;}
+
+	/// @return returns simulation area extent, including center
+	utils::BoundingBox		getSimulationAreaExtent()	{return particles ? particles->getBoundingBox() : utils::BoundingBox();}
+
+	/// @return returns the particle container pointer
+	ParticleContainer*		getParticleContainer()	{return particles;}
 };
 
 

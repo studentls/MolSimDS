@@ -62,6 +62,28 @@ err_type MolSim::Init(int argc, char *argsv[])
 	int size = sim->getParticleCount();
 	if(Viewer::Instance().IsRunning())Viewer::Instance().setParticleArraySize(sim->getParticleCount());
 
+	// set grid
+	ParticleContainer *pc = sim->getParticleContainer();
+	
+	// valid?
+	// beware, everything currently only in 2D!
+	if(pc && Viewer::Instance().IsRunning())
+	{
+		utils::BoundingBox bb;
+		bb = pc->getBoundingBox();
+		int xcount = 1;
+		int ycount = 1;
+
+		// linked cell?
+		if(pc->getType() == PCT_LINKEDCELL)
+		{
+			xcount = ((LinkedCellParticleContainer*)pc)->getCellExtent()[0];
+			ycount = ((LinkedCellParticleContainer*)pc)->getCellExtent()[1];
+		}
+
+		Viewer::Instance().setGrid(bb.center[0] - bb.extent[0] * 0.5, bb.center[1] - bb.extent[1] * 0.5, bb.extent[0], bb.extent[1], xcount, ycount);
+	}
+
 	return S_OK;
 }
 

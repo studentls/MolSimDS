@@ -445,24 +445,30 @@ void Simulation::adjustThermostat()
 
 void Simulation::notifyViewer()
 {
+	using namespace std;
+
 	// notify viewer
 		
 	VParticle *particles = NULL;
 
 	// wish to store 500 particles
-	int count = 500;
+	int count = this->particles->getParticleCount();
 
 	count = Viewer::Instance().LockParticles(&particles, count);
 	
-	// add particles
-	// put some random particles in the array...
-	for(int i = 0; i < count; i++)
-	{
-		particles[i].x = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
-        particles[i].y = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
-		particles[i].z = 0;
-		particles[i].type = rand() % 30;
-	}
+	int pos = 0;
+
+	// add particles from particle container
+	vector<Particle> vp = this->particles->getParticles();
+	if(!vp.empty())
+		for(vector<Particle>::iterator it = vp.begin(); it != vp.end(); it++)
+		{
+			particles[pos].x = it->x[0];
+			particles[pos].y = it->x[1];
+			particles[pos].z = it->x[2];
+			particles[pos].type = it->type;
+			pos++;
+		}
 
 	Viewer::Instance().UnlockParticles(&particles);
 }

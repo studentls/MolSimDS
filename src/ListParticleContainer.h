@@ -65,7 +65,9 @@ public:
 	/// @return returns PCT_LIST
 	ParticleContainerType			getType() {return PCT_LIST;}
 
-
+	/// method to retrieve a Bounding Box, which surrounds all particles
+	/// @return returns a BoundingBox, which defines extent and center of all particles in the container(bounding box)
+	utils::BoundingBox				getBoundingBox();
 };
 
 #endif 

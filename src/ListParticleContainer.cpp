@@ -128,3 +128,35 @@ bool ListParticleContainer::AddParticlesFromFileNew(const char *filename)
 
 	return true;
 }
+
+
+utils::BoundingBox ListParticleContainer::getBoundingBox()
+{
+	using namespace utils;
+	using namespace std;
+
+	// some work has to be done here,
+	// calc bounding box
+	BoundingBox bb;
+
+	Vector<double, 3> vmin(999999.9f);	//+infty
+	Vector<double, 3> vmax(-9999999.9f); //-infty
+
+	if(!particles.empty())
+	{
+		for(vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
+		{
+			for(int i = 0; i < 3; i++)
+			{
+				vmin[i] = min(vmin[i], it->x[i]);
+				vmax[i] = max(vmax[i], it->x[i]);
+			}			
+		}
+	}
+
+	// calc area(bounding box)
+	bb.extent = vmax - vmin;
+	bb.center = (vmax + vmin) * 0.5;
+
+	return bb;
+}

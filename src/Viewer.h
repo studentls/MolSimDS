@@ -64,9 +64,14 @@ private:
 	/// Mouse cursor position
 	utils::Vector<int, 2>	mouseOldPos;
 	utils::Vector<int, 2>	mousePos;
+	int						mouseOldWheel;
+	int						mouseWheel;
 
 	/// viewport translation
 	utils::Vector<float, 2> translation;
+
+	/// zoomfactor	
+	float					zoomFactor;
 
 	/// array for opengl particles
 	VParticle				*particles;
@@ -76,16 +81,36 @@ private:
 	/// color array			
 	utils::Color			colArray[COLOR_COUNT];
 
+	/// struct to store grid information
+	struct Grid 
+	{
+		float x;
+		float y;
+		float w;
+		float h;
+		int xcount;		/// how many cells in x direction?
+		int ycount;		/// how many cells in y direction?
+	};
+
+	/// store Grid information
+	Grid					grid;
+
 	/// variable indicates if viewer is running
 	bool					isRunning;
 
 	/// Draw function
 	void					Draw();
 
+	/// Process function, handle events
+	void					Process();
+
 	/// draws the grid for the particles...
 	/// @param xcount cells in x direction
 	/// @param ycount cells in y direction
-	void					DrawInftyGrid(float x, float y, float w, float h, int xcount, int ycount, float factor = 0.06125f);
+	void					DrawInftyGrid(float x, float y,
+										  float w, float h,
+										  int xcount, int ycount,
+										  float factor = 0.06125f);
 
 	/// clears everything up
 	void					Shutdown();
@@ -93,6 +118,10 @@ private:
 	/// callback functions
 	static void GLFWCALL	reshape(int w, int h)
 	{
+		// set data
+		Viewer::Instance().width  = w;
+		Viewer::Instance().height = h;
+
 		glViewport(0, 0, w, h);
 		glMatrixMode(GL_PROJECTION);
 		glLoadIdentity();
@@ -105,6 +134,8 @@ private:
 	/// update function
 	inline void	updateMousePos(const int x, const int y)	{mouseOldPos = mousePos; mousePos[0] = x; mousePos[1] = y;}
 
+	inline void updateMouseWheel(const int pos)				{mouseOldWheel = mouseWheel; mouseWheel = pos;}
+	
 	/// event function for left mouse button pushed
 	void	OnMouseLDown();
 
@@ -119,6 +150,12 @@ private:
 		}  
 	}
 
+	/// wrapper
+	static void GLFWCALL mouseWheelFun(int pos)
+	{
+		Viewer::Instance().updateMouseWheel(pos);
+	}
+
 	/// helper function to create a nice looking point sprite
 	void fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather);
 
@@ -126,7 +163,14 @@ private:
 	void generateColors();
 
 	/// for singleton, constructor is private
-	Viewer():width(0), height(0), particle_size(0), particle_count(0), particles(NULL), isRunning(false)	{}
+	Viewer():width(0), height(0), particle_size(0), particle_count(0), particles(NULL), isRunning(false)
+	{
+		grid.x = grid.y = 0.25f;
+		grid.w = grid.h = 0.6f;
+		grid.xcount = grid.ycount = 5;
+
+		zoomFactor = 1.0f;
+	}
 
 public:
 	/// public destructor
@@ -160,6 +204,18 @@ public:
 
 	/// @return count of displayed particles
 	int		getParticleCount()	{return particle_count;}
+
+	/// set grid values
+	void	setGrid(float x, float y, float w, float h, int xcount, int ycount)
+	{
+		grid.x		= x;
+		grid.y		= y;
+		grid.w		= w;
+		grid.h		= h;
+		grid.xcount = xcount;
+		grid.ycount = ycount;
+	}
+
 
 	/// set size of array
 	/// @param max_count maximum count of particles that can be saved

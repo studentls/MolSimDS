@@ -61,6 +61,10 @@ public:
 	/// method to identify container
 	/// @return returns member of ParticleContainerType
 	virtual ParticleContainerType			getType() = 0;
+
+	/// method to retrieve a Bounding Box, which surrounds all particles
+	/// @return returns a BoundingBox, which defines extent and center of all particles in the container(bounding box)
+	virtual utils::BoundingBox				getBoundingBox() = 0;
 };
 
 #endif /* PARTICLE_CONTAINER_H_ */
