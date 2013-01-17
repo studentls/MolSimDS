@@ -135,6 +135,9 @@ err_type Simulation::Run()
 		{
 			// update running dependend to the status of the viewer
 			running = Viewer::Instance().IsRunning();
+
+			// if running, notify(send particle data to viewer)
+			if(running)notifyViewer();
 		}
 
 		// increment loop values
@@ -438,4 +441,28 @@ void Simulation::adjustThermostat()
 	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
 
 	
+}
+
+void Simulation::notifyViewer()
+{
+	// notify viewer
+		
+	VParticle *particles = NULL;
+
+	// wish to store 500 particles
+	int count = 500;
+
+	count = Viewer::Instance().LockParticles(&particles, count);
+	
+	// add particles
+	// put some random particles in the array...
+	for(int i = 0; i < count; i++)
+	{
+		particles[i].x = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
+        particles[i].y = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
+		particles[i].z = 0;
+		particles[i].type = rand() % 30;
+	}
+
+	Viewer::Instance().UnlockParticles(&particles);
 }

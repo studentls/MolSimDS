@@ -15,7 +15,6 @@
 
 #include "Viewer.h"
 
-
 void	Viewer::InitAndDisplay()
 {
 	// now viewer runs
@@ -45,6 +44,45 @@ void	Viewer::InitAndDisplay()
 	updateMousePos(x, y);
     
     
+	//// put some random particles in the array...
+	//particle_size = 500;
+	//particles = new VParticle[500];
+	//for(int i = 0; i < particle_size; i++)
+	//{
+	//	particles[i].x = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
+ //       particles[i].y = (float)(rand()%RAND_MAX) / (float)RAND_MAX;
+	//	particles[i].z = 0;
+	//	particles[i].type = rand() % 30;
+	//}
+
+
+
+	// init point sprite
+	glGenTextures(1, &pointSpriteID);
+    glBindTexture(GL_TEXTURE_2D, pointSpriteID);
+    
+    // generate some data
+    unsigned char *data = NULL;    
+    int w = 64, h = 64;    
+    data = new unsigned char[w * h * 4]; // use rgba format
+    
+    memset(data, 0, w * h * 4);
+  
+	// fill with a nice feathered circle
+    fillcircleRGBA(data, w, h, 32, 32, 15, 10.0f);
+           
+    //use glu for mip map generation
+    // gluBuild2DMipmaps(GL_TEXTURE_2D, 3, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+    delete [] data;
+        
+    glBindTexture(GL_TEXTURE_2D, pointSpriteID);
+    
+   // glEnable (GL_BLEND);
+   // glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_COLOR, GL_ONE);
     //setupgl();
     //
     //pmutex.lock();
@@ -64,7 +102,12 @@ bool	Viewer::MessageLoop()
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
         
+		// lock
+		mutex.lock();
+
 		Draw();
+
+		mutex.unlock();
         
         glfwSwapBuffers();
         
@@ -85,14 +128,36 @@ void Viewer::Draw()
     
     DrawInftyGrid(0.25f, 0.25f, 0.6f, 0.5f, 5, 5);
     
-    //pmutex.lock();
-    //plotparticles();
-    //pmutex.unlock();
-    //
-    //
-    
+   	// point sprites for a nice visualization
+	glEnable(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, pointSpriteID);
+
+	    glEnable (GL_BLEND);
+    glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glBlendFunc(GL_SRC_COLOR, GL_ONE);
+	glEnable(GL_COLOR_MATERIAL);
+    glEnable(GL_POINT_SPRITE);
+    glBindTexture(GL_POINT_SPRITE, pointSpriteID);
+    glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	glTexEnvi(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	glTexEnvf(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_BLEND);
+
+    glPointSize(10.0f);
+    glBegin(GL_POINTS);
+    if(particles)
+    for(int i = 0; i < particle_count; i++)
+    {
+        glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(particles[i].x, particles[i].y, 0.0f);
+    }    
+    glEnd();    
+    glDisable(GL_POINT_SPRITE);
+    glDisable(GL_TEXTURE_2D);
+
+
     glColor3f(1.0f, 1.0f, 1.0f);
     glDisable(GL_TEXTURE_2D);
+	glDisable(GL_BLEND);
     glFlush();
 }
 
@@ -177,4 +242,65 @@ void Viewer::DrawInftyGrid(float x, float y, float w, float h, int xcount, int y
         }
     
     glEnd();
+}
+
+void Viewer::fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather)
+{
+    
+    float innerradiusSq = (radius - feather) * (radius - feather);
+    float outerradiusSq = (radius + feather) * (radius + feather);
+    
+    //loop
+    for(int x = 0; x < w; x++)
+        for(int y = 0; y < h; y++)
+        {
+            float distSq = (x - centerx) * (x - centerx) + (y - centery) * (y - centery);
+            int index = 4 * (x + y * w);
+            // inside inner radius?
+            if(distSq < innerradiusSq)
+            {
+                data[index + 0] = 0;
+                data[index + 1] = 0;
+                data[index + 2] = 0;
+                data[index + 3] = 255;
+            }
+            // inside outer radius(between inner and outer => feather)
+            else if(distSq < outerradiusSq)
+            {
+                float factor = 0.0f;
+                
+                float distfrominnerradius = sqrtf(distSq) - sqrtf(innerradiusSq);
+                
+                factor = distfrominnerradius / ( 2.0f * feather);
+                
+                if(factor > 1.0f)factor = 1.0f;
+                else if(factor < 0.0f)factor = 0.0f;
+                
+                factor = 1.0f - factor;
+                
+                data[index + 0] = 0;
+                data[index + 1] = 0;
+                data[index + 2] = 0;
+                data[index + 3] = 255 * factor;
+
+            }
+            else
+            {
+                data[index + 0] = 0;
+                data[index + 1] = 0;
+                data[index + 2] = 0;
+                data[index + 3] = 0;
+            }
+
+        }
+    
+}
+
+void Viewer::generateColors()
+{
+	using namespace utils;
+
+	//manually set some nice colors
+	colArray[0] = Color(1.0f, 0.0f, 1.0f);
+	colArray[1] = Color(1.0f, 1.0f, 0.0f);
 }

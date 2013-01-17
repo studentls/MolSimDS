@@ -108,6 +108,9 @@
     <ClInclude Include="src\Viewer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\utils\Color.h">
+      <Filter>Headerdateien\utils</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -157,6 +160,9 @@
     </ClCompile>
     <ClCompile Include="src\Viewer.cpp">
       <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="src\utils\Color.cpp">
+      <Filter>Quelldateien\utils</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

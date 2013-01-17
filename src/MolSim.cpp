@@ -58,6 +58,10 @@ err_type MolSim::Init(int argc, char *argsv[])
 	// use xml file
 	if(FAILED(sim->CreateSimulationFromXMLFile(simFileName.c_str())))return E_INVALIDPARAM;
 
+	// if viewer is active, set interior particle array size
+	int size = sim->getParticleCount();
+	if(Viewer::Instance().IsRunning())Viewer::Instance().setParticleArraySize(sim->getParticleCount());
+
 	return S_OK;
 }
 

@@ -315,6 +315,9 @@ private:
 	/// apply beta(Velocity Scale Factor) to particles
 	static void				applyTemperatureScalingFactor(void *data, Particle& p);
 
+	/// send particles to viewer
+	void					notifyViewer();
+
 public:
 	Simulation():particles(NULL)			{}
 
@@ -341,6 +344,9 @@ public:
 	/// get statistics
 	/// @return statistical data about the simulation
 	SimulationStatistics&	getStatistics()	{return this->statistics;}
+
+	/// @return returns count of particles in the container
+	int						getParticleCount()	{return (particles) ? particles->getParticleCount() : 0;}
 };
 
 

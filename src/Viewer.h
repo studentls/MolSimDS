@@ -17,11 +17,14 @@
 
 #include "utils/Base.h"
 #include "utils/Vector.h"
+#include "utils/Color.h"
 #include "Simulation.h"
 
 // include GLFW library
 //windows
 #ifdef WINDOWS
+// for point sprites the GL extensions are needed
+#include <gl/glew.h>
 #include <gl/glfw.h>
 #else
 //Mac/Linux
@@ -32,38 +35,63 @@
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
 
+#define COLOR_COUNT 10
+
+/// simple struct for opengl particles
+struct VParticle
+{
+	float x;
+	float y;
+	float z;
+	short type;
+};
+
 /// based on OpenGL
 /// use singleton pattern to easily communicate
 class Viewer
 {
 private:
+	/// mutex for multithread access to array
+	boost::mutex			mutex;
+
 	/// BackBuffer Height/Width
-	int	width;
-	int	height;
+	int						width;
+	int						height;
+
+	/// OpenGL id of the used point sprite
+	GLuint					pointSpriteID;
 
 	/// Mouse cursor position
-	utils::Vector<int, 2> mouseOldPos;
-	utils::Vector<int, 2> mousePos;
+	utils::Vector<int, 2>	mouseOldPos;
+	utils::Vector<int, 2>	mousePos;
 
 	/// viewport translation
 	utils::Vector<float, 2> translation;
 
+	/// array for opengl particles
+	VParticle				*particles;
+	unsigned int			particle_size;	/// array size
+	unsigned int			particle_count;	/// count of valid particles in array
+
+	/// color array			
+	utils::Color			colArray[COLOR_COUNT];
+
 	/// variable indicates if viewer is running
-	bool			isRunning;
+	bool					isRunning;
 
 	/// Draw function
-	void			Draw();
+	void					Draw();
 
 	/// draws the grid for the particles...
 	/// @param xcount cells in x direction
 	/// @param ycount cells in y direction
-	void			DrawInftyGrid(float x, float y, float w, float h, int xcount, int ycount, float factor = 0.06125f);
+	void					DrawInftyGrid(float x, float y, float w, float h, int xcount, int ycount, float factor = 0.06125f);
 
 	/// clears everything up
-	void			Shutdown();
+	void					Shutdown();
 
 	/// callback functions
-	static void GLFWCALL reshape(int w, int h)
+	static void GLFWCALL	reshape(int w, int h)
 	{
 		glViewport(0, 0, w, h);
 		glMatrixMode(GL_PROJECTION);
@@ -91,10 +119,25 @@ private:
 		}  
 	}
 
+	/// helper function to create a nice looking point sprite
+	void fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather);
+
+	/// helper to generate some nice colors
+	void generateColors();
+
 	/// for singleton, constructor is private
-	Viewer():width(0), height(0), isRunning(false)	{}
+	Viewer():width(0), height(0), particle_size(0), particle_count(0), particles(NULL), isRunning(false)	{}
 
 public:
+	/// public destructor
+	~Viewer()
+	{
+		// delete GL Textures
+		if(particles)glDeleteTextures(1, &pointSpriteID);
+
+		SAFE_DELETE(particles);
+	}
+	
 	/// instance method
 	static Viewer& Instance()
 	{
@@ -111,6 +154,54 @@ public:
 
 	/// @return returns if viewer is running
 	bool	IsRunning()	{return isRunning;}
+
+	/// @return size of interior particle array
+	int		getParticleArraySize()	{return particle_size;}
+
+	/// @return count of displayed particles
+	int		getParticleCount()	{return particle_count;}
+
+	/// set size of array
+	/// @param max_count maximum count of particles that can be saved
+	void	setParticleArraySize(const int max_count)
+	{
+		// delete array if necessary
+		if(particles)SAFE_DELETE_A(particles);
+
+		particle_size = max_count;
+		particle_count = 0;
+
+		particles = new VParticle[max_count];
+	}
+
+	/// retrieve pointer to particle array
+	/// be careful! this method shall be only called in combination with UnlockParticles!
+	/// @param count desired count of particles to store
+	/// @param out pointer to the particle array, where particles can be stored
+	/// @return max possible count of particles that can be stored
+	inline int		LockParticles(VParticle **out, const int count)
+	{
+		particle_count = min(count, particle_size);
+		
+		// first lock mutex
+		mutex.lock();
+
+		// out
+		*out = particles;
+
+		return particle_count;
+	}
+
+	/// unlock particle array, for security reasons a pointer is passed, which shall be NULLED afterwards
+	/// @param out pointer to the particle array retrieved from LockParticles, where particles have been stored
+	inline void	UnlockParticles(VParticle **out)
+	{
+		// mutex unlock
+		mutex.unlock();
+
+		// null pointer
+		*out = NULL;
+	}
 };
 
 #endif
