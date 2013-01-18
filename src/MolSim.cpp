@@ -247,6 +247,7 @@ void MolSim::showHelp()
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-help"<<"\t\t\t"<<"show help");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave\n\t\t\t\t<name> blank to run all tests");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"--viewer"<<"\t\t\t"<<"start with builtin OpenGL viewer");
 	
 }
 
@@ -372,9 +373,10 @@ void MolSim::runSingleTest(string s)
 
 void MolSim::showStatistics(SimulationStatistics& s)
 {
-	LOG4CXX_INFO(generalOutputLogger, "Statistics\n----------------------------");
+	LOG4CXX_INFO(generalOutputLogger, "Statistics");
+	utils::line();
 	LOG4CXX_INFO(generalOutputLogger, "total particle count:\t"<<s.particle_count);
 	LOG4CXX_INFO(generalOutputLogger, "iteration count: \t"<<s.step_count);
-	LOG4CXX_INFO(generalOutputLogger, "total time:\t\t "<<s.time);
-	LOG4CXX_INFO(generalOutputLogger, "timer per step:\t"<<s.timeperstep);
+	LOG4CXX_INFO(generalOutputLogger, "total time:\t\t"<<utils::secondsToHMS((int)s.time).c_str());
+	LOG4CXX_INFO(generalOutputLogger, "timer per step:\t\t"<<1000 * s.timeperstep<<" ms");
 }

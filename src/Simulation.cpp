@@ -92,16 +92,21 @@ err_type Simulation::Run()
 	statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
 
 	// output that calculation have started ("starting calculation...")
-	LOG4CXX_TRACE(simulationLogger, "starting calculation...");
+	LOG4CXX_TRACE(simulationLogger, ">> starting calculation...");
+	LOG4CXX_TRACE(simulationLogger, "\n   progress\t\t\telapsed time / remaining time\n");
 
 	//start timer
 	utils::Timer timer;
+	utils::Timer progress_timer; // update progress view
 
 	// additional running variable to finish if events occur
 	bool running = true;
 
 	// has the user requested a viewer to run?
 	bool viewer = Viewer::Instance().IsRunning();
+
+	// calculate how many steps will be 1%
+	int stepsperpercent = statistics.step_count / 100;
 
 	// iterate until the end time is reached...
 	while (current_time < desc.end_time && running) {
@@ -114,21 +119,35 @@ err_type Simulation::Run()
 		// perform one iteration step
 		performStep();
 
-	    // TODO: reset to 100
-		// plot the particles on every hundredth iteration, beginning with the first
+		// plot the particles on every desiredth iteration, beginning with the first
 		if (iteration % desc.iterationsperoutput == 0) {
 			plotParticles(iteration);
-			
-#ifndef DEBUG
-			// output that an iteration has finished
-			if(iteration % 25 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
-#else
-			// output that an iteration has finished
-			if(iteration % 5 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
-#endif
 		}
+		
+		// output info every 5s
+		if(progress_timer.getElapsedTime() > 5.0f)
+		{
+			stringstream str;
+
+			str<<"   [";
+
+			int max = 15;
+			int count = max * iteration / statistics.step_count;
+
+			for(int i = 0; i < count; i++)
+				str<<".";
+			for(int i = count; i < max; i++)
+				str<<" ";
+			// calc how many seconds iterations will approximately last from now onwards
+			int seconds = (int)(timer.getElapsedTime() / (double)iteration * statistics.step_count);
+
+			str<<"]  \t"<<(int)(100 * iteration / statistics.step_count)<<"%  \t"<<utils::secondsToHMS((int)timer.getElapsedTime())<<" / "<<utils::secondsToHMS(seconds);
+
+			LOG4CXX_TRACE(simulationLogger, str.str().c_str());
+
+			progress_timer.reset();
+		}
+		
 		
 		// is a viewer active?
 		if(viewer)
@@ -154,7 +173,7 @@ err_type Simulation::Run()
 
 	// output that the output has finished
 	cout << endl;
-	LOG4CXX_TRACE(simulationLogger, "output written. Terminating...");
+	LOG4CXX_TRACE(simulationLogger, ">> output written. Terminating...\n");
 
 	return S_OK;
 }

@@ -16,13 +16,15 @@
 #include "Base.h"
 
 #include <iostream>
+#include <string>
+#include <sstream>
 #include <cstdio>
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 
 /// specifies line width used by line(...)
-static const int g_linewidth = 40;
+static const int g_linewidth = 64;
 
 namespace utils
 {
@@ -102,6 +104,23 @@ namespace utils
 		return str + iLastDot + 1;
 	}
 
+	/// converts seconds into a string scheme
+	inline std::string			secondsToHMS(const int seconds)
+	{
+		int sec = seconds % 60;
+		int min = (seconds / 60) % 60;
+		int h = (seconds / 3600) % 60;
+
+		std::stringstream str;
+		if(h < 10)str<<"0";
+		str<<h<<":";
+		if(min < 10)str<<"0";
+		str<<min<<":";
+		if(sec < 10)str<<"0";
+		str<<sec;
+
+		return str.str();
+	}
 }
 
 #endif

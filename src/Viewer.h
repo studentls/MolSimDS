@@ -238,8 +238,11 @@ public:
 	/// @return max possible count of particles that can be stored
 	inline int		LockParticles(VParticle **out, const int unsigned count)
 	{
+#ifdef WINDOWS
+		particle_count = min(count, particle_size);
+#else
 		particle_count = std::min(count, particle_size);
-		
+#endif
 		// first lock mutex
 		mutex.lock();
 
