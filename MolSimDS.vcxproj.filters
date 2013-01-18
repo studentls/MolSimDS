@@ -213,5 +213,8 @@
     <None Include="FallingDrop.xml">
       <Filter>XML</Filter>
     </None>
+    <None Include="ViewerTest.xml">
+      <Filter>XML</Filter>
+    </None>
   </ItemGroup>
 </Project>

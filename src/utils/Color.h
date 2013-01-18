@@ -65,9 +65,9 @@ public:
 				
 	}
 
-	int getRed()	{return (r >= 1.0 ? 255 : r <= 0.0 ? 0 : (unsigned long)(r * 255.0)); }
-	int getGreen()	{return (g >= 1.0 ? 255 : g <= 0.0 ? 0 : (unsigned long)(g * 255.0)); }
-	int getBlue()	{return (b >= 1.0 ? 255 : b <= 0.0 ? 0 : (unsigned long)(b * 255.0)); }
+	int getRed()const 	{return (r >= 1.0 ? 255 : r <= 0.0 ? 0 : (unsigned long)(r * 255.0)); } 
+	int getGreen()const	{return (g >= 1.0 ? 255 : g <= 0.0 ? 0 : (unsigned long)(g * 255.0)); }
+	int getBlue()const	{return (b >= 1.0 ? 255 : b <= 0.0 ? 0 : (unsigned long)(b * 255.0)); }
 	
 	
 	void operator =		(const Color& c) {r =  c.r; g =  c.g; b =  c.b; a = c.a;}

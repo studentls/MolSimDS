@@ -110,6 +110,7 @@ private:
 	void					DrawInftyGrid(float x, float y,
 										  float w, float h,
 										  int xcount, int ycount,
+										  bool crosses = true,
 										  float factor = 0.06125f);
 
 	/// clears everything up
@@ -157,7 +158,7 @@ private:
 	}
 
 	/// helper function to create a nice looking point sprite
-	void fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather);
+	void fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather, const utils::Color& col);
 
 	/// helper to generate some nice colors
 	void generateColors();

@@ -15,6 +15,13 @@
 
 #include "Viewer.h"
 
+// Little Helper for Reordering
+unsigned long ARGBToABGR(unsigned long col)
+{
+	return ((col & 0x000000ff) << 16) | (col & 0xff00ff00) | ((col & 0x00ff0000) >> 16);
+}
+
+
 void	Viewer::InitAndDisplay()
 {
 	// now viewer runs
@@ -56,22 +63,26 @@ void	Viewer::InitAndDisplay()
     
     // generate some data
     unsigned char *data = NULL;    
-    int w = 64, h = 64;    
+    int w = 128, h = 128;    
     data = new unsigned char[w * h * 4]; // use rgba format
     
     memset(data, 0, w * h * 4);
   
 	// fill with a nice feathered circle
-    fillcircleRGBA(data, w, h, 32, 32, 15, 10.0f);
+	fillcircleRGBA(data, w, h, 32*2, 32*2, 15*2, 2*10.0f, utils::Color(1.0f, 1.0f, 1.0f));
            
-    //use glu for mip map generation
-    // gluBuild2DMipmaps(GL_TEXTURE_2D, 3, w, h, GL_RGB, GL_UNSIGNED_BYTE, data);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexImage2D(GL_TEXTURE_2D, 0, 4, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
-    delete [] data;
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, data); 
+	//glGenerateMipmap(GL_TEXTURE_2D);  // generate mipmaps, glu is obsolete!
+	
+	delete [] data;
         
     glBindTexture(GL_TEXTURE_2D, pointSpriteID);
+
+
+	// generate some nice colors for visualization
+	generateColors();
 }
 
 bool	Viewer::MessageLoop()
@@ -126,14 +137,12 @@ void Viewer::Draw()
 	if (w <= h)
 		gluOrtho2D (0.0 * s, s * 1.0, s * 0.0, s * 1.0*(GLfloat)h/(GLfloat)w);
 	else
-		gluOrtho2D (0.0 * s, s * 1.0*(GLfloat)w/(GLfloat)h, s *0.0, s*1.0);
-	
+		gluOrtho2D (0.0 * s, s * 1.0*(GLfloat)w/(GLfloat)h, s *0.0, s*1.0);	
 	
 
 	glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();		
-	
-	
+
     // translate by translation vector
     glTranslatef(translation[0] * s, translation[1] * s, 0.0f);
 
@@ -145,35 +154,71 @@ void Viewer::Draw()
 	glScalef(scalefactor, scalefactor, 1.0f);
 
 	// draw grid	
-	DrawInftyGrid(grid.x, grid.y, grid.w, grid.h, grid.xcount, grid.ycount);
+	bool drawCrosses = zoomFactor <= 0.1 ? true : false; // draw crosses only for small zoomfactor
+	int xcount = zoomFactor <= 1.0 ? grid.xcount : 1;	 // draw grid only when visibility is good
+	int ycount = zoomFactor <= 1.0 ? grid.ycount : 1;
+	DrawInftyGrid(grid.x, grid.y, grid.w, grid.h, xcount, ycount, drawCrosses);
     
-   	// point sprites for a nice visualization
+ //  	// point sprites for a nice visualization
+	//glEnable(GL_TEXTURE_2D);
+ //   glBindTexture(GL_TEXTURE_2D, pointSpriteID);
+
+	//glEnable (GL_BLEND);
+ //   glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	//glEnable(GL_COLOR_MATERIAL);
+ //   glEnable(GL_POINT_SPRITE);
+ //   glBindTexture(GL_POINT_SPRITE, pointSpriteID);
+ //   glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
+	//glTexEnvi(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_MODULATE );
+	//glTexEnvf(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_BLEND);
+
+	//// set correct size
+	//glPointSize(10.0f);
+
+ //   glBegin(GL_POINTS);
+ //   if(particles)
+ //   for(int i = 0; i < particle_count; i++)
+ //   {
+ //       glColor3f(1.0f, 0.0f, 0.0f);
+ //       glVertex3f(particles[i].x, particles[i].y, 0.0f);
+ //   }    
+ //   glEnd();    
+ //   glDisable(GL_POINT_SPRITE);
+
+	// use quads to visualize sprites
 	glEnable(GL_TEXTURE_2D);
     glBindTexture(GL_TEXTURE_2D, pointSpriteID);
 
 	glEnable (GL_BLEND);
     glBlendFunc (GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-	glEnable(GL_COLOR_MATERIAL);
-    glEnable(GL_POINT_SPRITE);
-    glBindTexture(GL_POINT_SPRITE, pointSpriteID);
-    glTexEnvi(GL_POINT_SPRITE, GL_COORD_REPLACE, GL_TRUE);
-	glTexEnvi(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-	glTexEnvf(GL_POINT_SPRITE, GL_TEXTURE_ENV_MODE, GL_BLEND);
 
-	// set correct size
-	glPointSize(10.0f);
+	float fSize = 3.0f;
+	float fSize2 = fSize * 0.5f; // half size
 
-    glBegin(GL_POINTS);
+    glBegin(GL_QUADS);
     if(particles)
     for(int i = 0; i < particle_count; i++)
     {
-        glColor3f(1.0f, 0.0f, 0.0f);
-        glVertex3f(particles[i].x, particles[i].y, 0.0f);
+      /*  glColor3f(1.0f, 0.0f, 0.0f);
+        glVertex3f(particles[i].x, particles[i].y, 0.0f);*/
+
+		float x = particles[i].x;
+		float y = particles[i].y;
+
+		// color according to array
+		utils::Color col = colArray[particles[i].type % COLOR_COUNT];
+
+		glColor3f(col.r, col.g, col.b);
+
+		glTexCoord2d(0.0,0.0); glVertex3f(x - fSize2, y - fSize2, 0.0);
+		glTexCoord2d(1.0,0.0); glVertex3f(x + fSize2, y - fSize2, 0.0f);
+		glTexCoord2d(1.0,1.0); glVertex3f(x + fSize2, y + fSize2, 0.0f);
+		glTexCoord2d(0.0,1.0); glVertex3f(x - fSize2, y + fSize2, 0.0f);
+
     }    
     glEnd();    
-    glDisable(GL_POINT_SPRITE);
-    glDisable(GL_TEXTURE_2D);
 
+    glDisable(GL_TEXTURE_2D);
 
     glColor3f(1.0f, 1.0f, 1.0f);
     glDisable(GL_TEXTURE_2D);
@@ -196,7 +241,7 @@ void Viewer::OnMouseLDown()
 	translation[1] -= factor * (mousePos[1] - mouseOldPos[1]);
 }
 
-void Viewer::DrawInftyGrid(float x, float y, float w, float h, int xcount, int ycount, float factor)
+void Viewer::DrawInftyGrid(float x, float y, float w, float h, int xcount, int ycount, bool crosses, float factor)
 {
    	float dx = w / (float)(xcount);
 	float dy = h / (float)(ycount);
@@ -247,29 +292,36 @@ void Viewer::DrawInftyGrid(float x, float y, float w, float h, int xcount, int y
     
     glColor3f(0.0f, 0.0f, 0.0f);
     
-    // draw crosses0
-    for(int i = 0; i < xcount + 1; i++)
-        for(int j = 0; j < ycount + 1; j++)
-        {
-            if(i > 0)glVertex3f(x + i * dx - dx * factor, y + j * dy, 0.0f);
-            else glVertex3f(x + i * dx, y + j * dy, 0.0f);
-            if(i < xcount)glVertex3f(x + i * dx + dx * factor, y + j * dy, 0.0f);
-            else glVertex3f(x + i * dx, y + j * dy, 0.0f);
-            if(j > 0)glVertex3f(x + i * dx, y + j * dy - dy *factor, 0.0f);
-            else glVertex3f(x + i * dx, y + j * dy, 0.0f);
-            if(j < ycount)glVertex3f(x + i * dx, y + j * dy + dy *factor, 0.0f);
-            else glVertex3f(x + i * dx, y + j * dy, 0.0f);
-        }
-    
+
+    // draw crosses?
+	if(crosses)
+	{
+		for(int i = 0; i < xcount + 1; i++)
+			for(int j = 0; j < ycount + 1; j++)
+			{
+				if(i > 0)glVertex3f(x + i * dx - dx * factor, y + j * dy, 0.0f);
+				else glVertex3f(x + i * dx, y + j * dy, 0.0f);
+				if(i < xcount)glVertex3f(x + i * dx + dx * factor, y + j * dy, 0.0f);
+				else glVertex3f(x + i * dx, y + j * dy, 0.0f);
+				if(j > 0)glVertex3f(x + i * dx, y + j * dy - dy *factor, 0.0f);
+				else glVertex3f(x + i * dx, y + j * dy, 0.0f);
+				if(j < ycount)glVertex3f(x + i * dx, y + j * dy + dy *factor, 0.0f);
+				else glVertex3f(x + i * dx, y + j * dy, 0.0f);
+			}
+	}
     glEnd();
 }
 
-void Viewer::fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather)
+void Viewer::fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int centery, int radius, float feather, const utils::Color& col)
 {
     
     float innerradiusSq = (radius - feather) * (radius - feather);
     float outerradiusSq = (radius + feather) * (radius + feather);
     
+	unsigned char r = (unsigned char)col.getRed();
+	unsigned char g = (unsigned char)col.getGreen();
+	unsigned char b = (unsigned char)col.getBlue();
+
     //loop
     for(int x = 0; x < w; x++)
         for(int y = 0; y < h; y++)
@@ -279,9 +331,9 @@ void Viewer::fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int 
             // inside inner radius?
             if(distSq < innerradiusSq)
             {
-                data[index + 0] = 0;
-                data[index + 1] = 0;
-                data[index + 2] = 0;
+                data[index + 0] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
                 data[index + 3] = 255;
             }
             // inside outer radius(between inner and outer => feather)
@@ -298,9 +350,9 @@ void Viewer::fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int 
                 
                 factor = 1.0f - factor;
                 
-                data[index + 0] = 0;
-                data[index + 1] = 0;
-                data[index + 2] = 0;
+                data[index + 0] = r;
+                data[index + 1] = g;
+                data[index + 2] = b;
                 data[index + 3] = 255 * factor;
 
             }
@@ -311,8 +363,7 @@ void Viewer::fillcircleRGBA(unsigned char *data, int w, int h, int centerx, int 
                 data[index + 2] = 0;
                 data[index + 3] = 0;
             }
-
-        }
+	}
     
 }
 
@@ -321,6 +372,14 @@ void Viewer::generateColors()
 	using namespace utils;
 
 	//manually set some nice colors
-	colArray[0] = Color(1.0f, 0.0f, 1.0f);
-	colArray[1] = Color(1.0f, 1.0f, 0.0f);
+	colArray[0] = Color(0.0f, 0.0f, 0.0f);
+	colArray[1] = Color(0xff2c87c7);//Color(1.0f, 0.0f, 0.0f);
+	colArray[2] = Color(0xff26adde);//Color(0.0f, 1.0f, 0.0f);	
+	colArray[3] = Color(0xff2459d4);//Color(0.0f, 0.0f, 1.0f);	
+	colArray[4] = Color(0xff21bed4);	
+	colArray[5] = Color(0.0f, 0.0f, 0.0f);	
+	colArray[6] = Color(0.0f, 0.0f, 0.0f);		
+	colArray[7] = Color(0.0f, 0.0f, 0.0f);	
+	colArray[8] = Color(0.0f, 0.0f, 0.0f);	
+	colArray[9] = Color(0.0f, 0.0f, 0.0f);
 }
