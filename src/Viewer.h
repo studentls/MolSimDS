@@ -236,9 +236,9 @@ public:
 	/// @param count desired count of particles to store
 	/// @param out pointer to the particle array, where particles can be stored
 	/// @return max possible count of particles that can be stored
-	inline int		LockParticles(VParticle **out, const int count)
+	inline int		LockParticles(VParticle **out, const int unsigned count)
 	{
-		particle_count = min(count, particle_size);
+		particle_count = std::min(count, particle_size);
 		
 		// first lock mutex
 		mutex.lock();
