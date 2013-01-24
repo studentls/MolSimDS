@@ -183,7 +183,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="ThermostatBig.xml" />
-    <None Include="ThermostatSmall.xml" />
+    <None Include="ThermostatSmall.xml">
+      <SubType>Designer</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -260,8 +260,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 								PeriodicBoundary b;
 								b.cell1 = index1;
 								b.cell2 = index2;
-								b.xAxis = xOpposite ? (SimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
-								b.yAxis = yOpposite ? (SimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
+								b.xAxis = xOpposite ? (SimulationAreaExtent[0] * ((x1 == 1) ? 1.0 : -1.0)) : 0;
+								b.yAxis = yOpposite ? (SimulationAreaExtent[1] * ((y1 == 1) ? 1.0 : -1.0)) : 0;
 								b.zAxis = 0.0;
 
 								periodicBoundaryGroups.push_back(b);
@@ -318,9 +318,9 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 											PeriodicBoundary b;
 											b.cell1 = index1;
 											b.cell2 = index2;
-											b.xAxis = xOpposite ? (SimulationAreaExtent[0] * ((x1 == 0) ? 1.0 : -1.0)) : 0;
-											b.yAxis = yOpposite ? (SimulationAreaExtent[1] * ((y1 == 0) ? 1.0 : -1.0)) : 0;
-											b.zAxis = zOpposite ? (SimulationAreaExtent[2] * ((z1 == 0) ? 1.0 : -1.0)) : 0;
+											b.xAxis = xOpposite ? (SimulationAreaExtent[0] * ((x1 == 1) ? 1.0 : -1.0)) : 0;
+											b.yAxis = yOpposite ? (SimulationAreaExtent[1] * ((y1 == 1) ? 1.0 : -1.0)) : 0;
+											b.zAxis = zOpposite ? (SimulationAreaExtent[2] * ((z1 == 1) ? 1.0 : -1.0)) : 0;
 											periodicBoundaryGroups.push_back(b);
 										}
 							}
