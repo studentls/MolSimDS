@@ -79,7 +79,7 @@ void MembraneContainer::ApplyMembraneForces()
 	}
 }
 
-void ApplyMembraneForce(bool directNeighbors, Particle& p1, Particle& p2)
+void MembraneContainer::ApplyMembraneForce(bool directNeighbors, Particle& p1, Particle& p2)
 {
 	double k = 300.0;
 	double r0 = 2.2;
