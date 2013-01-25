@@ -31,9 +31,18 @@
 #include <GL/glfw.h>
 #endif
 
+
+// define appropriate lib to use for thread synchronization
+#ifdef USE_BOOST
+
 // boost
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
+#else
+// else use glfw lib
+#include <gl/glfw.h>
+
+#endif
 
 #define COLOR_COUNT 10
 
@@ -51,8 +60,13 @@ struct VParticle
 class Viewer
 {
 private:
+
 	/// mutex for multithread access to array
+#ifdef USE_BOOST
 	boost::mutex			mutex;
+#else 
+	GLFWmutex				mutex;
+#endif
 
 	/// BackBuffer Height/Width
 	int						width;
@@ -171,6 +185,15 @@ private:
 		grid.xcount = grid.ycount = 5;
 
 		zoomFactor = 1.0f;
+
+		// Init GLFW Lib
+		if(glfwInit() != GL_TRUE)
+			Shutdown();
+
+		// initialize mutex if needed
+#ifndef USE_BOOST
+		mutex = glfwCreateMutex();
+#endif
 	}
 
 public:
@@ -181,6 +204,10 @@ public:
 		if(particles)glDeleteTextures(1, &pointSpriteID);
 
 		SAFE_DELETE(particles);
+
+#ifndef USE_BOOST
+		glfwDestroyMutex(mutex);
+#endif
 	}
 	
 	/// instance method
@@ -243,8 +270,12 @@ public:
 #else
 		particle_count = std::min(count, particle_size);
 #endif
+#ifdef USE_BOOST
 		// first lock mutex
 		mutex.lock();
+#else
+		glfwLockMutex(mutex);
+#endif
 
 		// out
 		*out = particles;
@@ -256,8 +287,12 @@ public:
 	/// @param out pointer to the particle array retrieved from LockParticles, where particles have been stored
 	inline void	UnlockParticles(VParticle **out)
 	{
+#ifdef USE_BOOST
 		// mutex unlock
 		mutex.unlock();
+#else
+		glfwUnlockMutex(mutex);
+#endif
 
 		// null pointer
 		*out = NULL;
