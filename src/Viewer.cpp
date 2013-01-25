@@ -26,10 +26,6 @@ void	Viewer::InitAndDisplay()
 {
 	// now viewer runs
 	isRunning = true;
-	
-	// Init GLFW Lib
-	 if(glfwInit() != GL_TRUE)
-       Shutdown();
 
 	// open window, and set basic attributes
     glfwOpenWindow(0, 0, 8, 8, 8, 8, 8, 8, GLFW_WINDOW);
@@ -95,13 +91,21 @@ bool	Viewer::MessageLoop()
 
 		// process any data
 		Process();
-        
+
+#ifdef USE_BOOST
 		// lock
 		mutex.lock();
+#else
+		glfwLockMutex(mutex);
+#endif
 
 		Draw();
 
+#ifdef USE_BOOST
 		mutex.unlock();
+#else
+		glfwUnlockMutex(mutex);
+#endif
         
         glfwSwapBuffers();
         

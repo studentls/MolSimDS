@@ -122,6 +122,8 @@ err_type MolSim::Run()
 		// else simply run simulation in one thread
 		if(Viewer::Instance().IsRunning())
 		{	
+#ifdef USE_BOOST
+
 			// create boost thread
 			 boost::thread workerThread(workerMain, this);
 
@@ -131,6 +133,20 @@ err_type MolSim::Run()
 
 			// join threads
 			workerThread.join();
+
+#else
+			GLFWthread worker;
+			
+			// create glfw based thread
+			worker = glfwCreateThread((GLFWthreadfun)workerMain, this);
+
+			// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
+			// run viewer's message loop
+			Viewer::Instance().MessageLoop();
+
+			// join threads
+			glfwWaitThread(worker, GLFW_WAIT);
+#endif
 		}
 		else
 		{
