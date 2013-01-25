@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef SIMULATIONFILE_H
-#define SIMULATIONFILE_H
+#ifndef C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
+#define C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
 
 // Begin prologue.
 //
@@ -226,6 +226,7 @@ class dim3_t;
 class List_t;
 class conditions_t;
 class LinkedCell_t;
+class Membrane_t;
 class algorithm_t;
 class params_t;
 class particle_t;
@@ -546,6 +547,38 @@ class LinkedCell_t: public ::xml_schema::type
   conditions_optional conditions_;
 };
 
+class Membrane_t: public ::xml_schema::type
+{
+  public:
+  // Constructors.
+  //
+  Membrane_t ();
+
+  Membrane_t (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  Membrane_t (const ::xercesc::DOMAttr& a,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  Membrane_t (const ::std::string& s,
+              const ::xercesc::DOMElement* e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  Membrane_t (const Membrane_t& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  virtual Membrane_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~Membrane_t ();
+};
+
 class algorithm_t: public ::xml_schema::type
 {
   public:
@@ -591,6 +624,27 @@ class algorithm_t: public ::xml_schema::type
   void
   LinkedCell (::std::auto_ptr< LinkedCell_type > p);
 
+  // Membrane
+  // 
+  typedef ::Membrane_t Membrane_type;
+  typedef ::xsd::cxx::tree::optional< Membrane_type > Membrane_optional;
+  typedef ::xsd::cxx::tree::traits< Membrane_type, char > Membrane_traits;
+
+  const Membrane_optional&
+  Membrane () const;
+
+  Membrane_optional&
+  Membrane ();
+
+  void
+  Membrane (const Membrane_type& x);
+
+  void
+  Membrane (const Membrane_optional& x);
+
+  void
+  Membrane (::std::auto_ptr< Membrane_type > p);
+
   // Constructors.
   //
   algorithm_t ();
@@ -620,6 +674,7 @@ class algorithm_t: public ::xml_schema::type
   protected:
   List_optional List_;
   LinkedCell_optional LinkedCell_;
+  Membrane_optional Membrane_;
 };
 
 class params_t: public ::xml_schema::type
@@ -1882,4 +1937,4 @@ simulationfile (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 //
 // End epilogue.
 
-#endif // SIMULATIONFILE_H
+#endif // C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H

@@ -244,6 +244,10 @@ conditions (::std::auto_ptr< conditions_type > x)
 }
 
 
+// Membrane_t
+// 
+
+
 // algorithm_t
 // 
 
@@ -305,6 +309,36 @@ void algorithm_t::
 LinkedCell (::std::auto_ptr< LinkedCell_type > x)
 {
   this->LinkedCell_.set (x);
+}
+
+const algorithm_t::Membrane_optional& algorithm_t::
+Membrane () const
+{
+  return this->Membrane_;
+}
+
+algorithm_t::Membrane_optional& algorithm_t::
+Membrane ()
+{
+  return this->Membrane_;
+}
+
+void algorithm_t::
+Membrane (const Membrane_type& x)
+{
+  this->Membrane_.set (x);
+}
+
+void algorithm_t::
+Membrane (const Membrane_optional& x)
+{
+  this->Membrane_ = x;
+}
+
+void algorithm_t::
+Membrane (::std::auto_ptr< Membrane_type > x)
+{
+  this->Membrane_.set (x);
 }
 
 
@@ -1778,6 +1812,60 @@ LinkedCell_t::
 {
 }
 
+// Membrane_t
+//
+
+Membrane_t::
+Membrane_t ()
+: ::xml_schema::type ()
+{
+}
+
+Membrane_t::
+Membrane_t (const Membrane_t& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c)
+{
+}
+
+Membrane_t::
+Membrane_t (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (e, f, c)
+{
+}
+
+Membrane_t::
+Membrane_t (const ::xercesc::DOMAttr& a,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (a, f, c)
+{
+}
+
+Membrane_t::
+Membrane_t (const ::std::string& s,
+            const ::xercesc::DOMElement* e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (s, e, f, c)
+{
+}
+
+Membrane_t* Membrane_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class Membrane_t (*this, f, c);
+}
+
+Membrane_t::
+~Membrane_t ()
+{
+}
+
 // algorithm_t
 //
 
@@ -1785,7 +1873,8 @@ algorithm_t::
 algorithm_t ()
 : ::xml_schema::type (),
   List_ (::xml_schema::flags (), this),
-  LinkedCell_ (::xml_schema::flags (), this)
+  LinkedCell_ (::xml_schema::flags (), this),
+  Membrane_ (::xml_schema::flags (), this)
 {
 }
 
@@ -1795,7 +1884,8 @@ algorithm_t (const algorithm_t& x,
              ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
   List_ (x.List_, f, this),
-  LinkedCell_ (x.LinkedCell_, f, this)
+  LinkedCell_ (x.LinkedCell_, f, this),
+  Membrane_ (x.Membrane_, f, this)
 {
 }
 
@@ -1805,7 +1895,8 @@ algorithm_t (const ::xercesc::DOMElement& e,
              ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   List_ (f, this),
-  LinkedCell_ (f, this)
+  LinkedCell_ (f, this),
+  Membrane_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1848,6 +1939,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!this->LinkedCell_)
       {
         this->LinkedCell_.set (r);
+        continue;
+      }
+    }
+
+    // Membrane
+    //
+    if (n.name () == "Membrane" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< Membrane_type > r (
+        Membrane_traits::create (i, f, this));
+
+      if (!this->Membrane_)
+      {
+        this->Membrane_.set (r);
         continue;
       }
     }

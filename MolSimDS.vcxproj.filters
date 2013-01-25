@@ -111,6 +111,9 @@
     <ClInclude Include="src\utils\Color.h">
       <Filter>Headerdateien\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\MembraneContainer.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -164,6 +167,9 @@
     <ClCompile Include="src\utils\Color.cpp">
       <Filter>Quelldateien\utils</Filter>
     </ClCompile>
+    <ClCompile Include="src\MembraneContainer.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
@@ -214,6 +220,9 @@
       <Filter>XML</Filter>
     </None>
     <None Include="ViewerTest.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="Membrane.xml">
       <Filter>XML</Filter>
     </None>
   </ItemGroup>

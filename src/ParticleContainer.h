@@ -19,7 +19,8 @@ enum ParticleContainerType
 {
 	PCT_UNKOWN,
 	PCT_LIST,
-	PCT_LINKEDCELL
+	PCT_LINKEDCELL,
+	PCT_MEMBRANE
 };
 
 /// an abstract class that is used to store Particles and iterate over them

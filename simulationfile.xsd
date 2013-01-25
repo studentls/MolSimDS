@@ -64,6 +64,14 @@ author: Leonhard Spiegelberg & Florian Dietz
     
   </xsd:complexType>
   
+  <xsd:complexType name="Membrane_t">
+    
+    <!--
+  MEMBRANE DEFINITION: SPECIAL ROLE?
+  -->
+    
+  </xsd:complexType>
+  
   <!--
   algorithm complex type
   -->
@@ -71,6 +79,7 @@ author: Leonhard Spiegelberg & Florian Dietz
     <xsd:choice>
       <xsd:element name="List" type="List_t"></xsd:element>
       <xsd:element name="LinkedCell" type="LinkedCell_t"></xsd:element>
+      <xsd:element name="Membrane" type="Membrane_t"></xsd:element>
     </xsd:choice>
     
   </xsd:complexType>
