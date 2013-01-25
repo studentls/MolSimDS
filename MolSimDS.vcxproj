@@ -174,7 +174,9 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="listexample.xml" />
-    <None Include="Membrane.xml" />
+    <None Include="Membrane.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="PerformanceTest.xml">
       <SubType>Designer</SubType>
     </None>

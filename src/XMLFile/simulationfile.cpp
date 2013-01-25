@@ -247,6 +247,24 @@ conditions (::std::auto_ptr< conditions_type > x)
 // Membrane_t
 // 
 
+const Membrane_t::pull_iterations_type& Membrane_t::
+pull_iterations () const
+{
+  return this->pull_iterations_.get ();
+}
+
+Membrane_t::pull_iterations_type& Membrane_t::
+pull_iterations ()
+{
+  return this->pull_iterations_.get ();
+}
+
+void Membrane_t::
+pull_iterations (const pull_iterations_type& x)
+{
+  this->pull_iterations_.set (x);
+}
+
 
 // algorithm_t
 // 
@@ -1816,8 +1834,9 @@ LinkedCell_t::
 //
 
 Membrane_t::
-Membrane_t ()
-: ::xml_schema::type ()
+Membrane_t (const pull_iterations_type& pull_iterations)
+: ::xml_schema::type (),
+  pull_iterations_ (pull_iterations, ::xml_schema::flags (), this)
 {
 }
 
@@ -1825,7 +1844,8 @@ Membrane_t::
 Membrane_t (const Membrane_t& x,
             ::xml_schema::flags f,
             ::xml_schema::container* c)
-: ::xml_schema::type (x, f, c)
+: ::xml_schema::type (x, f, c),
+  pull_iterations_ (x.pull_iterations_, f, this)
 {
 }
 
@@ -1833,25 +1853,46 @@ Membrane_t::
 Membrane_t (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f,
             ::xml_schema::container* c)
-: ::xml_schema::type (e, f, c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  pull_iterations_ (f, this)
 {
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
 }
 
-Membrane_t::
-Membrane_t (const ::xercesc::DOMAttr& a,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
-: ::xml_schema::type (a, f, c)
+void Membrane_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
 {
-}
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
 
-Membrane_t::
-Membrane_t (const ::std::string& s,
-            const ::xercesc::DOMElement* e,
-            ::xml_schema::flags f,
-            ::xml_schema::container* c)
-: ::xml_schema::type (s, e, f, c)
-{
+    // pull_iterations
+    //
+    if (n.name () == "pull_iterations" && n.namespace_ ().empty ())
+    {
+      if (!pull_iterations_.present ())
+      {
+        this->pull_iterations_.set (pull_iterations_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  if (!pull_iterations_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "pull_iterations",
+      "");
+  }
 }
 
 Membrane_t* Membrane_t::

@@ -116,7 +116,7 @@ err_type Simulation::Run()
 			if( iteration % desc.iterationsTillThermostatApplication == 0 && iteration != 0)
 				adjustThermostat();
 		
-		if (particles->getType() == PCT_MEMBRANE && iteration < 15000)
+		if (particles->getType() == PCT_MEMBRANE && iteration < ((MembraneContainer*)particles)->pullIterations)
 			particles->Iterate(forceCalculatorMembranePull, (void*)&desc);
 		
 		// perform one iteration step
@@ -205,7 +205,7 @@ void Simulation::calculateF() {
 		((MembraneContainer*)particles)->ApplyMembraneForces();
 	
 	// call particles.IteratePairwise() on forceCalculator
-	particles->IteratePairwise(forceCalculator, (void*)&desc);
+	//particles->IteratePairwise(forceCalculator, (void*)&desc);
 
 	// call gravityCalculator to add gravity force for each particle
 	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.

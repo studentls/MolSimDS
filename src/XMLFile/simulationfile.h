@@ -550,20 +550,25 @@ class LinkedCell_t: public ::xml_schema::type
 class Membrane_t: public ::xml_schema::type
 {
   public:
+  // pull_iterations
+  // 
+  typedef ::xml_schema::unsigned_int pull_iterations_type;
+  typedef ::xsd::cxx::tree::traits< pull_iterations_type, char > pull_iterations_traits;
+
+  const pull_iterations_type&
+  pull_iterations () const;
+
+  pull_iterations_type&
+  pull_iterations ();
+
+  void
+  pull_iterations (const pull_iterations_type& x);
+
   // Constructors.
   //
-  Membrane_t ();
+  Membrane_t (const pull_iterations_type&);
 
   Membrane_t (const ::xercesc::DOMElement& e,
-              ::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0);
-
-  Membrane_t (const ::xercesc::DOMAttr& a,
-              ::xml_schema::flags f = 0,
-              ::xml_schema::container* c = 0);
-
-  Membrane_t (const ::std::string& s,
-              const ::xercesc::DOMElement* e,
               ::xml_schema::flags f = 0,
               ::xml_schema::container* c = 0);
 
@@ -577,6 +582,16 @@ class Membrane_t: public ::xml_schema::type
 
   virtual 
   ~Membrane_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  ::xsd::cxx::tree::one< pull_iterations_type > pull_iterations_;
 };
 
 class algorithm_t: public ::xml_schema::type

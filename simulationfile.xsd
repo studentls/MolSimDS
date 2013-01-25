@@ -65,11 +65,12 @@ author: Leonhard Spiegelberg & Florian Dietz
   </xsd:complexType>
   
   <xsd:complexType name="Membrane_t">
-    
     <!--
-  MEMBRANE DEFINITION: SPECIAL ROLE?
+  MEMBRANE IS HARDCODED SINCE IT IS NOT SUPPOSED TO BE EXTENSIBLE
   -->
-    
+    <xsd:all>
+      <xsd:element name="pull_iterations" type="xsd:unsignedInt"></xsd:element>
+    </xsd:all>
   </xsd:complexType>
   
   <!--

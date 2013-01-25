@@ -33,8 +33,10 @@ private:
 
 public:
 
-	/// a constructor that creates the value particles from scratch
-	MembraneContainer();
+	unsigned int pullIterations;
+
+	/// a constructor that takes the number of iterations for which the pull is active
+	MembraneContainer(unsigned int pullIterations);
 
 	/// a method to add a Particle to the ListParticleContainer
 	void AddParticle(const Particle& particle);

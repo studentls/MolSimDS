@@ -18,10 +18,11 @@
 
 #include "MembraneContainer.h"
 
-MembraneContainer::MembraneContainer() {
+MembraneContainer::MembraneContainer(unsigned int pullIterations) {
 	particles = NULL;
 	particleCount = 0;
 	dimensions = 0;
+	this->pullIterations = pullIterations;
 }
 
 void MembraneContainer::AddParticle(const Particle& particle) {
@@ -132,8 +133,8 @@ void MembraneContainer::SetMembrane(const Vec3& vLowerLeftFrontCorner,
 			p.x[1]	= vLowerLeftFrontCorner[1] + y * meshWidth;
 			p.x[2]	= vLowerLeftFrontCorner[2];
 			// the type is used to determine if the particle is to be pulled up in the beginning
-			if ((x == 17 || x == 18) &&
-				(y == 24 || y == 25))
+			if ((x == 16 || x == 17) &&
+				(y == 23 || y == 24))
 				p.type = 1;
 			else
 				p.type	= 0;
