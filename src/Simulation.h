@@ -231,8 +231,8 @@ public:
 		}
 	}
 
-	inline double getSigmaSq(const unsigned int& type1, const unsigned int& type2)	{assert(type1 < materials.size()); assert(type2 < materials.size()); return cached_mat[type1 + cacheline * type2].sigmaSq;}
-	inline double getEpsilon24(const unsigned int& type1, const unsigned int& type2)	{assert(type1 < materials.size()); assert(type2 < materials.size()); return cached_mat[type1 + cacheline * type2].epsilon24;}
+	inline double getSigmaSq(const unsigned int& type1, const unsigned int& type2) const	{assert(type1 < materials.size()); assert(type2 < materials.size()); return cached_mat[type1 + cacheline * type2].sigmaSq;}
+	inline double getEpsilon24(const unsigned int& type1, const unsigned int& type2) const 	{assert(type1 < materials.size()); assert(type2 < materials.size()); return cached_mat[type1 + cacheline * type2].epsilon24;}
 };
 
 /// a struct to hold statistical data of a simulation

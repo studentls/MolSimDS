@@ -396,6 +396,16 @@ void MolSim::showStatistics(SimulationStatistics& s)
 	utils::line();
 	LOG4CXX_INFO(generalOutputLogger, "total particle count:\t"<<s.particle_count);
 	LOG4CXX_INFO(generalOutputLogger, "iteration count: \t"<<s.step_count);
-	LOG4CXX_INFO(generalOutputLogger, "total time:\t\t"<<utils::secondsToHMS((int)s.time).c_str());
+	
+	// for less than 10 seconds print detailed time out
+	if(s.time < 10.0)
+	{
+		LOG4CXX_INFO(generalOutputLogger, "total time:\t\t"<<s.time * 1000<<" ms");
+	}
+	else
+	{
+		LOG4CXX_INFO(generalOutputLogger, "total time:\t\t"<<utils::secondsToHMS((int)s.time).c_str());
+	}
+	
 	LOG4CXX_INFO(generalOutputLogger, "timer per step:\t\t"<<1000 * s.timeperstep<<" ms");
 }
