@@ -57,6 +57,7 @@ class ParticleContainerTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo);	
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetBoundary);	
 	CPPUNIT_TEST(testLinkedCellParticleContainerIndices);
+	CPPUNIT_TEST(testLinkedCellOpenMPIndices);
 	CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -378,6 +379,23 @@ public:
 
 		SAFE_DELETE(pc2D);
 		SAFE_DELETE(pc3D);
+	}
+
+	/// this test tests if the construction of stripped indices works properly
+	void testLinkedCellOpenMPIndices()
+	{
+		// create a indexstrip
+		IndexStrip strip;
+
+		// construct for a domain of 10x7x1 indices for the first strip
+		strip.constructVerticalStripIndices(0, 7, utils::Vector<unsigned int, 3>(10, 7, 1));
+
+		// there should be 4(n-1) + n pairs, where n denotes cellCount[1] for one strip
+		CPPUNIT_ASSERT(strip.size() == 4*(7 - 1) + 7);
+
+		// maybe include here a correctness check...
+		// ...
+		LOG4CXX_INFO(generalOutputLogger, "add correctness check for strip Indices");
 	}
 };
 

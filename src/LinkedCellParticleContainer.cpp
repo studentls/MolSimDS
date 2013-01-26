@@ -21,7 +21,21 @@
 void LinkedCellParticleContainer::Iterate(void(*func)(void*, Particle&), void *data)
 {		
 	assert(Cells);
+#ifdef OPENMP
+	//openMP version
+	
+#pragma omp parallel for
+	for(int i = 0; i < getCellCount(); ++i)
+	{
+		if(Cells[i].empty())continue;
 
+		for(int j = 0; j < Cells[i].size(); ++j)
+		{
+			Particle& p = Cells[i][j];
+			(*func)(data, p);				
+		}
+	}
+#else
 	// go through all Cells...
 	for(int i = 0; i < getCellCount(); i++)
 	{
@@ -33,10 +47,12 @@ void LinkedCellParticleContainer::Iterate(void(*func)(void*, Particle&), void *d
 			(*func)(data, p);				
 		}
 	}
+#endif
 }
 
 void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data)
 {
+#ifndef OPENMP
 	// Step 1: calc pairwise force between particles for each cell
 
 	// go through cells
@@ -88,6 +104,93 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 			}			
 		}
 	}
+#else
+	//Open MP version
+	// Step 1: calc pairwise force between particles for each cell
+
+	// go through cells
+#pragma omp parallel for
+	for(int i = 0; i < getCellCount(); i++)
+	{
+		// for all particles in cell_i, calc forces in cell_i
+		for(int j = 0; j < Cells[i].size(); j++)
+		{
+			for(int k = j + 1; k < Cells[i].size(); k++)
+			{
+				Particle& p1 = Cells[i][j];
+				Particle& p2 = Cells[i][k];
+
+				func(data, p1, p2);
+			}
+		}
+	}
+
+	// Step 2: calc force with neighbouring cells
+	// use stored pairs to iterate, these may be ordered to increase performance in a special way
+	// ramaining an unsolved problem for simulations yet
+	
+	// pairs should exist!
+	assert(oddStrips.size() != 0);
+	assert(evenStrips.size() != 0);
+
+#pragma omp parallel for
+	// 2.1 go through oddStrips and calc forces
+	for(int iStrip = 0; iStrip < oddStrips.size(); iStrip++)
+	{
+		// go through all pairs in the strip
+		for(int iPair = 0; iPair < oddStrips[iStrip].size(); iPair++)
+		{
+			int i = oddStrips[iStrip][iPair][0];
+			int j = oddStrips[iStrip][iPair][1];
+
+			// if one cell is empty go to next pair
+			if(Cells[i].empty() || Cells[j].empty())continue;
+
+			// for all particles in cell_i
+			for(int  k = 0; k < Cells[i].size(); k++)
+			{		
+				// calc force, based on actio / reaction between cell_i and cell_j
+				for(int l = 0; l < Cells[j].size(); l++)
+				{
+					Particle& p1 = Cells[i][k];
+					Particle& p2 = Cells[j][l];
+
+					func(data, p1, p2);
+				}			
+			}
+		}
+	}
+
+#pragma omp parallel for
+	// 2.2 go through evenStrips and calc forces
+	for(int iStrip = 0; iStrip < evenStrips.size(); iStrip++)
+	{
+		// go through all pairs in the strip
+		for(int iPair = 0; iPair < evenStrips[iStrip].size(); iPair++)
+		{
+			int i = evenStrips[iStrip][iPair][0];
+			int j = evenStrips[iStrip][iPair][1];
+
+			// if one cell is empty go to next pair
+			if(Cells[i].empty() || Cells[j].empty())continue;
+
+			// for all particles in cell_i
+			for(int  k = 0; k < Cells[i].size(); k++)
+			{		
+				// calc force, based on actio / reaction between cell_i and cell_j
+				for(int l = 0; l < Cells[j].size(); l++)
+				{
+					Particle& p1 = Cells[i][k];
+					Particle& p2 = Cells[j][l];
+
+					func(data, p1, p2);
+				}			
+			}
+		}
+	}
+	
+
+#endif
 }
 
 void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
@@ -510,8 +613,43 @@ void LinkedCellParticleContainer::calcIndices()
 
 	calcFrameIndices(haloIndices, 0);
 	calcFrameIndices(boundaryIndices, 1);
+
+	// if OpenMP calc indices
+#ifdef OPENMP
+	calcMTIndices();
+#endif
 }
 
+void LinkedCellParticleContainer::calcMTIndices()
+{
+	// only for 2D at the moment!
+	if(dim == 2)
+	{
+
+		// (1) calc Indices for even stripes
+		for(int i = 0; i < cellCount[0]; i += 2)
+		{
+			IndexStrip strip;
+			strip.constructVerticalStripIndices(i, cellCount[1], cellCount);
+
+			evenStrips.push_back(strip);
+		}
+
+		// (2) calc Indices for odd stripes
+		for(int i = 1; i < cellCount[0] - 1; i += 2)
+		{
+			IndexStrip strip;
+			strip.constructVerticalStripIndices(i, cellCount[1], cellCount);
+
+			oddStrips.push_back(strip);
+		}
+	}
+	else
+	{
+		//...
+		LOG4CXX_INFO(generalOutputLogger, "3D MT not yet implemented!");
+	}
+}
 void LinkedCellParticleContainer::calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r)
 {
 	int m = cellCount[0];

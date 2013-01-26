@@ -179,6 +179,8 @@ err_type MolSim::Release()
 ///			returns E_FILENOTFOUND if no file exists
 err_type MolSim::parseLine(int argc, char *argsv[])
 {
+	state = AS_NONE;
+	
 	// Syntax is molsim scene.xml (--viewer)
 	// where t_end and delta_t denote a floating point value
 	if(argc != 2 && argc != 3)
@@ -219,39 +221,40 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		}
 	}
 
-	if(argc ==2 || argc == 3)
-	{
-		int index = 1;
+	if(state == AS_NONE)
+		if(argc == 2 || argc == 3 )
+		{
+			int index = 1;
 		
-		//set index according where a possible -- option may be set
-		if(argsv[1][0] == '-')index = 2;
-		else index = 1;
+			//set index according where a possible -- option may be set
+			if(argsv[1][0] == '-')index = 2;
+			else index = 1;
 
-		// parse file
+			// parse file
 
-		// check if file exists
-		if(!fileExists(argsv[index]))
-		{
-			LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
-			printUsage();
-			return E_FILENOTFOUND;
+			// check if file exists
+			if(!fileExists(argsv[index]))
+			{
+				LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
+				printUsage();
+				return E_FILENOTFOUND;
+			}
+
+			// has file correct ending?
+			if(strcmp(utils::getFileExtension(argsv[index]), "xml") != 0)
+			{
+				LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
+				printUsage();
+				return E_FILEERROR;
+			}
+
+			// everything ok...
+			// set name
+			simFileName = argsv[index];
+
+			//run Simulation
+			state = AS_SIMULATION;
 		}
-
-		// has file correct ending?
-		if(strcmp(utils::getFileExtension(argsv[index]), "xml") != 0)
-		{
-			LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
-			printUsage();
-			return E_FILEERROR;
-		}
-
-		// everything ok...
-		// set name
-		simFileName = argsv[index];
-
-		//run Simulation
-		state = AS_SIMULATION;
-	}
 
 	return S_OK;
 }

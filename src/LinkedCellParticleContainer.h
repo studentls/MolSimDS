@@ -17,6 +17,7 @@
 #include "ParticleContainer.h"
 #include "utils/utils.h"
 
+
 // use flag System for Boundaries
 // to combine flags use e.g. BC_RIGHT | BC_LEFT
 // reflective boundaries
@@ -42,6 +43,72 @@ struct PeriodicBoundary
 	double	xAxis;		/// distance on x - axis (0 or length of area on axis)
 	double	yAxis;		/// distance on y - axis (0 or length of area on axis)
 	double	zAxis;		/// distance on y - axis (0 or length of area on axis)
+};
+
+
+/// indices for Cells used for OpenMP parallelization
+/// structure to hold a strip of Indices
+class  IndexStrip : public utils::TFastArray<utils::Vector<unsigned int, 2> >
+{
+private:
+	/// little helper function, to create fast a pair
+	/// @param i1 first index
+	/// @param i2 second index
+	utils::Vector<unsigned int, 2> makePair(const unsigned int i1, const unsigned int i2)
+	{
+		utils::Vector<unsigned int, 2> res;
+		res[0] = i1;
+		res[1] = i2;
+
+		return res;
+	}
+
+	/// little helper function, to create fast a 1D index
+	/// @param x first index
+	/// @param y second index
+	/// @param cellCount 3D-vector with domain dimensions
+	unsigned int Index2DTo1D(const unsigned int x, const unsigned int y, const utils::Vector<unsigned int, 3>		cellCount)
+	{
+		assert(x + cellCount[0] * y < cellCount[0] * cellCount[1]);
+
+		return x + cellCount[0] * y;
+	}
+public:
+	IndexStrip()
+	{
+		TFastArray<utils::Vector<unsigned int, 2> >();
+	}
+
+	/// method to construct indices for a vertical strip(for 2D)
+	/// @param verticalCellCount amount for how many cells indices shall be constructed
+	/// @param leftStart index of the left Cell. Indices will be constructed for verticalCellCount cells between leftStart and leftStart+1 Cells
+	/// @param cellCount 3D Vector containing domain cell count in each dimension
+	void	constructVerticalStripIndices(const int leftStart, const int verticalCellCount, const utils::Vector<unsigned int, 3>		cellCount)
+	{
+		for(int i = 0; i < verticalCellCount - 1; i++)
+		{
+			// - pair
+			this->push_back(makePair(Index2DTo1D(leftStart, i, cellCount),
+									 Index2DTo1D(leftStart + 1, i, cellCount)));
+			// | left pair
+			this->push_back(makePair(Index2DTo1D(leftStart, i, cellCount),
+									 Index2DTo1D(leftStart, i + 1, cellCount)));
+			//  right | pair
+			this->push_back(makePair(Index2DTo1D(leftStart + 1, i, cellCount),
+									 Index2DTo1D(leftStart + 1, i + 1, cellCount)));
+			// \ pair
+			this->push_back(makePair(Index2DTo1D(leftStart, i, cellCount),
+									 Index2DTo1D(leftStart + 1, i + 1, cellCount)));
+			// / pair
+			this->push_back(makePair(Index2DTo1D(leftStart + 1, i, cellCount),
+									 Index2DTo1D(leftStart, i + 1, cellCount)));
+		}
+
+		// final pair
+		
+		this->push_back(makePair(Index2DTo1D(leftStart, verticalCellCount - 1, cellCount),
+									Index2DTo1D(leftStart + 1, verticalCellCount - 1, cellCount)));
+	}
 };
 
 /// a class that is used to store Particles and iterate over them
@@ -92,6 +159,10 @@ private:
 	/// where 1, 2 are the index of the Cells array
 	/// note that here the space is very important, as g++ has problems otherwise parsing it
 	std::vector<utils::Vector<unsigned int, 2> >	cellPairs;
+
+	/// used for OpenMP
+	utils::TFastArray<IndexStrip>							oddStrips;	/// contains index data for odd strips
+	utils::TFastArray<IndexStrip>							evenStrips; /// contains index pairs for even strips
 
 	/// array of indices of halo cells
 	std::vector<unsigned int>						haloIndices;
@@ -285,6 +356,9 @@ private:
 
 	/// function which will calculate all necessary index array
 	void	calcIndices();
+
+	/// function to calcualte Indices for Multithreading
+	void	calcMTIndices();
 
 	/// function to calculate indices of the r-th frame from the outside
 	/// e.g. r = 0 will return indices of the halo frame
