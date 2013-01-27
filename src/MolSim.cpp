@@ -113,54 +113,62 @@ err_type MolSim::Run()
 	case AS_SINGLETEST:
 		runSingleTest(strTestCase);
 		break;
-	case AS_SIMULATION:
-		// valid pointer?
-		if(!sim)return E_NOTINITIALIZED;
-	
-		// if viewer is active(--viewer option enabled)
-		// run multithreaded
-		// else simply run simulation in one thread
-		if(Viewer::Instance().IsRunning())
-		{	
-#ifdef USE_BOOST
-
-			// create boost thread
-			 boost::thread workerThread(workerMain, this);
-
-			// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
-			// run viewer's message loop
-			Viewer::Instance().MessageLoop();
-
-			// join threads
-			workerThread.join();
-
-#else
-			GLFWthread worker;
-			
-			// create glfw based thread
-			worker = glfwCreateThread((GLFWthreadfun)workerMain, this);
-
-			// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
-			// run viewer's message loop
-			Viewer::Instance().MessageLoop();
-
-			// join threads
-			glfwWaitThread(worker, GLFW_WAIT);
-#endif
-		}
-		else
+	case AS_PTEST:
 		{
-			// run simulation...
-			err_type e = sim->Run();
-			if(FAILED(e))return e;
-		}	
+			PerformanceTest PTest;
 
-		// show statistics...
-		SimulationStatistics &stats = sim->getStatistics();
-		showStatistics(stats);
-		break;
-	}
+			// run performance tests...
+			PTest.Run(simFileName.c_str());
+
+			break;
+		}
+	case AS_SIMULATION:
+		{
+			// valid pointer?
+			if(!sim)return E_NOTINITIALIZED;
 	
+			// if viewer is active(--viewer option enabled)
+			// run multithreaded
+			// else simply run simulation in one thread
+			if(Viewer::Instance().IsRunning())
+			{	
+#ifdef USE_BOOST
+				// create boost thread
+				 boost::thread workerThread(workerMain, this);
+
+				// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
+				// run viewer's message loop
+				Viewer::Instance().MessageLoop();
+
+				// join threads
+				workerThread.join();
+#else
+				GLFWthread worker;
+			
+				// create glfw based thread
+				worker = glfwCreateThread((GLFWthreadfun)workerMain, this);
+
+				// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
+				// run viewer's message loop
+				Viewer::Instance().MessageLoop();
+
+				// join threads
+				glfwWaitThread(worker, GLFW_WAIT);
+#endif
+			}
+			else
+			{
+				// run simulation...
+				err_type e = sim->Run();
+				if(FAILED(e))return e;
+			}	
+
+			// show statistics...
+			SimulationStatistics &stats = sim->getStatistics();
+			showStatistics(stats);
+			break;
+		}
+	}
 	return S_OK;
 }
 
@@ -199,6 +207,11 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_HELP;
 		else if(strcmp(argsv[1], "-showtests") == 0)
 			state = AS_SHOWTESTS;
+		else if(strcmp(argsv[1], "-ptest") == 0)
+		{
+			LOG4CXX_ERROR(generalOutputLogger, ">> error: please specify a test file!");
+			return E_INVALIDPARAM;
+		}
 	}
 	else if(argc == 3)
 	{
@@ -212,6 +225,16 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		{
 			// initialize viewer
 			Viewer::Instance().InitAndDisplay();
+		}
+		else if(strcmp(argsv[1], "-ptest") == 0)
+		{
+			state = AS_PTEST;
+			simFileName = argsv[2];
+			if(strcmp(utils::getFileExtension(argsv[2]), "xml") != 0)
+			{
+				LOG4CXX_ERROR(generalOutputLogger, ">> error: invalid file format!");
+				return E_INVALIDPARAM;
+			}
 		}
 		else
 		{
@@ -266,6 +289,7 @@ void MolSim::showHelp()
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-help"<<"\t\t\t"<<"show help");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave\n\t\t\t\t<name> blank to run all tests");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"-ptest <file>"<<"\t\t\t"<<"run performance tests for the given file");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"--viewer"<<"\t\t\t"<<"start with builtin OpenGL viewer");
 	
 }

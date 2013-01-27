@@ -24,6 +24,7 @@
 #include "ParticleGenerator.h"
 #include <vector>
 #include "Viewer.h"
+#include "PerformanceTest.h"
 
 /// Output Format
 enum SimulationOutputFormat
@@ -353,6 +354,9 @@ public:
 
 	/// @return returns the particle container pointer
 	ParticleContainer*		getParticleContainer()	{return particles;}
+
+	// befriended with performance test class
+	friend class PerformanceTest;
 };
 
 

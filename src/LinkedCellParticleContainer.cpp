@@ -24,7 +24,7 @@ void LinkedCellParticleContainer::Iterate(void(*func)(void*, Particle&), void *d
 #ifdef OPENMP
 	//openMP version
 	
-#pragma omp parallel for
+#pragma omp parallel for num_threads(threadCount)
 	for(int i = 0; i < getCellCount(); ++i)
 	{
 		if(Cells[i].empty())continue;
@@ -109,7 +109,7 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 	// Step 1: calc pairwise force between particles for each cell
 
 	// go through cells
-#pragma omp parallel for
+#pragma omp parallel for num_threads(threadCount)
 	for(int i = 0; i < getCellCount(); i++)
 	{
 		// for all particles in cell_i, calc forces in cell_i
@@ -133,7 +133,7 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 	assert(oddStrips.size() != 0);
 	assert(evenStrips.size() != 0);
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(threadCount)
 	// 2.1 go through oddStrips and calc forces
 	for(int iStrip = 0; iStrip < oddStrips.size(); iStrip++)
 	{
@@ -161,7 +161,7 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 		}
 	}
 
-#pragma omp parallel for
+#pragma omp parallel for num_threads(threadCount)
 	// 2.2 go through evenStrips and calc forces
 	for(int iStrip = 0; iStrip < evenStrips.size(); iStrip++)
 	{

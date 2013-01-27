@@ -101,6 +101,7 @@
     <ClInclude Include="src\ParticleContainer.h" />
     <ClInclude Include="src\ParticleContainerTest.h" />
     <ClInclude Include="src\ParticleGenerator.h" />
+    <ClInclude Include="src\PerformanceTest.h" />
     <ClInclude Include="src\Simulation.h" />
     <ClInclude Include="src\TXTFile.h" />
     <ClInclude Include="src\utils\Base.h" />
@@ -130,6 +131,7 @@
     <ClCompile Include="src\outputWriter\VTKWriter.cpp" />
     <ClCompile Include="src\outputWriter\XYZWriter.cpp" />
     <ClCompile Include="src\Particle.cpp" />
+    <ClCompile Include="src\PerformanceTest.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
     <ClCompile Include="src\TXTFile.cpp" />
     <ClCompile Include="src\utils\Color.cpp" />

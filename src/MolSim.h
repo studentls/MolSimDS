@@ -33,6 +33,9 @@
 #include "ParticleContainerTest.h"
 #include "XMLFileReaderTest.h"
 
+// include PerformanceTest
+#include "PerformanceTest.h"
+
 /// specifies in which state the application currently is
 enum ApplicationState
 {
@@ -41,7 +44,8 @@ enum ApplicationState
 	AS_TESTS,		/// run all tests
 	AS_SINGLETEST,	/// run single test
 	AS_HELP,		/// show help
-	AS_SHOWTESTS	/// show all avaliable tests
+	AS_SHOWTESTS,	/// show all avaliable tests
+	AS_PTEST		/// performance Test
 };
 
 /// maximal level to display test structure

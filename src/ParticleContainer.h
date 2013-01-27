@@ -13,6 +13,7 @@
 #include <vector>
 #include "Logging.h"
 #include "Particle.h"
+#include "utils/utils.h"
 
 /// used to identify ParticleContainer
 enum ParticleContainerType
@@ -24,7 +25,20 @@ enum ParticleContainerType
 
 /// an abstract class that is used to store Particles and iterate over them
 class ParticleContainer {
+protected:
+	int										threadCount;
 public:
+
+	/// constructor
+	ParticleContainer()
+	{
+#ifdef OPENMP
+		threadCount = omp_get_max_threads(); // use per default maximum avaliable threads
+#else
+		threadCount = 1;
+#endif
+	}
+
 	/// a method to add a Particle to the ListParticleContainer
 	virtual void							AddParticle(const Particle& particle) = 0;
 
@@ -65,6 +79,10 @@ public:
 	/// method to retrieve a Bounding Box, which surrounds all particles
 	/// @return returns a BoundingBox, which defines extent and center of all particles in the container(bounding box)
 	virtual utils::BoundingBox				getBoundingBox() = 0;
+
+	/// set how many threads shall be used
+	/// @param threadCount minimum 1
+	void									setThreadCount(const int threadCount)	{this->threadCount = threadCount < 1 ? 1 : threadCount;}
 };
 
 #endif /* PARTICLE_CONTAINER_H_ */

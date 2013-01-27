@@ -114,6 +114,9 @@
     <ClInclude Include="src\utils\TFastArray.h">
       <Filter>Headerdateien\utils</Filter>
     </ClInclude>
+    <ClInclude Include="src\PerformanceTest.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -166,6 +169,9 @@
     </ClCompile>
     <ClCompile Include="src\utils\Color.cpp">
       <Filter>Quelldateien\utils</Filter>
+    </ClCompile>
+    <ClCompile Include="src\PerformanceTest.cpp">
+      <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
