@@ -38,10 +38,6 @@
 // boost
 #include <boost/thread.hpp>
 #include <boost/date_time.hpp>
-#else
-// else use glfw lib
-#include <gl/glfw.h>
-
 #endif
 
 #define COLOR_COUNT 10
