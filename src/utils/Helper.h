@@ -121,6 +121,12 @@ namespace utils
 
 		return str.str();
 	}
+
+	/// generates float random
+	inline double random(double low, double high)
+	{
+		return low + ((double)(rand()%RAND_MAX)/(double)RAND_MAX)/(high - low);
+	}
 }
 
 #endif

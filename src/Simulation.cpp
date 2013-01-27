@@ -294,7 +294,7 @@ void Simulation::gravityCalculator(void *data, Particle& p)
 	utils::Vector<double, 3> grav_force;
 
 	// only y - component is affected...
-	grav_force[1] = p.m * desc->gravitational_constant;
+	grav_force[1] = desc->materials[p.type].mass * desc->gravitational_constant;
 
 	p.addForce(grav_force);
 }
@@ -322,7 +322,9 @@ void Simulation::posCalculator(void* data, Particle& p) {
 	// calc new pos
 	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// x_i ( t^{n+1} ) = x_i (t^n) + delta_t * p_i (t^n) + delta_t^2 * f_i (t^n) * 0.5 / m_i
-	p.x = (p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * 0.5 * (1.0 / p.m));
+	//p.x = p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * 0.5 * (1.0 / p.m);
+	// Cache here!
+	p.x = p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * desc->getHalfInvMass(p.type);
 }
 
 void Simulation::calculateV() {
@@ -345,7 +347,8 @@ void Simulation::velCalculator(void* data, Particle& p) {
 	// calc new vel
 	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-	p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
+	//p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / desc->materials[p.type].mass));
+	p.v = p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * desc->getHalfInvMass(p.type);
 }
 
 void Simulation::plotParticles(int iteration) {
@@ -360,7 +363,7 @@ void Simulation::plotParticles(int iteration) {
 		{
 			// VTK Output
 			outputWriter::VTKWriter writer;
-			writer.plotParticles(particles->getParticles(), desc.outname, iteration);
+			writer.plotParticles(particles->getParticles(), desc.materials, desc.outname, iteration);
 			break;
 		}
 	case SOF_XYZ:
@@ -386,18 +389,18 @@ void Simulation::plotParticles(int iteration) {
 
 void Simulation::kineticEnergyCalculator(void *data, Particle& p)
 {
-	double *eout = (double*)data;
+	SimulationDesc *desc = (SimulationDesc*)data;
 
 	// calc according to
 	// Task 1, Sheet 4
-	*eout += p.m * p.v.L2NormSq() * 0.5;
+	desc->kineticEnergy += desc->materials[p.type].mass * p.v.L2NormSq() * 0.5;
 }
 
 void Simulation::totalMassCalculator(void *data, Particle& p)
 {
-	double *sum = (double*)data;
+	SimulationDesc *desc = (SimulationDesc*)data;
 
-	*sum += p.m;
+	desc->totalMass += desc->materials[p.type].mass;
 }
 
 void Simulation::setBrownianMotionCalculator(void *data, Particle& p)
@@ -425,9 +428,11 @@ void Simulation::initializeThermostat()
 	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
 
 	// we need the total mass of all particles...
-	double totalMass = 0.0;
-	particles->Iterate(totalMassCalculator, (void*)&totalMass);
-
+	
+	desc.totalMass = 0.0;
+	particles->Iterate(totalMassCalculator, (void*)&desc);
+	double totalMass = desc.totalMass;
+	
 	// calculate inital velocity that is set for each particle
 	desc.brownianMotionFactor = sqrt(2.0 * EnergyProposed / (desc.dimensions * totalMass));
 
@@ -448,9 +453,10 @@ void Simulation::adjustThermostat()
 	// calc beta
 
 	//get energy of the system
-	double EnergyAtTheMoment = 0.0;
-	particles->Iterate(kineticEnergyCalculator, (double*)&EnergyAtTheMoment);
-
+	desc.kineticEnergy = 0.0;	
+	particles->Iterate(kineticEnergyCalculator, (void*)&desc);
+	double EnergyAtTheMoment = desc.kineticEnergy;
+	
 	// proposed energy
 	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
 

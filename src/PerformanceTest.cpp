@@ -27,6 +27,7 @@ err_type PerformanceTest::Run(const char *xmlFile)
 	Simulation sim;
 
 	res = sim.CreateSimulationFromXMLFile(xmlFile);
+	if(FAILED(res))return res;
 
 	// modify simulation desc
 	sim.desc.output_fmt = SOF_NONE;			// no output for performance analysis

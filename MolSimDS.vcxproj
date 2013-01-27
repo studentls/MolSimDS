@@ -103,6 +103,7 @@
     <ClInclude Include="src\ParticleGenerator.h" />
     <ClInclude Include="src\PerformanceTest.h" />
     <ClInclude Include="src\Simulation.h" />
+    <ClInclude Include="src\SimulationDesc.h" />
     <ClInclude Include="src\TXTFile.h" />
     <ClInclude Include="src\utils\Base.h" />
     <ClInclude Include="src\utils\Color.h" />
@@ -141,7 +142,6 @@
   </ItemGroup>
   <ItemGroup>
     <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
       <FileType>XSD</FileType>
       <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenInline>
       <GenForward Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenForward>
@@ -153,6 +153,9 @@
       <GenDoxygen Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenDoxygen>
       <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.h</HeaderSuffix>
       <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.cpp</SourceSuffix>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">./src/XMLFile</OutDir>
+      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.h</HeaderSuffix>
+      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.cpp</SourceSuffix>
     </CXX_Tree_Mapping_Rule>
     <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
       <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenInline>
@@ -171,30 +174,18 @@
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
-    <None Include="example.xml" />
     <None Include="FallingDrop.xml" />
     <None Include="FallingDropInitialize.xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="listexample.xml" />
     <None Include="PerformanceTest.xml">
       <SubType>Designer</SubType>
     </None>
     <None Include="PeriodicBoundaries.xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="periodicBoundaryTest.xml" />
-    <None Include="sphereexample.xml" />
-    <None Include="Task2.xml" />
-    <None Include="Task3.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="test.xml">
-      <SubType>Designer</SubType>
-    </None>
     <None Include="ThermostatBig.xml" />
     <None Include="ThermostatSmall.xml" />
-    <None Include="ViewerTest.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -9,6 +9,7 @@
 #define VTKWRITER_H_
 
 #include "../Particle.h"
+#include "../SimulationDesc.h"
 #include "vtk-unstructured.h"
 
 #include <list>
@@ -35,7 +36,7 @@ public:
 	 *
 	 * @note: initializeOutput() must have been called before.
 	 */
-	void plotParticle(Particle& p);
+	void plotParticle(const Particle& p, const double mass);
 
 	/**
 	 * writes the final output file.
@@ -54,7 +55,7 @@ public:
 	* @param iteration the number of the current iteration used to 
 	*        create a unique filename
 	*/
-	void plotParticles(std::vector<Particle> particles, const std::string& filename, int iteration);
+	void plotParticles(const std::vector<Particle>& particles, const std::vector<Material>& materials, const std::string& filename, int iteration);
 
 private:
 	VTKFile_t* vtkFile;

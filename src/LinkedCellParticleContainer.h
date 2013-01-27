@@ -638,21 +638,6 @@ public:
 	/// @data optional data given to func
 	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
 
-	/// add particles from *.txt file
-	void							AddParticlesFromFile(const char *filename)
-	{
-		//...
-	}
-
-	/// our new fileformat, replace later AddParticlesFromFile
-	/// @return return true if file could be read
-	bool							AddParticlesFromFileNew(const char *filename)
-	{
-		//	... 
-		// nothing
-		return true;
-	}
-
 	/// removes all particles
 	void							Clear()
 	{
@@ -762,7 +747,9 @@ public:
 						Cells[index].push_back(p);
 						
 						// remove particle from current cell (i-th cell)
-						it = Cells[i].erase(it);
+						//it = Cells[i].erase(it);
+						*it = Cells[i].back();
+						Cells[i].pop_back();
 
 					}
 				}
@@ -776,7 +763,9 @@ public:
 						// reassign			
 						Cells[index].push_back(p);
 						// remove particle from current cell (i-th cell)
-						it = Cells[i].erase(it);
+						//it = Cells[i].erase(it);
+						*it = Cells[i].back();
+						Cells[i].pop_back();
 
 					}
 				}

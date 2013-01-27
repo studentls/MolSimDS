@@ -66,7 +66,7 @@ void VTKWriter::writeFile(const std::string& filename, int iteration) {
 	delete vtkFile;
 }
 
-void VTKWriter::plotParticle(Particle& p) {
+void VTKWriter::plotParticle(const Particle& p, const double mass) {
 	if (vtkFile->UnstructuredGrid().present()) {
 
 		//disabling nerving warning
@@ -78,7 +78,7 @@ void VTKWriter::plotParticle(Particle& p) {
 	PointData::DataArray_sequence& pointDataSequence = vtkFile->UnstructuredGrid()->Piece().PointData().DataArray();
 	PointData::DataArray_iterator dataIterator = pointDataSequence.begin();
 
-	dataIterator->push_back(p.m);
+	dataIterator->push_back(mass);
 	//cout << "Appended mass data in: " << dataIterator->Name();
 
 	dataIterator++;
@@ -104,14 +104,14 @@ void VTKWriter::plotParticle(Particle& p) {
 }
 
 
-void VTKWriter::plotParticles(std::vector<Particle> particles, const std::string& filename, int iteration)
+void VTKWriter::plotParticles(const std::vector<Particle>& particles, const std::vector<Material>& materials, const std::string& filename, int iteration)
 {
 	//init
 	initializeOutput(particles.size());
 
 	//plot stuff
-	for(vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
-		plotParticle(*it);
+	for(vector<Particle>::const_iterator it = particles.begin(); it != particles.end(); it++)
+		plotParticle(*it, materials[it->type].mass);
 
 	//write to file
 	writeFile(filename, iteration);

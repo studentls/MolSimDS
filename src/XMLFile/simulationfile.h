@@ -984,20 +984,6 @@ class particle_t: public ::xml_schema::type
   void
   V (::std::auto_ptr< V_type > p);
 
-  // m
-  // 
-  typedef ::xml_schema::decimal m_type;
-  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
-
-  const m_type&
-  m () const;
-
-  m_type&
-  m ();
-
-  void
-  m (const m_type& x);
-
   // material
   // 
   typedef ::xml_schema::string material_type;
@@ -1022,8 +1008,7 @@ class particle_t: public ::xml_schema::type
   // Constructors.
   //
   particle_t (const X_type&,
-              const V_type&,
-              const m_type&);
+              const V_type&);
 
   particle_t (const ::xercesc::DOMElement& e,
               ::xml_schema::flags f = 0,
@@ -1050,7 +1035,6 @@ class particle_t: public ::xml_schema::type
   protected:
   ::xsd::cxx::tree::one< X_type > X_;
   ::xsd::cxx::tree::one< V_type > V_;
-  ::xsd::cxx::tree::one< m_type > m_;
   material_optional material_;
 };
 
@@ -1122,20 +1106,6 @@ class cuboid_t: public ::xml_schema::type
   void
   h (const h_type& x);
 
-  // m
-  // 
-  typedef ::xml_schema::decimal m_type;
-  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
-
-  const m_type&
-  m () const;
-
-  m_type&
-  m ();
-
-  void
-  m (const m_type& x);
-
   // material
   // 
   typedef ::xml_schema::string material_type;
@@ -1162,8 +1132,7 @@ class cuboid_t: public ::xml_schema::type
   cuboid_t (const X_type&,
             const V_type&,
             const N_type&,
-            const h_type&,
-            const m_type&);
+            const h_type&);
 
   cuboid_t (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f = 0,
@@ -1192,7 +1161,6 @@ class cuboid_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< N_type > N_;
   ::xsd::cxx::tree::one< h_type > h_;
-  ::xsd::cxx::tree::one< m_type > m_;
   material_optional material_;
 };
 
@@ -1261,20 +1229,6 @@ class sphere_t: public ::xml_schema::type
   void
   h (const h_type& x);
 
-  // m
-  // 
-  typedef ::xml_schema::decimal m_type;
-  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
-
-  const m_type&
-  m () const;
-
-  m_type&
-  m ();
-
-  void
-  m (const m_type& x);
-
   // dimensions
   // 
   typedef ::xml_schema::integer dimensions_type;
@@ -1316,7 +1270,6 @@ class sphere_t: public ::xml_schema::type
             const V_type&,
             const r_type&,
             const h_type&,
-            const m_type&,
             const dimensions_type&);
 
   sphere_t (const ::xercesc::DOMElement& e,
@@ -1346,7 +1299,6 @@ class sphere_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< r_type > r_;
   ::xsd::cxx::tree::one< h_type > h_;
-  ::xsd::cxx::tree::one< m_type > m_;
   ::xsd::cxx::tree::one< dimensions_type > dimensions_;
   material_optional material_;
 };
@@ -1411,6 +1363,24 @@ class material_t: public ::xml_schema::type
   void
   sigma (const sigma_optional& x);
 
+  // mass
+  // 
+  typedef ::xml_schema::decimal mass_type;
+  typedef ::xsd::cxx::tree::optional< mass_type > mass_optional;
+  typedef ::xsd::cxx::tree::traits< mass_type, char, ::xsd::cxx::tree::schema_type::decimal > mass_traits;
+
+  const mass_optional&
+  mass () const;
+
+  mass_optional&
+  mass ();
+
+  void
+  mass (const mass_type& x);
+
+  void
+  mass (const mass_optional& x);
+
   // Constructors.
   //
   material_t ();
@@ -1441,6 +1411,7 @@ class material_t: public ::xml_schema::type
   name_optional name_;
   epsilon_optional epsilon_;
   sigma_optional sigma_;
+  mass_optional mass_;
 };
 
 class data_t: public ::xml_schema::type

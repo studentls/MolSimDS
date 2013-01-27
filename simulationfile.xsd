@@ -120,7 +120,6 @@ author: Leonhard Spiegelberg & Florian Dietz
     <xsd:all>
       <xsd:element name="X" type="Vec3_t"></xsd:element>
       <xsd:element name="V" type="Vec3_t"></xsd:element>
-      <xsd:element name="m" type="xsd:decimal"></xsd:element>
       <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
     </xsd:all>
   </xsd:complexType>
@@ -131,7 +130,6 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="V" type="Vec3_t"></xsd:element>
       <xsd:element name="N" type="dim3_t"></xsd:element>
       <xsd:element name="h" type="xsd:decimal"></xsd:element>
-      <xsd:element name="m" type="xsd:decimal"></xsd:element>
       <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
     </xsd:all>
   </xsd:complexType>
@@ -142,7 +140,6 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="V" type="Vec3_t"></xsd:element>
       <xsd:element name="r" type="xsd:decimal"></xsd:element>
       <xsd:element name="h" type="xsd:decimal"></xsd:element>
-      <xsd:element name="m" type="xsd:decimal"></xsd:element>
       <xsd:element name="dimensions" type="xsd:integer"></xsd:element>
       <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
     </xsd:all>
@@ -152,7 +149,8 @@ author: Leonhard Spiegelberg & Florian Dietz
   <xsd:complexType name="material_t">
     <xsd:attribute name="name" type="xsd:string"></xsd:attribute>
     <xsd:attribute name="epsilon" type="xsd:decimal"></xsd:attribute>
-    <xsd:attribute name="sigma" type="xsd:decimal"></xsd:attribute>    
+    <xsd:attribute name="sigma" type="xsd:decimal"></xsd:attribute>
+    <xsd:attribute name="mass" type="xsd:decimal"></xsd:attribute>
   </xsd:complexType>
   
   <xsd:complexType name="data_t">

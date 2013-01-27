@@ -34,7 +34,6 @@ public:
 			/// -> in case of 2d, we use only the first and the second
 			const utils::Vector<double, 3>& x_arg,
 	        const utils::Vector<double, 3>& v_arg,
-	        double m_arg,
 	        int type = 0
 	);
 
@@ -47,17 +46,14 @@ public:
 	/// the velocity of the particle
 	utils::Vector<double, 3> v;
 
-	/// the mass of this particle
-	double m;
-
-	/// type of the particle. The use of this value depends on particularities of the implementation. Currently not in use
-	int type;
+	/// type of the particle, used to index a particle
+	short type;
 
 	/// get the current force acting on the Particle
-	utils::Vector<double, 3>& getF();
+	utils::Vector<double, 3> getF() const {return f;}
 
 	/// get the force that acted on the Particle last iteration
-	utils::Vector<double, 3>& getOldF();
+	utils::Vector<double, 3> getOldF() const	{return old_f;}
 	
 	/// reset the force acting on the Particle
 	void resetForce();
@@ -86,14 +82,13 @@ public:
 	bool operator == (Particle& other);
 
 	/// assignment operator
-	Particle& operator = (const Particle& p)
+	inline Particle& operator = (const Particle& p)
 	{
 		f		= p.f;
 		old_f	= p.old_f;
 		x		= p.x;
 		v		= p.v;
 		type	= p.type;
-		m		= p.m;
 
 		return *this;
 	}

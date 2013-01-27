@@ -48,14 +48,13 @@ author: F.Dietz & L.Spiegelberg
 
   <data>
     <!-- material1-->
-    <material epsilon="1.0" sigma="1.0" name="Liquid1"/>
+    <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
     <!-- material1-->
-    <material epsilon="1.0" sigma="0.9412" name="Liquid2"/>
+    <material epsilon="1.0" sigma="0.9412" name="Liquid2" mass="2.0"/>
     
     <!-- C1 -->
     <cuboid>
       <h>1.2</h>
-      <m>1</m>
       <N>50 14 1</N>
       <V>0.0 0.0 0.0</V>
       <X>0.6 2.0 0.0</X>
@@ -65,7 +64,6 @@ author: F.Dietz & L.Spiegelberg
     <!-- C2 -->
     <cuboid>
       <h>1.2</h>
-      <m>2.0</m>
       <N>50 14 1</N>
       <V>0.0 0.0 0.0</V>
       <X>0.6 19.0 0.0</X>

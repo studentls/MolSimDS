@@ -67,7 +67,7 @@ private:
 		double *d = ((double*)data);
 
 		//add masses...
-		*d += p.m;
+		*d += 1.0;
 	}
 
 	/// test function, summing up data pairwise
@@ -84,7 +84,6 @@ private:
 	void addSimpleParticlesToParticleContainerFromArray(std::vector<Particle> &particles, double *positions, const int count, const double mass, const int type)
 	{
 		Particle p;
-		p.m = mass;
 		p.type = type;
 		for(int i = 0; i < count; i++)
 		{
@@ -104,7 +103,7 @@ private:
 		utils::Vector<double, 3> extent;
 		utils::Vector<unsigned int, 3> N;
 		utils::Vector<double, 3> lowercorner;
-		ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+		ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, vel, 0.0, 1);
 
 		int dim = dimz == 0 ? 2 : 3;
 		lowercorner[0] = 0.0;
@@ -221,7 +220,7 @@ public:
 			}
 
 			ListParticleContainer lpc;
-			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, vel, 0.0, 1);
 
 			lowercorner[0] = 0.0;
 			lowercorner[1] = 0.0;
@@ -300,7 +299,7 @@ public:
 			}
 
 			ListParticleContainer lpc;
-			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, vel, 0);
 
 			lowercorner[0] = 0.0;
 			lowercorner[1] = 0.0;

@@ -117,6 +117,9 @@
     <ClInclude Include="src\PerformanceTest.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="src\SimulationDesc.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
@@ -183,28 +186,7 @@
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
-    <None Include="example.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="listexample.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="sphereexample.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="Task2.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="Task3.xml">
-      <Filter>XML</Filter>
-    </None>
     <None Include="ThermostatSmall.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="test.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="periodicBoundaryTest.xml">
       <Filter>XML</Filter>
     </None>
     <None Include="PeriodicBoundaries.xml">
@@ -220,9 +202,6 @@
       <Filter>XML</Filter>
     </None>
     <None Include="FallingDrop.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="ViewerTest.xml">
       <Filter>XML</Filter>
     </None>
   </ItemGroup>

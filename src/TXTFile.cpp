@@ -113,9 +113,9 @@ err_type TXTFile::readFile(const char *filename)
 				memset(strbuf, 0, 256 * sizeof(char));
 
 				// syntax is
-				//	   name epsilon sigma
+				//	   name epsilon sigma mass
 				// e.g mat 1.0 2.0
-				if(sscanf(buffer, "%s %lf %lf", strbuf, &mat.epsilon, &mat.sigma) <= 0)
+				if(sscanf(buffer, "%s %lf %lf %lf", strbuf, &mat.epsilon, &mat.sigma, &mat.mass) <= 0)
 				{
 					LOG4CXX_ERROR(generalOutputLogger, "failed to parse file "<<filename<<" at line "<<line<<" correctly");
 					return E_PARSEERROR;
@@ -132,12 +132,12 @@ err_type TXTFile::readFile(const char *filename)
 				Particle p;
 
 				// syntax is
-				//	   xyz, velocity, mass, type
+				//	   xyz, velocity, type
 				//	   where xyz, velocity are 3D vectors and type is an index to the i-th material
-				// e.g 1.0 1.0 1.0, 0.0 -10.0 0.0, 1.0, 0
-				if(sscanf(buffer, "%lf %lf %lf, %lf %lf %lf, %lf, %d",
+				// e.g 1.0 1.0 1.0, 0.0 -10.0 0.0, , 0
+				if(sscanf(buffer, "%lf %lf %lf, %lf %lf %lf, %d",
 					&p.x[0], &p.x[1], &p.x[2], &p.v[0], &p.v[1], &p.v[2],
-					&p.m, &p.type) <= 0)
+					&p.type) <= 0)
 				{
 					LOG4CXX_ERROR(generalOutputLogger, "failed to parse file "<<filename<<" at line "<<line<<" correctly");
 					return E_PARSEERROR;
@@ -239,7 +239,7 @@ err_type TXTFile::writeFile(const char *filename, const std::vector<Particle>& p
 	fprintf(pFile, "material:\n");
 	for(std::vector<Material>::const_iterator it = materials.begin(); it != materials.end(); it++)
 	{
-		fprintf(pFile, "%s %lf %lf\n", it->name.c_str(), it->epsilon, it->sigma);
+		fprintf(pFile, "%s %lf %lf %lf\n", it->name.c_str(), it->epsilon, it->sigma, it->mass);
 	}
 
 	// print particles...
@@ -247,7 +247,7 @@ err_type TXTFile::writeFile(const char *filename, const std::vector<Particle>& p
 	for(std::vector<Particle>::const_iterator it = particles.begin(); it != particles.end(); it++)
 	{
 		fprintf(pFile, "%lf %lf %lf, %lf %lf %lf, %lf, %d\n", it->x[0], it->x[1], it->x[2],
-			it->v[0], it->v[1], it->v[2], it->m, it->type);
+			it->v[0], it->v[1], it->v[2], it->type);
 	}
 	
 	// close, everything o.k.

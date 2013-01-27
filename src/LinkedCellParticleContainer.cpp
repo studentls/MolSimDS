@@ -152,10 +152,7 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 				// calc force, based on actio / reaction between cell_i and cell_j
 				for(int l = 0; l < Cells[j].size(); l++)
 				{
-					Particle& p1 = Cells[i][k];
-					Particle& p2 = Cells[j][l];
-
-					func(data, p1, p2);
+					func(data, Cells[i][k], Cells[j][l]);
 				}			
 			}
 		}
@@ -180,16 +177,11 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 				// calc force, based on actio / reaction between cell_i and cell_j
 				for(int l = 0; l < Cells[j].size(); l++)
 				{
-					Particle& p1 = Cells[i][k];
-					Particle& p2 = Cells[j][l];
-
-					func(data, p1, p2);
+						func(data, Cells[i][k], Cells[j][l]);
 				}			
 			}
 		}
 	}
-	
-
 #endif
 }
 

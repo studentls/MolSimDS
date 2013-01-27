@@ -50,13 +50,6 @@ public:
 	/// @param data additional data given to func
 	virtual void							IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data) = 0;
 
-	/// add particles from *.txt file
-	virtual void							AddParticlesFromFile(const char *filename) = 0;
-
-	/// our new fileformat, replace later AddParticlesFromFile
-	/// @return return true if file could be read
-	virtual bool							AddParticlesFromFileNew(const char *filename) = 0;
-
 	/// removes all particles
 	virtual void							Clear() = 0;
 

@@ -40,13 +40,6 @@ public:
 	/// @param data additional data given to func
 	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
 
-	/// add particles from *.txt file
-	void AddParticlesFromFile(const char *filename);
-
-	/// our new fileformat, replace later AddParticlesFromFile
-	/// @return return true if file could be read
-	bool AddParticlesFromFileNew(const char *filename);
-
 	/// removes all particles
 	void Clear()	{if(!particles.empty())particles.clear();}
 
