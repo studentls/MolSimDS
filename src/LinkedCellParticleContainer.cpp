@@ -261,6 +261,10 @@ void	LinkedCellParticleContainer::generatePairs()
 					// get neighbours
 					std::vector<unsigned int> neighbours = getNeighbours2D(i1);
 
+					if(neighbours.empty())
+					{
+						LOG4CXX_ERROR(generalOutputLogger, "failure!");
+					}
 					// go through neighbours
 					assert(!neighbours.empty());
 					for(std::vector<unsigned int>::iterator it = neighbours.begin(); it < neighbours.end(); it++)
@@ -627,7 +631,7 @@ void LinkedCellParticleContainer::calcMTIndices()
 	{
 
 		// (1) calc Indices for even stripes
-		for(int i = 0; i < cellCount[0]; i += 2)
+		for(int i = 0; i < cellCount[0] - 1; i += 2)
 		{
 			IndexStrip strip;
 			strip.constructVerticalStripIndices(i, cellCount[1], cellCount);

@@ -67,7 +67,7 @@ private:
 	/// @param x first index
 	/// @param y second index
 	/// @param cellCount 3D-vector with domain dimensions
-	unsigned int Index2DTo1D(const unsigned int x, const unsigned int y, const utils::Vector<unsigned int, 3>		cellCount)
+	unsigned int Index2DTo1D(const unsigned int x, const unsigned int y, const utils::Vector<unsigned int, 3>&		cellCount)
 	{
 		assert(x + cellCount[0] * y < cellCount[0] * cellCount[1]);
 

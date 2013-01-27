@@ -115,10 +115,7 @@ private:
 		N[1] = dimy;
 		N[2] = dimz;
 
-		for(int i = 0; i < dim; i++)
-			{
-				extent[i] = N[i] - 2;
-			}
+		for(int i = 0; i < dim; i++)extent[i] = N[i];
 
 		//construct container...
 		LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(dim, lpc.getParticles(), 1.0, lowercorner, extent, BC_NONE, 1.0);
@@ -131,6 +128,7 @@ public:
 
 	void tearDown()	{}
 
+	/// test iteration function by a simple sum function
 	void testListParticleContainerIteration()
 	{
 		ListParticleContainer PC;
@@ -155,6 +153,7 @@ public:
 		CPPUNIT_ASSERT( -epsilon < (sum - (double)iParticleCount)  && (sum - (double)iParticleCount) < epsilon);
 	}
 
+	/// test pairwise iteration function by a simple sum function
 	void testListParticleContainerIterationPairwise()
 	{
 		ListParticleContainer PC;
@@ -182,6 +181,7 @@ public:
 	
 	}
 
+	/// test if halo particles are retunred properly for constructed linked cell particle container
 	void testLinkedCellParticleContainerGetHalo()
 	{
 		
@@ -260,7 +260,7 @@ public:
 		}
 	}
 
-
+	/// test if boundary particles are retunred properly for constructed linked cell particle container
 	void testLinkedCellParticleContainerGetBoundary()
 	{
 		
@@ -345,6 +345,7 @@ public:
 
 	}
 
+	/// test if indices are constructed correctly for linked cell particle container
 	void testLinkedCellParticleContainerIndices()
 	{
 		using namespace utils;
@@ -381,7 +382,7 @@ public:
 		SAFE_DELETE(pc3D);
 	}
 
-	/// this test tests if the construction of stripped indices works properly
+	/// tests if the construction of stripped indices works properly
 	void testLinkedCellOpenMPIndices()
 	{
 		// create a indexstrip
@@ -392,6 +393,31 @@ public:
 
 		// there should be 4(n-1) + n pairs, where n denotes cellCount[1] for one strip
 		CPPUNIT_ASSERT(strip.size() == 4*(7 - 1) + 7);
+
+		// now test for several domain sizes in 2D
+		for(int nx = 1; nx < 5; nx++)
+			for(int ny = 1; ny < 5; ny++)
+			{
+				// construct every time a linked cell particle container
+				LinkedCellParticleContainer *pc2D = this->createSimpleLC(nx, ny, 0);
+
+				// halo cells shall also be noticed!
+				int dimx = nx + 2;
+				int dimy = ny + 2;
+
+				// compare sizes
+				// every strip should have 4(dimy - 1) +  dimy pairs contained
+				// and oddstrips + evenstrips should equal dimx - 1
+				CPPUNIT_ASSERT(pc2D->evenStrips.size() + pc2D->oddStrips.size() == dimx - 1);
+
+				for(int i = 0; i < pc2D->evenStrips.size(); i++)
+					CPPUNIT_ASSERT(pc2D->evenStrips[i].size() == 4 * (dimy - 1) + dimy);
+
+				for(int i = 0; i < pc2D->oddStrips.size(); i++)
+					CPPUNIT_ASSERT(pc2D->oddStrips[i].size() == 4 * (dimy - 1) + dimy);
+
+				SAFE_DELETE(pc2D);
+			}
 
 		// maybe include here a correctness check...
 		// ...
