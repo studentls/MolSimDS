@@ -11,14 +11,10 @@ author: F.Dietz & L.Spiegelberg
        xsi:noNamespaceSchemaLocation="simulationfile.xsd">
 
   <params>
-    <dimension>2</dimension>
+    <dimension>3</dimension>
     <output>out</output>
     
     <iterationsperoutput>10</iterationsperoutput>
-    <initialTemperature>0</initialTemperature>
-    <iterationsTillThermostatApplication>-1</iterationsTillThermostatApplication>
-    <targetTemperature>0</targetTemperature>
-    <temperatureStepSize>0</temperatureStepSize>
     <gravity>-0.001</gravity>
    
     <delta_t>0.01</delta_t>

@@ -53,7 +53,7 @@ public:
 	void ApplyMembraneForces();
 	
 	/// calculate and apply the force between a pair of neighboring particles in a membrane. Used in ApplyMembraneForces()
-	void ApplyMembraneForce(bool directNeighbors, Particle& p1, Particle& p2);
+	void ApplyMembraneForce(double distanceFactor, Particle& p1, Particle& p2);
 
 	/// applies a reflective boundary at the bottom
 	void ApplyReflectiveBoundaryAtBottom(void(*func)(void*, Particle&, Particle&), void *data);

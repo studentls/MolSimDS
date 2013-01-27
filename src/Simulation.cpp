@@ -205,7 +205,7 @@ void Simulation::calculateF() {
 		((MembraneContainer*)particles)->ApplyMembraneForces();
 	
 	// call particles.IteratePairwise() on forceCalculator
-	//particles->IteratePairwise(forceCalculator, (void*)&desc);
+		particles->IteratePairwise(forceCalculator, (void*)&desc);
 
 	// call gravityCalculator to add gravity force for each particle
 	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.
@@ -321,9 +321,11 @@ void Simulation::gravityCalculator(void *data, Particle& p)
 
 	// add gravitational force, based on G = m * g
 	utils::Vector<double, 3> grav_force;
+	// act on the last dimension
+	int dimensionToAffect = desc->dimensions - 1;
 
 	// only y - component is affected...
-	grav_force[1] = p.m * desc->gravitational_constant;
+	grav_force[dimensionToAffect] = p.m * desc->gravitational_constant;
 
 	p.addForce(grav_force);
 }

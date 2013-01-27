@@ -66,31 +66,33 @@ void MembraneContainer::ApplyMembraneForces()
 			int j = *it;
 			Particle& p2 = particles[j];
 			// call the function on the pair of Particles
-			ApplyMembraneForce(true, p1, p2);
+			ApplyMembraneForce(1.0, p1, p2);
 		}
 		// do the diagonal neighbors
 		neighbors = p1.getDiagonalNeighbors();
+		double distanceFactor = sqrt(2.0);
 		for (std::vector<int>::iterator it = neighbors.begin(); it < neighbors.end(); it++)
 		{
 			int j = *it;
 			Particle& p2 = particles[j];
 			// call the function on the pair of Particles
-			ApplyMembraneForce(false, p1, p2);
+			ApplyMembraneForce(distanceFactor, p1, p2);
 		}
 	}
 }
 
-void MembraneContainer::ApplyMembraneForce(bool directNeighbors, Particle& p1, Particle& p2)
+void MembraneContainer::ApplyMembraneForce(double distanceFactor, Particle& p1, Particle& p2)
 {
 	double k = 300.0;
 	double r0 = 2.2;
 
-	double r = r0 * (directNeighbors ? 1.0 : sqrt(2.0));
+	double r = r0 * distanceFactor;
 	double dst = p1.x.distance(p2.x);
 	
 	double factor = k * (dst - r);
 
-	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
+	// the division by the distance is for normalization of the force vector
+	utils::Vector<double, 3> force = (p2.x - p1.x) * (factor / dst);
 	
 	// add individual particle to particle force to sum
 	p1.addForce(force);
@@ -136,6 +138,8 @@ void MembraneContainer::SetMembrane(const Vec3& vLowerLeftFrontCorner,
 			if ((x == 16 || x == 17) &&
 				(y == 23 || y == 24))
 				p.type = 1;
+			/*if (x == 5 && y == 5)
+				p.type = 1;*/
 			else
 				p.type	= 0;
 			p.m		= mass;
