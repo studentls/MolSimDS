@@ -1,0 +1,78 @@
+<?xml version="1.0"?>
+
+<!--
+
+file: ThermostatBig.xml big experiment for Thermostat functionality
+author: F.Dietz & L.Spiegelberg
+
+-->
+
+<simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="simulationfile.xsd">
+
+  <params>
+    <dimension>3</dimension>
+    <output>out</output>
+    
+    <iterationsperoutput>10</iterationsperoutput>
+    <initialTemperature>40</initialTemperature>
+    <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
+    <targetTemperature>40</targetTemperature>
+    <temperatureStepSize>0.1</temperatureStepSize>
+    <gravity>-12.44</gravity>
+   
+    <delta_t>0.0005</delta_t>
+    <epsilon>2.0</epsilon>
+    <outputfmt>None</outputfmt>
+    <sigma>1.15</sigma>
+    
+    <t_end>100.0</t_end>
+    <t_start>0.0</t_start>
+    
+    <algorithm>
+      <LinkedCell>
+        <cutoff_radius>2.5</cutoff_radius>
+        <sizeofdomainX>60.0</sizeofdomainX>
+        <sizeofdomainY>24.0</sizeofdomainY>
+        <sizeofdomainZ>51.0</sizeofdomainZ>
+        <offset>0.0 0.0 0.0</offset>
+        <conditions>
+          <condition value="front" type="reflective"></condition>
+          <condition value="back" type="reflective"></condition>
+          <condition value="left" type="periodic"></condition>
+          <condition value="right" type="periodic"></condition>
+          <condition value="top" type="periodic"></condition>
+          <condition value="bottom" type="periodic"></condition>
+        </conditions>
+      </LinkedCell>
+    </algorithm>
+    
+  </params>
+
+  <data>
+    <!-- material1-->
+    <material epsilon="2.0" sigma="1.15" name="Liquid1" mass="40.0"/>
+    <!-- material1-->
+    <material epsilon="2.0" sigma="1.15" name="Liquid2" mass="80.0"/>
+    
+    <!-- C1 -->
+    <cuboid>
+      <h>1.2</h>
+      <N>48 9 42</N>
+      <V>0.0 0.0 0.0</V>
+      <X>0.6 0.6 0.6</X>
+      <material>Liquid1</material>
+    </cuboid>
+    
+    <!-- C2 -->
+    <cuboid>
+      <h>1.2</h>
+      <N>48 9 42</N>
+      <V>0.0 0.0 0.0</V>
+      <X>0.6 11.4 0.6</X>
+      <material>Liquid2</material>
+    </cuboid>
+    
+  </data>
+
+</simulationfile>
