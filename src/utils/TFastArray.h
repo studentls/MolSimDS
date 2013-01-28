@@ -51,9 +51,11 @@ public:
 	{
 		_capacity = fa._capacity;
 		_size = fa._size;
+		_data = NULL;
 		if(_capacity != 0)
 		{
-			_data = realloc(sizeof(T) * _capacity);
+			_data = realloc(_data, sizeof(T) * _capacity);
+
 			memcpy(_data, fa._data, sizeof(T) * _capacity);
 		}
 		else _data = NULL;
