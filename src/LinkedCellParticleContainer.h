@@ -747,9 +747,7 @@ public:
 						Cells[index].push_back(p);
 						
 						// remove particle from current cell (i-th cell)
-						//it = Cells[i].erase(it);
-						*it = Cells[i].back();
-						Cells[i].pop_back();
+						it = Cells[i].erase(it);
 
 					}
 				}
@@ -763,10 +761,7 @@ public:
 						// reassign			
 						Cells[index].push_back(p);
 						// remove particle from current cell (i-th cell)
-						//it = Cells[i].erase(it);
-						*it = Cells[i].back();
-						Cells[i].pop_back();
-
+						it = Cells[i].erase(it);
 					}
 				}
 

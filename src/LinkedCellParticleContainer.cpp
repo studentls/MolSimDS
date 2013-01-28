@@ -112,13 +112,28 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 #pragma omp parallel for num_threads(threadCount)
 	for(int i = 0; i < getCellCount(); i++)
 	{
+		// this code hurts vector!
+		//// for all particles in cell_i, calc forces in cell_i
+		//for(int j = 0; j < Cells[i].size(); j++)
+		//{
+		//	for(int k = j + 1; k < Cells[i].size(); k++)
+		//	{
+		//		Particle& p1 = Cells[i][j];
+		//		Particle& p2 = Cells[i][k];
+
+		//		func(data, p1, p2);
+		//	}
+		//}
+
+		// ugly vector version!
 		// for all particles in cell_i, calc forces in cell_i
-		for(int j = 0; j < Cells[i].size(); j++)
+		// for all particles in cell_i, calc forces in cell_i
+		for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
 		{
-			for(int k = j + 1; k < Cells[i].size(); k++)
+			for(std::vector<Particle>::iterator it2 = it1 + 1; it2 != Cells[i].end(); it2++)
 			{
-				Particle& p1 = Cells[i][j];
-				Particle& p2 = Cells[i][k];
+				Particle& p1 = *it1;
+				Particle& p2 = *it2;
 
 				func(data, p1, p2);
 			}
