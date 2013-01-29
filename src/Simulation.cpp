@@ -102,9 +102,10 @@ err_type Simulation::Run()
 	// additional running variable to finish if events occur
 	bool running = true;
 
+#ifndef ICE
 	// has the user requested a viewer to run?
 	bool viewer = Viewer::Instance().IsRunning();
-
+#endif
 	// calculate how many steps will be 1%
 	int stepsperpercent = statistics.step_count / 100;
 
@@ -151,7 +152,7 @@ err_type Simulation::Run()
 			progress_timer.reset();
 		}
 		
-		
+#ifndef ICE	
 		// is a viewer active?
 		if(viewer)
 		{
@@ -161,7 +162,7 @@ err_type Simulation::Run()
 			// if running, notify(send particle data to viewer)
 			if(running)notifyViewer();
 		}
-
+#endif
 		// increment loop values
 		iteration++;
 		current_time += desc.delta_t;
@@ -502,7 +503,7 @@ void Simulation::adjustThermostat()
 void Simulation::notifyViewer()
 {
 	using namespace std;
-
+#ifndef ICE
 	// notify viewer
 		
 	VParticle *particles = NULL;
@@ -527,4 +528,5 @@ void Simulation::notifyViewer()
 		}
 
 	Viewer::Instance().UnlockParticles(&particles);
+#endif
 }

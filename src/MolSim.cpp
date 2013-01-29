@@ -60,11 +60,15 @@ err_type MolSim::Init(int argc, char *argsv[])
 
 	// if viewer is active, set interior particle array size
 	int size = sim->getParticleCount();
+	
+	// not for ICE
+#ifndef ICE
 	if(Viewer::Instance().IsRunning())Viewer::Instance().setParticleArraySize(sim->getParticleCount());
-
+#endif
 	// set grid
 	ParticleContainer *pc = sim->getParticleContainer();
 	
+#ifndef ICE
 	// valid?
 	// beware, everything currently only in 2D!
 	if(pc && Viewer::Instance().IsRunning())
@@ -83,7 +87,7 @@ err_type MolSim::Init(int argc, char *argsv[])
 
 		Viewer::Instance().setGrid(bb.center[0] - bb.extent[0] * 0.5, bb.center[1] - bb.extent[1] * 0.5, bb.extent[0], bb.extent[1], xcount, ycount);
 	}
-
+#endif
 	return S_OK;
 }
 
@@ -126,7 +130,7 @@ err_type MolSim::Run()
 		{
 			// valid pointer?
 			if(!sim)return E_NOTINITIALIZED;
-	
+#ifndef ICE	
 			// if viewer is active(--viewer option enabled)
 			// run multithreaded
 			// else simply run simulation in one thread
@@ -162,7 +166,10 @@ err_type MolSim::Run()
 				err_type e = sim->Run();
 				if(FAILED(e))return e;
 			}	
-
+#else
+			err_type e = sim->Run();
+			if(FAILED(e))return e;
+#endif
 			// show statistics...
 			SimulationStatistics &stats = sim->getStatistics();
 			showStatistics(stats);
@@ -223,8 +230,13 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 		// can be displayed before or after the filename
 		else if(strcmp(argsv[1], "--viewer") == 0 || strcmp(argsv[2], "--viewer") == 0)
 		{
+#ifndef ICE	
 			// initialize viewer
 			Viewer::Instance().InitAndDisplay();
+#else
+			LOG4CXX_ERROR(generalOutputLogger, ">> sorry, but currently X11 output does not work for ICE!");
+			return E_INVALIDPARAM;
+#endif		
 		}
 		else if(strcmp(argsv[1], "-ptest") == 0)
 		{
