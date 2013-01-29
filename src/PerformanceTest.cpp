@@ -18,7 +18,7 @@
 err_type PerformanceTest::Run(const char *xmlFile)
 {
 	err_type res = S_OK;
-	int perfstepcount = 1000; // use 1000 steps to analyse Performance
+	int perfstepcount = 1000; // use 1000 steps to analyse Performance as a maximum
 	int maximumthreads = 16; // perf up to 16 threads
 
 	LOG4CXX_INFO(generalOutputLogger, ">> init performance tests for file "<<xmlFile);
@@ -33,17 +33,32 @@ err_type PerformanceTest::Run(const char *xmlFile)
 	sim.desc.output_fmt = SOF_NONE;			// no output for performance analysis
 	sim.desc.iterationsperoutput = 9999;	// no output
 
+
+	// we allow for performance testing maximum 1000 steps!
+	perfstepcount = (int)((sim.desc.end_time - sim.desc.start_time) / sim.desc.delta_t) > perfstepcount ? perfstepcount : (int)((sim.desc.end_time - sim.desc.start_time) / sim.desc.delta_t);
+
 	sim.desc.end_time = sim.desc.start_time +  sim.desc.delta_t * perfstepcount; // use perfsteps
 	
 	double speedup = 1.0;
 	double basespeed = 1.0;
 
+	// if omp is avaliable print info
+#ifdef OPENMP
+	LOG4CXX_INFO(generalOutputLogger, ">> number of processors avaliable: "<<omp_get_num_procs());
+	LOG4CXX_INFO(generalOutputLogger, "   max avaliable OpenMP threads:   "<<omp_get_max_threads());
+#endif
+
 	LOG4CXX_INFO(generalOutputLogger, ">> starting performance tests for file "<<xmlFile);
+
 	// performe analysis
 	for(int i = 1; i <= maximumthreads; i++)
 	{
 		sim.particles->setThreadCount(i);
+#ifdef OPENMP
 		LOG4CXX_INFO(generalOutputLogger, ">> running performance test "<<i<<" out of "<<maximumthreads);
+#else 
+		LOG4CXX_INFO(generalOutputLogger, ">> running performance test "<<i);
+#endif OPENMP
 		utils::Timer timer;
 		sim.Run();
 		double time = timer.getElapsedTime();
@@ -52,8 +67,11 @@ err_type PerformanceTest::Run(const char *xmlFile)
 		// calc speed up
 		speedup = basespeed / time;
 
+#ifdef OPENMP
 		LOG4CXX_INFO(generalOutputLogger, ">> "<<time << " s @ "<<i<<" threads , speedup factor: "<<speedup);
-
+#else 
+		LOG4CXX_INFO(generalOutputLogger, ">> "<<time << " s , speed comparison"<<speedup);
+#endif
 		// push back data
 		PerformanceTestData entry;
 		entry.time = time;

@@ -37,7 +37,7 @@ private:
 	err_type	saveCSV(const char *filename);	
 public:
 
-	/// Run Performance Tests
+	/// Run Performance Tests, internal the maximum steps will be cut at 1000 steps to ensure a good runtime
 	/// @param inputFile for which performance shall be evaluated
 	err_type Run(const char *xmlFile);
 };

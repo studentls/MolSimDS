@@ -190,6 +190,9 @@
     <None Include="PeriodicBoundaries.xml">
       <SubType>Designer</SubType>
     </None>
+    <None Include="RayleighTaylor3D.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="ThermostatBig.xml" />
     <None Include="ThermostatSmall.xml">
       <SubType>Designer</SubType>

@@ -23,7 +23,7 @@ author: F.Dietz & L.Spiegelberg
    
     <delta_t>0.0005</delta_t>
     <epsilon>2.0</epsilon>
-    <outputfmt>None</outputfmt>
+    <outputfmt>VTK</outputfmt>
     <sigma>1.15</sigma>
     
     <t_end>100.0</t_end>

@@ -1,216 +1,205 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Quelldateien">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Headerdateien">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hpp;hxx;hm;inl;inc;xsd</Extensions>
-    </Filter>
-    <Filter Include="Ressourcendateien">
-      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
-      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
-    </Filter>
-    <Filter Include="Headerdateien\utils">
-      <UniqueIdentifier>{ddc214a9-1092-4580-8470-6607f805aaeb}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Headerdateien\outputWriter">
-      <UniqueIdentifier>{11af1689-dee8-4bb4-960b-24f12436e2cd}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\outputWriter">
-      <UniqueIdentifier>{6def1da9-c67a-468b-ad3c-b72e6cf2c645}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Quelldateien\utils">
-      <UniqueIdentifier>{309eb3ab-0f18-4891-ad4f-7e2551582fa1}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Schemadateien">
-      <UniqueIdentifier>{c7fa2fa4-5f67-4cd9-afcd-da72f49f0c54}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="XML">
-      <UniqueIdentifier>{2fb0d546-09ef-4130-ba89-61ecb2de312e}</UniqueIdentifier>
-    </Filter>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="src\FileReader.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Particle.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Vector.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\outputWriter\vtk-unstructured.h">
-      <Filter>Headerdateien\outputWriter</Filter>
-    </ClInclude>
-    <ClInclude Include="src\outputWriter\XYZWriter.h">
-      <Filter>Headerdateien\outputWriter</Filter>
-    </ClInclude>
-    <ClInclude Include="src\outputWriter\VTKWriter.h">
-      <Filter>Headerdateien\outputWriter</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MolSim.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ParticleContainer.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Timer.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\utils.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Base.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ParticleContainerTest.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Helper.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ParticleGenerator.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\MaxwellBoltzmannDistribution.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Logging.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Simulation.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\ListParticleContainer.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\LinkedCellParticleContainer.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\XMLFileReader.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\XMLFileReaderTest.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\XMLFile\simulationfile.h">
-      <Filter>Quelldateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Plane.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\TXTFile.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Viewer.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\Color.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\utils\TFastArray.h">
-      <Filter>Headerdateien\utils</Filter>
-    </ClInclude>
-    <ClInclude Include="src\PerformanceTest.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-    <ClInclude Include="src\SimulationDesc.h">
-    <ClInclude Include="src\MembraneContainer.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
-      <Filter>Quelldateien\outputWriter</Filter>
-    </ClCompile>
-    <ClCompile Include="src\outputWriter\VTKWriter.cpp">
-      <Filter>Quelldateien\outputWriter</Filter>
-    </ClCompile>
-    <ClCompile Include="src\outputWriter\XYZWriter.cpp">
-      <Filter>Quelldateien\outputWriter</Filter>
-    </ClCompile>
     <ClCompile Include="src\FileReader.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Particle.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MolSim.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Simulation.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Logging.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\ListParticleContainer.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\LinkedCellParticleContainer.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\XMLFileReader.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\XMLFile\simulationfile.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\TXTFile.cpp">
-      <Filter>Quelldateien</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Viewer.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\utils\Color.cpp">
-      <Filter>Quelldateien\utils</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LinkedCellParticleContainer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ListParticleContainer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MembraneContainer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\MolSim.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\PerformanceTest.cpp">
-    <ClCompile Include="src\MembraneContainer.cpp">
-      <Filter>Quelldateien</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Particle.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Logging.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Simulation.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLFile\simulationfile.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\TXTFile.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Viewer.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\XMLFileReader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\outputWriter\XYZWriter.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\outputWriter\VTKWriter.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\utils\Base.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\outputWriter\XYZWriter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Color.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\FileReader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Helper.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LinkedCellParticleContainer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ListParticleContainer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Logging.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MaxwellBoltzmannDistribution.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MembraneContainer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\MolSim.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Particle.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleContainer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleContainerTest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ParticleGenerator.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PerformanceTest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Plane.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Simulation.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\SimulationDesc.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLFile\simulationfile.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\TFastArray.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Timer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\TXTFile.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\utils.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\utils\Vector.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Viewer.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\outputWriter\vtk-unstructured.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\outputWriter\VTKWriter.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLFileReader.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+    <ClInclude Include="src\XMLFileReaderTest.h">
+      <Filter>Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="FallingDrop.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="FallingDropInitialize.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="PerformanceTest.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="PeriodicBoundaries.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="ThermostatBig.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="ThermostatSmall.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="ViewerTest.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="listexample.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="Membrane.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="RayleighTaylor3D.xml">
+      <Filter>xml</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <CXX_Tree_Mapping_Rule Include="simulationfile.xsd" />
     <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
-      <Filter>Schemadateien</Filter>
-    </CXX_Tree_Mapping_Rule>
-    <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">
-      <Filter>Schemadateien</Filter>
+      <Filter>xml</Filter>
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
-    <None Include="ThermostatSmall.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="PeriodicBoundaries.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="ThermostatBig.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="PerformanceTest.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="FallingDropInitialize.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="FallingDrop.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="ViewerTest.xml">
-      <Filter>XML</Filter>
-    </None>
-    <None Include="Membrane.xml">
-      <Filter>XML</Filter>
-    </None>
+    <Filter Include="Source">
+      <UniqueIdentifier>{9d4576d1-e417-47ff-b72e-1b0aa7f07d8c}</UniqueIdentifier>
+      <Extensions>*.cpp</Extensions>
+    </Filter>
+    <Filter Include="Header">
+      <UniqueIdentifier>{18a92b45-39ce-4c41-a84d-cc65aff9511c}</UniqueIdentifier>
+      <Extensions>*.h</Extensions>
+    </Filter>
+    <Filter Include="xml">
+      <UniqueIdentifier>{a444367e-7e9b-46d9-a375-bea428388f52}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

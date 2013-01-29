@@ -398,5 +398,22 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		(*out) = container;
 	}
 
+
+	// secure check, see if types are all valid!
+	std::vector<Particle> tmp = (*out)->getParticles();
+	if(tmp.empty())return S_OK;
+	else
+	{
+		// go through particles and check type
+		for(std::vector<Particle>::const_iterator it = tmp.begin(); it != tmp.end(); ++it)
+		{
+			if(it->type < 0 || it->type >= desc.materials.size())
+			{
+				LOG4CXX_ERROR(generalOutputLogger, ">> error: invalid type found! total failure!");
+				return E_UNKNOWN;
+			}
+		}
+	}
+
 	return S_OK;
 }

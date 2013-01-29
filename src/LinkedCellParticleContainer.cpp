@@ -106,94 +106,132 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 	}
 #else
 	//Open MP version
-	// Step 1: calc pairwise force between particles for each cell
 
-	// go through cells
-#pragma omp parallel for num_threads(threadCount)
-	for(int i = 0; i < getCellCount(); i++)
+	// use different indices, for different dimensions...
+	if(dim == 2)
 	{
-		// this code hurts vector!
-		//// for all particles in cell_i, calc forces in cell_i
-		//for(int j = 0; j < Cells[i].size(); j++)
-		//{
-		//	for(int k = j + 1; k < Cells[i].size(); k++)
-		//	{
-		//		Particle& p1 = Cells[i][j];
-		//		Particle& p2 = Cells[i][k];
+		// Step 1: calc pairwise force between particles for each cell
 
-		//		func(data, p1, p2);
-		//	}
-		//}
-
-		// ugly vector version!
-		// for all particles in cell_i, calc forces in cell_i
-		// for all particles in cell_i, calc forces in cell_i
-		for(std::vector<Particle>::iterator it1 = Cells[i].begin(); it1 != Cells[i].end(); it1++)
+		// go through cells
+	#pragma omp parallel for num_threads(threadCount)
+		for(int i = 0; i < getCellCount(); i++)
 		{
-			for(std::vector<Particle>::iterator it2 = it1 + 1; it2 != Cells[i].end(); it2++)
+			// any particles contained?
+			if(Cells[i].empty())continue;
+
+			// for all particles in cell_i, calc forces in cell_i
+			for(int j = 0; j < Cells[i].size(); j++)
 			{
-				Particle& p1 = *it1;
-				Particle& p2 = *it2;
+				for(int k = j + 1; k < Cells[i].size(); k++)
+				{
+					Particle& p1 = Cells[i][j];
+					Particle& p2 = Cells[i][k];
 
-				func(data, p1, p2);
+					func(data, p1, p2);
+				}
 			}
 		}
-	}
 
-	// Step 2: calc force with neighbouring cells
-	// use stored pairs to iterate, these may be ordered to increase performance in a special way
-	// ramaining an unsolved problem for simulations yet
+		// Step 2: calc force with neighbouring cells
+		// use stored pairs to iterate, these may be ordered to increase performance in a special way
+		// ramaining an unsolved problem for simulations yet
 	
-	// pairs should exist!
-	assert(oddStrips.size() != 0);
-	assert(evenStrips.size() != 0);
+		// pairs should exist!
+		assert(oddStrips.size() != 0);
+		assert(evenStrips.size() != 0);
 
-#pragma omp parallel for num_threads(threadCount)
-	// 2.1 go through oddStrips and calc forces
-	for(int iStrip = 0; iStrip < oddStrips.size(); iStrip++)
-	{
-		// go through all pairs in the strip
-		for(int iPair = 0; iPair < oddStrips[iStrip].size(); iPair++)
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.1 go through oddStrips and calc forces
+		for(int iStrip = 0; iStrip < oddStrips.size(); iStrip++)
 		{
-			int i = oddStrips[iStrip][iPair][0];
-			int j = oddStrips[iStrip][iPair][1];
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < oddStrips[iStrip].size(); iPair++)
+			{
+				int i = oddStrips[iStrip][iPair][0];
+				int j = oddStrips[iStrip][iPair][1];
 
-			// if one cell is empty go to next pair
-			if(Cells[i].empty() || Cells[j].empty())continue;
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
+			}
+		}
 
-			// for all particles in cell_i
-			for(int  k = 0; k < Cells[i].size(); k++)
-			{		
-				// calc force, based on actio / reaction between cell_i and cell_j
-				for(int l = 0; l < Cells[j].size(); l++)
-				{
-					func(data, Cells[i][k], Cells[j][l]);
-				}			
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.2 go through evenStrips and calc forces
+		for(int iStrip = 0; iStrip < evenStrips.size(); iStrip++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < evenStrips[iStrip].size(); iPair++)
+			{
+				int i = evenStrips[iStrip][iPair][0];
+				int j = evenStrips[iStrip][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
 			}
 		}
 	}
-
-#pragma omp parallel for num_threads(threadCount)
-	// 2.2 go through evenStrips and calc forces
-	for(int iStrip = 0; iStrip < evenStrips.size(); iStrip++)
+	else
 	{
-		// go through all pairs in the strip
-		for(int iPair = 0; iPair < evenStrips[iStrip].size(); iPair++)
+		// only 3D supported...
+		assert(dim == 3);
+
+		// Step 1: calc pairwise force between particles for each cell
+
+		// go through cells
+	#pragma omp parallel for num_threads(threadCount)
+		for(int i = 0; i < getCellCount(); i++)
 		{
-			int i = evenStrips[iStrip][iPair][0];
-			int j = evenStrips[iStrip][iPair][1];
+			// any particles contained?
+			if(Cells[i].empty())continue;
 
-			// if one cell is empty go to next pair
-			if(Cells[i].empty() || Cells[j].empty())continue;
-
-			// for all particles in cell_i
-			for(int  k = 0; k < Cells[i].size(); k++)
-			{		
-				// calc force, based on actio / reaction between cell_i and cell_j
-				for(int l = 0; l < Cells[j].size(); l++)
+			// for all particles in cell_i, calc forces in cell_i
+			for(int j = 0; j < Cells[i].size(); j++)
+			{
+				for(int k = j + 1; k < Cells[i].size(); k++)
 				{
-						func(data, Cells[i][k], Cells[j][l]);
-				}			
+					Particle& p1 = Cells[i][j];
+					Particle& p2 = Cells[i][k];
+
+					func(data, p1, p2);
+				}
+			}
+		}
+
+		// Step 2: calc force with neighbouring cells
+		// use stored pairs to iterate, these may be ordered to increase performance in a special way
+		// ramaining an unsolved problem for simulations yet
+	
+		// pairs should exist!
+		assert(oddLayers.size() != 0);
+		assert(evenLayers.size() != 0);
+
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.1 go through oddLayers and calc forces
+		for(int iLayer = 0; iLayer < oddLayers.size(); iLayer++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < oddLayers[iLayer].size(); iPair++)
+			{
+				int i = oddLayers[iLayer][iPair][0];
+				int j = oddLayers[iLayer][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
+			}
+		}
+
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.2 go through evenLayers and calc forces
+		for(int iLayer = 0; iLayer < evenLayers.size(); iLayer++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < evenLayers[iLayer].size(); iPair++)
+			{
+				int i = evenLayers[iLayer][iPair][0];
+				int j = evenLayers[iLayer][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
 			}
 		}
 	}
@@ -657,8 +695,37 @@ void LinkedCellParticleContainer::calcMTIndices()
 	}
 	else
 	{
-		//...
-		LOG4CXX_INFO(generalOutputLogger, "3D MT not yet implemented!");
+		// (1) calc Indices for even layers
+		for(int i = 0; i < cellCount[2] - 1; i += 2)
+		{
+			IndexLayer layer;
+			layer.constructVerticalInteractionSlice(i, this);
+
+			evenLayers.push_back(layer);
+		}
+
+		// (2) calc Indices for odd layer
+		for(int i = 1; i < cellCount[2] - 1; i += 2)
+		{
+			IndexLayer layer;
+			layer.constructVerticalInteractionSlice(i, this);
+
+			oddLayers.push_back(layer);
+		}
+
+		// (3) in 3D the top layer has no internal ((x,y)-pairs!) interactions, decide upon cellCount[2] where to put
+		if(cellCount[2] & 0x1) // cellCount[2] odd --> put top layer to even layers...
+		{
+			IndexLayer layer;
+			layer.constructInternalSliceIndices(cellCount[2] - 1, this);
+			evenLayers.push_back(layer);
+		}
+		else // cellCount[2] even --> put top layer to odd layers...
+		{
+			IndexLayer layer;
+			layer.constructInternalSliceIndices(cellCount[2] - 1, this);
+			oddLayers.push_back(layer);
+		}
 	}
 }
 void LinkedCellParticleContainer::calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r)
@@ -752,4 +819,75 @@ void LinkedCellParticleContainer::calcFrameIndices(std::vector<unsigned int> &ou
 	default:
 		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
 	}
+}
+
+// located here due to c++'s internal behaviour
+void IndexLayer::constructVerticalInteractionSlice(const int zOffset, const LinkedCellParticleContainer *pc)
+{
+	// check if valid zOffset
+	assert(zOffset >= 0);
+	assert(zOffset < pc->cellCount[2] - 1);
+
+	// go through all x,y cells
+	for(int x = 0; x < pc->cellCount[0]; x++)
+		for(int y = 0; y < pc->cellCount[1]; y++)
+		{
+			// index of the root cell in this iteration
+			int index = pc->Index3DTo1D(x, y, zOffset);
+			
+			// calculate pairs
+			for(int i = -1; i <= 1; i++) // x
+				for(int j = -1; j <= 1; j++) // y
+					for(int k = 0; k <= 1; k++) // z
+					{
+						// reject if not in boundaries
+						if(x + i < 0 || x + i >= pc->cellCount[0])continue;
+						if(y + j < 0 || y + j >= pc->cellCount[1])continue;
+						if(zOffset + k < 0 || zOffset + k >= pc->cellCount[2])continue;
+
+						// calc a neighbour
+						int index2 = pc->Index3DTo1D(x + i, y + j, zOffset + k);
+
+						// valid index?
+						if(index2 < 0 || index2 > pc->getCellCount())continue;
+
+						//unordered pairs!
+						if(index < index2)this->push_back(pc->makePair(index, index2));
+						
+					}
+		}
+}
+
+void IndexLayer::constructInternalSliceIndices(const int zOffset, const LinkedCellParticleContainer *pc)
+{
+	// check if valid zOffset
+	assert(zOffset >= 0);
+	assert(zOffset <= pc->cellCount[2] - 1); // top layer allowed!
+
+	// go through all x,y cells
+	for(int x = 0; x < pc->cellCount[0]; x++)
+		for(int y = 0; y < pc->cellCount[1]; y++)
+		{
+			// index of the root cell in this iteration
+			int index = pc->Index3DTo1D(x, y, zOffset);
+			
+			// calculate pairs
+			for(int i = -1; i <= 1; i++) // x
+				for(int j = -1; j <= 1; j++) // y
+					{
+						// reject if not in boundaries
+						if(x + i < 0 || x + i >= pc->cellCount[0])continue;
+						if(y + j < 0 || y + j >= pc->cellCount[1])continue;
+
+						// calc a neighbour
+						int index2 = pc->Index3DTo1D(x + i, y + j, zOffset);
+
+						// valid index?
+						if(index2 < 0 || index2 > pc->getCellCount())continue;
+
+						//unordered pairs!
+						if(index < index2)this->push_back(pc->makePair(index, index2));
+						
+					}
+		}
 }
