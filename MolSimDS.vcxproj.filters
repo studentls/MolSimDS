@@ -118,6 +118,7 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="src\SimulationDesc.h">
+    <ClInclude Include="src\MembraneContainer.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
@@ -174,6 +175,7 @@
       <Filter>Quelldateien\utils</Filter>
     </ClCompile>
     <ClCompile Include="src\PerformanceTest.cpp">
+    <ClCompile Include="src\MembraneContainer.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -202,6 +204,12 @@
       <Filter>XML</Filter>
     </None>
     <None Include="FallingDrop.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="ViewerTest.xml">
+      <Filter>XML</Filter>
+    </None>
+    <None Include="Membrane.xml">
       <Filter>XML</Filter>
     </None>
   </ItemGroup>

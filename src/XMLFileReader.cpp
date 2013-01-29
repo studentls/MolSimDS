@@ -376,6 +376,20 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		(*out) = container;
 
 	}
+	else if(file->params().algorithm().Membrane().present())
+	{
+		// use the membrane list
+		Membrane_t& lc = file->params().algorithm().Membrane().get();
+		unsigned int pullIterations = lc.pull_iterations();;
+		container = new MembraneContainer(pullIterations);
+
+		// hardcoded contents for the container
+		utils::Vector<unsigned int, 2> dimensions(50, 50);
+		Vec3 lowerLeftFrontCorner(15.0, 15.0, 1.5);
+		((MembraneContainer*)container)->SetMembrane(lowerLeftFrontCorner, dimensions, 2.2);
+
+		(*out) = container;
+	}
 	else
 	{
 		// use in this case, the simple ListParticleContainer

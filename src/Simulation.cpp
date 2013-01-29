@@ -116,6 +116,9 @@ err_type Simulation::Run()
 			if( iteration % desc.iterationsTillThermostatApplication == 0 && iteration != 0)
 				adjustThermostat();
 		
+		if (particles->getType() == PCT_MEMBRANE && iteration < ((MembraneContainer*)particles)->pullIterations)
+			particles->Iterate(forceCalculatorMembranePull, (void*)&desc);
+		
 		// perform one iteration step
 		performStep();
 
@@ -197,8 +200,12 @@ void Simulation::calculateF() {
 	// call particles.Iterate() on forceResetter
 	particles->Iterate(forceResetter, (void*)&desc);
 
+	// if it's a membrane, calculate the membrane forces
+	if (particles->getType() == PCT_MEMBRANE)
+		((MembraneContainer*)particles)->ApplyMembraneForces();
+	
 	// call particles.IteratePairwise() on forceCalculator
-	particles->IteratePairwise(forceCalculator, (void*)&desc);
+		particles->IteratePairwise(forceCalculator, (void*)&desc);
 
 	// call gravityCalculator to add gravity force for each particle
 	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.
@@ -206,9 +213,11 @@ void Simulation::calculateF() {
 
 	// apply Boundary conditions, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
-	{
 		((LinkedCellParticleContainer*)particles)->ApplyBoundaryConditions(forceCalculator, (void*)&desc);
-	}
+
+	// apply Boundary conditions, if Membrane Algorithm is used...
+	if(particles->getType() == PCT_MEMBRANE)
+		((MembraneContainer*)particles)->ApplyReflectiveBoundaryAtBottom(forceCalculator, (void*)&desc);
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
@@ -286,15 +295,37 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	p2.substractForce(force);
 }
 
+void Simulation::forceCalculatorMembranePull(void* data, Particle& p)
+{
+#ifdef DEBUG
+	// assert data is a valid pointer!
+	if(!data)
+	{
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
+		return;
+	}
+#endif
+
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	utils::Vector<double, 3> pull;
+	pull[2] = 0.8;
+
+	if (p.type == 1)
+		p.addForce(pull);
+}
+
 void Simulation::gravityCalculator(void *data, Particle& p)
 {
 	SimulationDesc *desc = (SimulationDesc*)data;
 
 	// add gravitational force, based on G = m * g
 	utils::Vector<double, 3> grav_force;
+	// act on the last dimension
+	int dimensionToAffect = desc->dimensions - 1;
 
-	// only y - component is affected...
-	grav_force[1] = desc->materials[p.type].mass * desc->gravitational_constant;
+	// only the last dimension is affected...
+	grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
 
 	p.addForce(grav_force);
 }

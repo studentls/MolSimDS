@@ -21,6 +21,7 @@
 #include "Particle.h"
 #include "LinkedCellParticleContainer.h"
 #include "ListParticleContainer.h"
+#include "MembraneContainer.h"
 #include "ParticleGenerator.h"
 #include <vector>
 #include "Viewer.h"
@@ -52,6 +53,9 @@ private:
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	static void				forceCalculator(void*, Particle&, Particle&);
+
+	/// apply a pulling force to a membrane. Used in Run()
+	static void				forceCalculatorMembranePull(void*, Particle&);
 
 	/// calculate Gravity force for each particle
 	static void				gravityCalculator(void*, Particle&);

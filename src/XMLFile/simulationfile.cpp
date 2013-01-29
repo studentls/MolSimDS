@@ -244,6 +244,28 @@ conditions (::std::auto_ptr< conditions_type > x)
 }
 
 
+// Membrane_t
+// 
+
+const Membrane_t::pull_iterations_type& Membrane_t::
+pull_iterations () const
+{
+  return this->pull_iterations_.get ();
+}
+
+Membrane_t::pull_iterations_type& Membrane_t::
+pull_iterations ()
+{
+  return this->pull_iterations_.get ();
+}
+
+void Membrane_t::
+pull_iterations (const pull_iterations_type& x)
+{
+  this->pull_iterations_.set (x);
+}
+
+
 // algorithm_t
 // 
 
@@ -305,6 +327,36 @@ void algorithm_t::
 LinkedCell (::std::auto_ptr< LinkedCell_type > x)
 {
   this->LinkedCell_.set (x);
+}
+
+const algorithm_t::Membrane_optional& algorithm_t::
+Membrane () const
+{
+  return this->Membrane_;
+}
+
+algorithm_t::Membrane_optional& algorithm_t::
+Membrane ()
+{
+  return this->Membrane_;
+}
+
+void algorithm_t::
+Membrane (const Membrane_type& x)
+{
+  this->Membrane_.set (x);
+}
+
+void algorithm_t::
+Membrane (const Membrane_optional& x)
+{
+  this->Membrane_ = x;
+}
+
+void algorithm_t::
+Membrane (::std::auto_ptr< Membrane_type > x)
+{
+  this->Membrane_.set (x);
 }
 
 
@@ -1748,6 +1800,83 @@ LinkedCell_t::
 {
 }
 
+// Membrane_t
+//
+
+Membrane_t::
+Membrane_t (const pull_iterations_type& pull_iterations)
+: ::xml_schema::type (),
+  pull_iterations_ (pull_iterations, ::xml_schema::flags (), this)
+{
+}
+
+Membrane_t::
+Membrane_t (const Membrane_t& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  pull_iterations_ (x.pull_iterations_, f, this)
+{
+}
+
+Membrane_t::
+Membrane_t (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  pull_iterations_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void Membrane_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // pull_iterations
+    //
+    if (n.name () == "pull_iterations" && n.namespace_ ().empty ())
+    {
+      if (!pull_iterations_.present ())
+      {
+        this->pull_iterations_.set (pull_iterations_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  if (!pull_iterations_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "pull_iterations",
+      "");
+  }
+}
+
+Membrane_t* Membrane_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class Membrane_t (*this, f, c);
+}
+
+Membrane_t::
+~Membrane_t ()
+{
+}
+
 // algorithm_t
 //
 
@@ -1755,7 +1884,8 @@ algorithm_t::
 algorithm_t ()
 : ::xml_schema::type (),
   List_ (::xml_schema::flags (), this),
-  LinkedCell_ (::xml_schema::flags (), this)
+  LinkedCell_ (::xml_schema::flags (), this),
+  Membrane_ (::xml_schema::flags (), this)
 {
 }
 
@@ -1765,7 +1895,8 @@ algorithm_t (const algorithm_t& x,
              ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
   List_ (x.List_, f, this),
-  LinkedCell_ (x.LinkedCell_, f, this)
+  LinkedCell_ (x.LinkedCell_, f, this),
+  Membrane_ (x.Membrane_, f, this)
 {
 }
 
@@ -1775,7 +1906,8 @@ algorithm_t (const ::xercesc::DOMElement& e,
              ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   List_ (f, this),
-  LinkedCell_ (f, this)
+  LinkedCell_ (f, this),
+  Membrane_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1818,6 +1950,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!this->LinkedCell_)
       {
         this->LinkedCell_.set (r);
+        continue;
+      }
+    }
+
+    // Membrane
+    //
+    if (n.name () == "Membrane" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< Membrane_type > r (
+        Membrane_traits::create (i, f, this));
+
+      if (!this->Membrane_)
+      {
+        this->Membrane_.set (r);
         continue;
       }
     }

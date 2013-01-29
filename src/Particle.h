@@ -8,6 +8,7 @@
 #ifndef PARTICLE_H_
 #define PARTICLE_H_
 
+#include <vector>
 #include "utils/Vector.h"
 
 
@@ -18,8 +19,18 @@ private:
 	/// the force effective on this particle
 	utils::Vector<double, 3> f;
 
-	/// the force wich was effective on this particle
+	/// the force which was effective on this particle
 	utils::Vector<double, 3> old_f;
+	
+	/// the indices of the direct neighbors of the Particle, if in a membrane
+	/// note that for performance reasons only the neighbors with a lower index are stored
+	/// to reduce redundancy
+	std::vector<int> directNeighbors;
+
+	/// the indices of the diagonal neighbors of the Particle, if in a membrane
+	/// note that for performance reasons only the neighbors with a lower index are stored
+	/// to reduce redundancy
+	std::vector<int> diagonalNeighbors;
 
 public:
 	/// a constructor that takes and sets its type
@@ -53,7 +64,19 @@ public:
 	utils::Vector<double, 3> getF() const {return f;}
 
 	/// get the force that acted on the Particle last iteration
-	utils::Vector<double, 3> getOldF() const	{return old_f;}
+	utils::Vector<double, 3> getOldF() const {return old_f;}
+
+	/// get the indices of the direct neighbors of the Particle
+	std::vector<int>& getDirectNeighbors();
+
+	/// set the indices of the direct neighbors of the Particle
+	void setDirectNeighbors(std::vector<int>& n);
+
+	/// get the indices of the diagonal neighbors of the Particle
+	std::vector<int>& getDiagonalNeighbors();
+
+	/// set the indices of the diagonal neighbors of the Particle
+	void setDiagonalNeighbors(std::vector<int>& n);
 	
 	/// reset the force acting on the Particle
 	void resetForce();
@@ -89,6 +112,8 @@ public:
 		x		= p.x;
 		v		= p.v;
 		type	= p.type;
+		directNeighbors = p.directNeighbors;
+		diagonalNeighbors = p.diagonalNeighbors;
 
 		return *this;
 	}

@@ -93,6 +93,7 @@
     <ClInclude Include="src\ListParticleContainer.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\MaxwellBoltzmannDistribution.h" />
+    <ClInclude Include="src\MembraneContainer.h" />
     <ClInclude Include="src\MolSim.h" />
     <ClInclude Include="src\outputWriter\vtk-unstructured.h" />
     <ClInclude Include="src\outputWriter\VTKWriter.h" />
@@ -125,6 +126,7 @@
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp" />
+    <ClCompile Include="src\MembraneContainer.cpp" />
     <ClCompile Include="src\MolSim.cpp" />
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\libxsd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -178,6 +180,10 @@
     <None Include="FallingDropInitialize.xml">
       <SubType>Designer</SubType>
     </None>
+    <None Include="listexample.xml" />
+    <None Include="Membrane.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="PerformanceTest.xml">
       <SubType>Designer</SubType>
     </None>
@@ -185,7 +191,10 @@
       <SubType>Designer</SubType>
     </None>
     <None Include="ThermostatBig.xml" />
-    <None Include="ThermostatSmall.xml" />
+    <None Include="ThermostatSmall.xml">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="ViewerTest.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
