@@ -35,7 +35,7 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	try
 	{
 		::xml_schema::flags flags;
-		flags = !validate ? ::xml_schema::flags::dont_validate : 0;
+			flags = !validate ? ::xml_schema::flags::dont_validate : 0;
 
 		file = std::auto_ptr<simulationfile_t>(simulationfile(filename, flags));
 	
@@ -106,6 +106,14 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		desc.temperatureStepSize = 0;
 	}
 	
+	// if necessary add default materials...	
+	if(file->params().algorithm().Membrane().present())
+	{
+		// add 2 default materials
+		desc.materials.push_back(createDefaultMaterial());
+		desc.materials.push_back(createDefaultMaterial());
+	}	
+
 	// dimension
 	desc.dimensions = file->params().dimension();
 
@@ -382,6 +390,10 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		Membrane_t& lc = file->params().algorithm().Membrane().get();
 		unsigned int pullIterations = lc.pull_iterations();;
 		container = new MembraneContainer(pullIterations);
+		
+		// add 2 default materials
+		desc.materials.push_back(createDefaultMaterial());
+		desc.materials.push_back(createDefaultMaterial());
 
 		// hardcoded contents for the container
 		utils::Vector<unsigned int, 2> dimensions(50, 50);
