@@ -20,6 +20,9 @@
 #include "utils/Color.h"
 #include "Simulation.h"
 
+// for HPC errors will occur
+#ifndef ICE
+
 // include GLFW library
 //windows
 #ifdef WINDOWS
@@ -294,5 +297,7 @@ public:
 		*out = NULL;
 	}
 };
+
+#endif
 
 #endif

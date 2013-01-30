@@ -14,6 +14,20 @@
 //------------------------------------------------------------------------------------------------
 #include "PerformanceTest.h"
 
+// use PAPI for Linux
+#if defined(LINUX) && defined(USE_PAPI)
+#include <papi.h>
+#define EVENT_COUNT 4
+
+void handle_error (int retval)
+{
+     printf("PAPI error %d: %s\n", retval, PAPI_strerror(retval));
+     exit(1);
+}
+
+#endif
+
+
 
 err_type PerformanceTest::Run(const char *xmlFile)
 {
@@ -58,19 +72,72 @@ err_type PerformanceTest::Run(const char *xmlFile)
 		LOG4CXX_INFO(generalOutputLogger, ">> running performance test "<<i<<" out of "<<maximumthreads);
 #else 
 		LOG4CXX_INFO(generalOutputLogger, ">> running performance test "<<i);
-#endif OPENMP
+#endif 
+		// PAPI
+#if defined(USE_PAPI) && defined(LINUX)
+		int retval = PAPI_library_init(PAPI_VER_CURRENT);
+
+		if(retval != PAPI_VER_CURRENT)
+		{
+			handle_error(retval);
+			return E_UNKNOWN;
+			
+		}
+		// create event set;
+		int eventset = PAPI_NULL;
+		long_long evvalues[EVENT_COUNT];
+		memset(evvalues, 0, sizeof(int) * EVENT_COUNT);
+		if(PAPI_create_eventset(&eventset) != PAPI_OK)
+		{
+			handle_error(retval);
+			return E_UNKNOWN;
+		}
+
+		
+		// add some measurements to event set...
+		if(PAPI_query_event(PAPI_TOT_INS) != PAPI_OK)
+		{
+			LOG4CXX_ERROR(generalOutputLogger, ">> error: no instruction counter avaliable");
+			return E_UNKNOWN;
+		}
+		
+		//if(PAPI_add_event(eventset, PAPI_TOT_INS) != PAPI_OK)return E_UNKNOWN;
+		if(PAPI_add_event(eventset, PAPI_VEC_INS) != PAPI_OK)return E_UNKNOWN;
+		if(PAPI_add_event(eventset, PAPI_FP_OPS) != PAPI_OK)return E_UNKNOWN;
+		//if(PAPI_add_event(eventset, PAPI_FDV_INS) != PAPI_OK)return E_UNKNOWN;
+		// start event
+		retval = PAPI_start(eventset);
+		if(retval != PAPI_OK)
+		{
+			handle_error(retval);
+			return E_UNKNOWN;
+		}
+#endif		
+
 		utils::Timer timer;
 		sim.Run();
+
+
 		double time = timer.getElapsedTime();
 		if(i == 1)basespeed = time; // store for one thread
+		
 
+#if defined(USE_PAPI) && defined(LINUX)
+		// stop event, read values
+		if(PAPI_stop(eventset, evvalues) != PAPI_OK)return E_UNKNOWN;
+
+	        //LOG4CXX_INFO(generalOutputLogger, ">> PAPI: total instruction count:    "<<evvalues[0]);
+                LOG4CXX_INFO(generalOutputLogger, ">> PAPI: SIMD  instruction count:    "<<evvalues[0]);
+                LOG4CXX_INFO(generalOutputLogger, "         Floating point operations:  "<<evvalues[1]);
+
+#endif
 		// calc speed up
 		speedup = basespeed / time;
 
 #ifdef OPENMP
 		LOG4CXX_INFO(generalOutputLogger, ">> "<<time << " s @ "<<i<<" threads , speedup factor: "<<speedup);
 #else 
-		LOG4CXX_INFO(generalOutputLogger, ">> "<<time << " s , speed comparison"<<speedup);
+		LOG4CXX_INFO(generalOutputLogger, ">> "<<time << " s , speed comparison "<<speedup);
 #endif
 		// push back data
 		PerformanceTestData entry;

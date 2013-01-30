@@ -15,6 +15,9 @@
 
 #include "Viewer.h"
 
+// not for HPC
+#ifndef ICE
+
 // Little Helper for Reordering
 unsigned long ARGBToABGR(unsigned long col)
 {
@@ -387,3 +390,5 @@ void Viewer::generateColors()
 	colArray[8] = Color(0.0f, 0.0f, 0.0f);	
 	colArray[9] = Color(0.0f, 0.0f, 0.0f);
 }
+
+#endif

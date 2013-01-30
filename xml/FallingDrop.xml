@@ -1,0 +1,68 @@
+<?xml version="1.0"?>
+
+<!--
+
+file: FallingDrop.xml everything for Sheet4, has to be made!
+author: F.Dietz & L.Spiegelberg
+
+NOTE:
+This file exists to fix a problem because FallingDropInitialize was executed when it was bugged. This is no longer the case.
+This file can therefore be ignored.
+
+-->
+
+<simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="simulationfile.xsd">
+
+  <params>
+    <dimension>2</dimension>
+    <brownianMotionFactor>0.1</brownianMotionFactor>
+    <gravity>-12.44</gravity>
+    <output>Drop</output>
+
+    <iterationsperoutput>10</iterationsperoutput>
+
+    <delta_t>0.0005</delta_t>
+    <epsilon>1.0</epsilon>
+    <outputfmt>VTK</outputfmt>
+    <sigma>1.2</sigma>
+
+    <t_end>40</t_end>
+    <t_start>0.0</t_start>
+
+    <algorithm>
+      <LinkedCell>
+        <cutoff_radius>2.5</cutoff_radius>
+        <sizeofdomainX>303.0</sizeofdomainX>
+        <sizeofdomainY>180.0</sizeofdomainY>
+        <sizeofdomainZ>0.0</sizeofdomainZ>
+        <offset>0.0 0.0 0.0</offset>
+        <conditions>
+          <condition value="all"></condition>
+        </conditions>
+      </LinkedCell>
+    </algorithm>
+
+  </params>
+
+  <data>
+    <!-- material1-->
+    <material epsilon="1.0" sigma="1.2" name="bassinMat" mass="1.0"/>
+    
+    <!-- the liquid in the bassin -->
+    
+    <inputfile>TXT_29000.txt</inputfile>
+    
+    <!-- a drop -->
+    <sphere>
+      <X>150.0 150.0 0.0</X>
+      <V>0.0 0.0 0.0</V>
+      <r>20</r>
+      <h>1.2</h>
+      <dimensions>2</dimensions>
+      <material>bassinMat</material>
+    </sphere>
+    
+  </data>
+
+</simulationfile>

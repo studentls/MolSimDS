@@ -1,0 +1,194 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<!--
+
+file: simulation.xsd
+author: Leonhard Spiegelberg & Florian Dietz
+
+  -->
+
+<xsd:schema xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+
+  <!-- simple vector, node that this should be later length-checked! -->
+  <xsd:simpleType name="Vec3_t">
+    <xsd:list itemType="xsd:decimal" ></xsd:list>
+  </xsd:simpleType>
+
+  <xsd:simpleType name="dim3_t">
+    <xsd:list itemType="xsd:int"></xsd:list>
+  </xsd:simpleType>
+
+  <!-- 
+  types of algorithms
+  -->
+  <xsd:complexType name="List_t">
+  
+  </xsd:complexType>
+
+  <xsd:complexType name="conditions_t">
+    <xsd:sequence>
+      <xsd:element name="condition" minOccurs="0" maxOccurs="6">
+        <xsd:complexType>
+          <xsd:simpleContent>
+           <xsd:extension base="xsd:string">
+             <!--
+             possible values are: left, right, top, bottom, front, back, all, outflow, none
+             note that if a condition with value "all", "outflow" or "none" appears, all left, right,... 
+             conditions will be ignored!
+             -->
+             <xsd:attribute name="value" type="xsd:string" use="required"></xsd:attribute>
+             <xsd:attribute name="type" type="xsd:string" use="optional"></xsd:attribute>
+           </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>        
+      </xsd:element>
+    </xsd:sequence>
+    
+    
+  
+  </xsd:complexType>
+  
+  <xsd:complexType name="LinkedCell_t">
+    <xsd:all>
+      <xsd:element name="sizeofdomainX" type="xsd:decimal"></xsd:element>
+      <xsd:element name="sizeofdomainY" type="xsd:decimal"></xsd:element>
+      <xsd:element name="sizeofdomainZ" type="xsd:decimal"></xsd:element>
+      <xsd:element name="cutoff_radius" type="xsd:decimal"></xsd:element>
+      
+      <!-- the front lower left corner -->
+      <xsd:element name="offset" type="Vec3_t"></xsd:element>
+      
+      <!-- boundary conditions -->
+      <xsd:element name="conditions" type="conditions_t" minOccurs="0" maxOccurs="1"></xsd:element>
+      
+    </xsd:all>
+    
+  </xsd:complexType>
+  
+  <xsd:complexType name="Membrane_t">
+    <!--
+  MEMBRANE IS HARDCODED SINCE IT IS NOT SUPPOSED TO BE EXTENSIBLE
+  -->
+    <xsd:all>
+      <xsd:element name="pull_iterations" type="xsd:unsignedInt"></xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+  
+  <!--
+  algorithm complex type
+  -->
+  <xsd:complexType name="algorithm_t">
+    <xsd:choice>
+      <xsd:element name="List" type="List_t"></xsd:element>
+      <xsd:element name="LinkedCell" type="LinkedCell_t"></xsd:element>
+      <xsd:element name="Membrane" type="Membrane_t"></xsd:element>
+    </xsd:choice>
+    
+  </xsd:complexType>
+  <!-- 
+  parameter complex type
+  -->
+  
+  <xsd:complexType name="params_t">
+    <xsd:all>
+      <xsd:element name="dimension" type="xsd:unsignedInt"></xsd:element>
+      <xsd:element name="output" type="xsd:string"></xsd:element>
+      <xsd:element name="iterationsperoutput" type="xsd:int"></xsd:element>
+      <xsd:element name="delta_t" type="xsd:decimal"></xsd:element>
+      <xsd:element name="t_end" type="xsd:decimal"></xsd:element>
+      <xsd:element name="epsilon" type="xsd:decimal"></xsd:element>
+      <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
+      <xsd:element name="brownianMotionFactor" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
+      
+      <xsd:element name="gravity" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="iterationsTillThermostatApplication" type="xsd:int"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="initialTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="targetTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="temperatureStepSize" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+
+      <xsd:element name="t_start" type="xsd:decimal"></xsd:element>
+      <xsd:element name="outputfmt">
+        <xsd:simpleType>
+          <xsd:restriction base="xsd:string">
+            <xsd:enumeration value="None"></xsd:enumeration>
+            <xsd:enumeration value="VTK"></xsd:enumeration>
+            <xsd:enumeration value="XYZ"></xsd:enumeration>
+            <xsd:enumeration value="TXT"></xsd:enumeration>
+          </xsd:restriction>
+        </xsd:simpleType>
+      </xsd:element>
+      <xsd:element name="algorithm" type="algorithm_t"></xsd:element>
+    
+    </xsd:all> 
+  </xsd:complexType>
+  
+  
+  <!--
+  data node stuff
+  -->
+  
+  <xsd:complexType name="particle_t">
+    <xsd:all>
+      <xsd:element name="X" type="Vec3_t"></xsd:element>
+      <xsd:element name="V" type="Vec3_t"></xsd:element>
+      <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+
+  <xsd:complexType name="cuboid_t">
+    <xsd:all>
+      <xsd:element name="X" type="Vec3_t"></xsd:element>
+      <xsd:element name="V" type="Vec3_t"></xsd:element>
+      <xsd:element name="N" type="dim3_t"></xsd:element>
+      <xsd:element name="h" type="xsd:decimal"></xsd:element>
+      <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+
+  <xsd:complexType name="sphere_t">
+    <xsd:all>
+      <xsd:element name="X" type="Vec3_t"></xsd:element>
+      <xsd:element name="V" type="Vec3_t"></xsd:element>
+      <xsd:element name="r" type="xsd:decimal"></xsd:element>
+      <xsd:element name="h" type="xsd:decimal"></xsd:element>
+      <xsd:element name="dimensions" type="xsd:integer"></xsd:element>
+      <xsd:element name="material" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
+    </xsd:all>
+  </xsd:complexType>
+
+  <!-- material definition index by type-->
+  <xsd:complexType name="material_t">
+    <xsd:attribute name="name" type="xsd:string"></xsd:attribute>
+    <xsd:attribute name="epsilon" type="xsd:decimal"></xsd:attribute>
+    <xsd:attribute name="sigma" type="xsd:decimal"></xsd:attribute>
+    <xsd:attribute name="mass" type="xsd:decimal"></xsd:attribute>
+  </xsd:complexType>
+  
+  <xsd:complexType name="data_t">
+    <xsd:sequence>
+      <xsd:element name="particle" type="particle_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="inputfile" type="xsd:string" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="cuboid" type="cuboid_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="sphere" type="sphere_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+      <xsd:element name="material" type="material_t" minOccurs="0" maxOccurs="unbounded"></xsd:element>
+    </xsd:sequence>
+  </xsd:complexType>
+ 
+
+  <!--
+  simulation data type
+  -->
+  <xsd:complexType name="simulationfile_t">
+
+    <xsd:sequence>
+      <xsd:element name="params" type="params_t"></xsd:element>     
+      <xsd:element name="data" type="data_t"></xsd:element>
+    </xsd:sequence>
+
+  </xsd:complexType>
+
+  <!-- root element
+  -->
+  <xsd:element name="simulationfile" type="simulationfile_t">   
+  </xsd:element>
+
+</xsd:schema>

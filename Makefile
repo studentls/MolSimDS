@@ -1,5 +1,4 @@
-# This is a makefile template
-
+# default make file for linux/mac platform
 
 # Compiler
 # --------
@@ -13,9 +12,9 @@ include files.mk
 # -------------------------------------------------------------------------
 ## intel flags
 #CFLAGS=-I/opt/include -g -O3 -openmp
-## gcc flags
+## g++ flags
 CFLAGS=-I/opt/include -g -O3 -fopenmp
-## gcc flags for gprof
+## g++ flags for gprof
 #CFLAGS=-I/opt/include -g -O3 -pg
 
 # Linker flags
@@ -41,4 +40,5 @@ clean:
 
 .cpp.o:
 	$(CC) $(CFLAGS) $(INCLUDES) -c $< -o $@
+
 
