@@ -360,6 +360,128 @@ Membrane (::std::auto_ptr< Membrane_type > x)
 }
 
 
+// SLJ_t
+// 
+
+const SLJ_t::factor_optional& SLJ_t::
+factor () const
+{
+  return this->factor_;
+}
+
+SLJ_t::factor_optional& SLJ_t::
+factor ()
+{
+  return this->factor_;
+}
+
+void SLJ_t::
+factor (const factor_type& x)
+{
+  this->factor_.set (x);
+}
+
+void SLJ_t::
+factor (const factor_optional& x)
+{
+  this->factor_ = x;
+}
+
+
+// potentialforce_t
+// 
+
+const potentialforce_t::LJ_optional& potentialforce_t::
+LJ () const
+{
+  return this->LJ_;
+}
+
+potentialforce_t::LJ_optional& potentialforce_t::
+LJ ()
+{
+  return this->LJ_;
+}
+
+void potentialforce_t::
+LJ (const LJ_type& x)
+{
+  this->LJ_.set (x);
+}
+
+void potentialforce_t::
+LJ (const LJ_optional& x)
+{
+  this->LJ_ = x;
+}
+
+void potentialforce_t::
+LJ (::std::auto_ptr< LJ_type > x)
+{
+  this->LJ_.set (x);
+}
+
+const potentialforce_t::Gravity_optional& potentialforce_t::
+Gravity () const
+{
+  return this->Gravity_;
+}
+
+potentialforce_t::Gravity_optional& potentialforce_t::
+Gravity ()
+{
+  return this->Gravity_;
+}
+
+void potentialforce_t::
+Gravity (const Gravity_type& x)
+{
+  this->Gravity_.set (x);
+}
+
+void potentialforce_t::
+Gravity (const Gravity_optional& x)
+{
+  this->Gravity_ = x;
+}
+
+void potentialforce_t::
+Gravity (::std::auto_ptr< Gravity_type > x)
+{
+  this->Gravity_.set (x);
+}
+
+const potentialforce_t::SLJ_optional& potentialforce_t::
+SLJ () const
+{
+  return this->SLJ_;
+}
+
+potentialforce_t::SLJ_optional& potentialforce_t::
+SLJ ()
+{
+  return this->SLJ_;
+}
+
+void potentialforce_t::
+SLJ (const SLJ_type& x)
+{
+  this->SLJ_.set (x);
+}
+
+void potentialforce_t::
+SLJ (const SLJ_optional& x)
+{
+  this->SLJ_ = x;
+}
+
+void potentialforce_t::
+SLJ (::std::auto_ptr< SLJ_type > x)
+{
+  this->SLJ_.set (x);
+}
+
+
 // params_t
 // 
 
@@ -679,6 +801,30 @@ void params_t::
 outputfmt (::std::auto_ptr< outputfmt_type > x)
 {
   this->outputfmt_.set (x);
+}
+
+const params_t::potentialforce_type& params_t::
+potentialforce () const
+{
+  return this->potentialforce_.get ();
+}
+
+params_t::potentialforce_type& params_t::
+potentialforce ()
+{
+  return this->potentialforce_.get ();
+}
+
+void params_t::
+potentialforce (const potentialforce_type& x)
+{
+  this->potentialforce_.set (x);
+}
+
+void params_t::
+potentialforce (::std::auto_ptr< potentialforce_type > x)
+{
+  this->potentialforce_.set (x);
 }
 
 const params_t::algorithm_type& params_t::
@@ -1984,6 +2130,176 @@ algorithm_t::
 {
 }
 
+// SLJ_t
+//
+
+SLJ_t::
+SLJ_t ()
+: ::xml_schema::type (),
+  factor_ (::xml_schema::flags (), this)
+{
+}
+
+SLJ_t::
+SLJ_t (const SLJ_t& x,
+       ::xml_schema::flags f,
+       ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  factor_ (x.factor_, f, this)
+{
+}
+
+SLJ_t::
+SLJ_t (const ::xercesc::DOMElement& e,
+       ::xml_schema::flags f,
+       ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  factor_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+    this->parse (p, f);
+  }
+}
+
+void SLJ_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  while (p.more_attributes ())
+  {
+    const ::xercesc::DOMAttr& i (p.next_attribute ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    if (n.name () == "factor" && n.namespace_ ().empty ())
+    {
+      this->factor_.set (factor_traits::create (i, f, this));
+      continue;
+    }
+  }
+}
+
+SLJ_t* SLJ_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class SLJ_t (*this, f, c);
+}
+
+SLJ_t::
+~SLJ_t ()
+{
+}
+
+// potentialforce_t
+//
+
+potentialforce_t::
+potentialforce_t ()
+: ::xml_schema::type (),
+  LJ_ (::xml_schema::flags (), this),
+  Gravity_ (::xml_schema::flags (), this),
+  SLJ_ (::xml_schema::flags (), this)
+{
+}
+
+potentialforce_t::
+potentialforce_t (const potentialforce_t& x,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  LJ_ (x.LJ_, f, this),
+  Gravity_ (x.Gravity_, f, this),
+  SLJ_ (x.SLJ_, f, this)
+{
+}
+
+potentialforce_t::
+potentialforce_t (const ::xercesc::DOMElement& e,
+                  ::xml_schema::flags f,
+                  ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  LJ_ (f, this),
+  Gravity_ (f, this),
+  SLJ_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void potentialforce_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // LJ
+    //
+    if (n.name () == "LJ" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< LJ_type > r (
+        LJ_traits::create (i, f, this));
+
+      if (!this->LJ_)
+      {
+        this->LJ_.set (r);
+        continue;
+      }
+    }
+
+    // Gravity
+    //
+    if (n.name () == "Gravity" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< Gravity_type > r (
+        Gravity_traits::create (i, f, this));
+
+      if (!this->Gravity_)
+      {
+        this->Gravity_.set (r);
+        continue;
+      }
+    }
+
+    // SLJ
+    //
+    if (n.name () == "SLJ" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< SLJ_type > r (
+        SLJ_traits::create (i, f, this));
+
+      if (!this->SLJ_)
+      {
+        this->SLJ_.set (r);
+        continue;
+      }
+    }
+
+    break;
+  }
+}
+
+potentialforce_t* potentialforce_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class potentialforce_t (*this, f, c);
+}
+
+potentialforce_t::
+~potentialforce_t ()
+{
+}
+
 // params_t
 //
 
@@ -1997,6 +2313,7 @@ params_t (const dimension_type& dimension,
           const sigma_type& sigma,
           const t_start_type& t_start,
           const outputfmt_type& outputfmt,
+          const potentialforce_type& potentialforce,
           const algorithm_type& algorithm)
 : ::xml_schema::type (),
   dimension_ (dimension, ::xml_schema::flags (), this),
@@ -2014,6 +2331,7 @@ params_t (const dimension_type& dimension,
   temperatureStepSize_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
+  potentialforce_ (potentialforce, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
 {
 }
@@ -2028,6 +2346,7 @@ params_t (const dimension_type& dimension,
           const sigma_type& sigma,
           const t_start_type& t_start,
           const outputfmt_type& outputfmt,
+          ::std::auto_ptr< potentialforce_type >& potentialforce,
           ::std::auto_ptr< algorithm_type >& algorithm)
 : ::xml_schema::type (),
   dimension_ (dimension, ::xml_schema::flags (), this),
@@ -2045,6 +2364,7 @@ params_t (const dimension_type& dimension,
   temperatureStepSize_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
+  potentialforce_ (potentialforce, ::xml_schema::flags (), this),
   algorithm_ (algorithm, ::xml_schema::flags (), this)
 {
 }
@@ -2069,6 +2389,7 @@ params_t (const params_t& x,
   temperatureStepSize_ (x.temperatureStepSize_, f, this),
   t_start_ (x.t_start_, f, this),
   outputfmt_ (x.outputfmt_, f, this),
+  potentialforce_ (x.potentialforce_, f, this),
   algorithm_ (x.algorithm_, f, this)
 {
 }
@@ -2093,6 +2414,7 @@ params_t (const ::xercesc::DOMElement& e,
   temperatureStepSize_ (f, this),
   t_start_ (f, this),
   outputfmt_ (f, this),
+  potentialforce_ (f, this),
   algorithm_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
@@ -2283,6 +2605,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
+    // potentialforce
+    //
+    if (n.name () == "potentialforce" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< potentialforce_type > r (
+        potentialforce_traits::create (i, f, this));
+
+      if (!potentialforce_.present ())
+      {
+        this->potentialforce_.set (r);
+        continue;
+      }
+    }
+
     // algorithm
     //
     if (n.name () == "algorithm" && n.namespace_ ().empty ())
@@ -2360,6 +2696,13 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
   {
     throw ::xsd::cxx::tree::expected_element< char > (
       "outputfmt",
+      "");
+  }
+
+  if (!potentialforce_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "potentialforce",
       "");
   }
 

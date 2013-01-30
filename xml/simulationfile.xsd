@@ -84,6 +84,26 @@ author: Leonhard Spiegelberg & Florian Dietz
     </xsd:choice>
     
   </xsd:complexType>
+
+  <!--
+ SLJ complex type
+  -->
+  <xsd:complexType name="SLJ_t">
+    <xsd:attribute name="factor" type="xsd:decimal"></xsd:attribute>
+  </xsd:complexType>
+  
+  <!--
+ potentialforce complex type
+  -->
+  <xsd:complexType name="potentialforce_t">
+    <xsd:choice>
+      <xsd:element name="LJ" type="xsd:string"></xsd:element>
+      <xsd:element name="Gravity" type="xsd:string"></xsd:element>
+      <xsd:element name="SLJ" type="SLJ_t"></xsd:element>
+    </xsd:choice>
+
+  </xsd:complexType>
+  
   <!-- 
   parameter complex type
   -->
@@ -116,6 +136,7 @@ author: Leonhard Spiegelberg & Florian Dietz
           </xsd:restriction>
         </xsd:simpleType>
       </xsd:element>
+      <xsd:element name="potentialforce" type="potentialforce_t"></xsd:element>
       <xsd:element name="algorithm" type="algorithm_t"></xsd:element>
     
     </xsd:all> 

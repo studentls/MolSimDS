@@ -52,7 +52,19 @@ private:
 	static void				forceResetter(void*, Particle& p);
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
-	static void				forceCalculator(void*, Particle&, Particle&);
+	/// use Lennard Jones (12, 6) potential for inter molecular forces
+	static void				forceLJCalculator(void*, Particle&, Particle&);
+
+	/// calculate and apply the force between a pair of particles. Used in calculateF()
+	/// use Smoothed Lennard Jones (12, 6) potential for inter molecular forces
+	static void				forceSLJCalculator(void*, Particle&, Particle&);
+
+	/// calculate and apply the force between a pair of particles. Used in calculateF()
+	/// use gravitational forces for inter molecular forces
+	static void				forceGravitationCalculator(void*, Particle&, Particle&);
+
+	/// member variable holding a possible inter molecular force calculation function
+	void					(*forceCalculator)(void*, Particle&, Particle&);
 
 	/// apply a pulling force to a membrane. Used in Run()
 	static void				forceCalculatorMembranePull(void*, Particle&);

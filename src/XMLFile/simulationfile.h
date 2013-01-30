@@ -31,8 +31,8 @@
 // in the accompanying FLOSSE file.
 //
 
-#ifndef C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
-#define C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
+#ifndef XML_SIMULATIONFILE_H
+#define XML_SIMULATIONFILE_H
 
 // Begin prologue.
 //
@@ -228,6 +228,8 @@ class conditions_t;
 class LinkedCell_t;
 class Membrane_t;
 class algorithm_t;
+class SLJ_t;
+class potentialforce_t;
 class params_t;
 class particle_t;
 class cuboid_t;
@@ -692,6 +694,155 @@ class algorithm_t: public ::xml_schema::type
   Membrane_optional Membrane_;
 };
 
+class SLJ_t: public ::xml_schema::type
+{
+  public:
+  // factor
+  // 
+  typedef ::xml_schema::decimal factor_type;
+  typedef ::xsd::cxx::tree::optional< factor_type > factor_optional;
+  typedef ::xsd::cxx::tree::traits< factor_type, char, ::xsd::cxx::tree::schema_type::decimal > factor_traits;
+
+  const factor_optional&
+  factor () const;
+
+  factor_optional&
+  factor ();
+
+  void
+  factor (const factor_type& x);
+
+  void
+  factor (const factor_optional& x);
+
+  // Constructors.
+  //
+  SLJ_t ();
+
+  SLJ_t (const ::xercesc::DOMElement& e,
+         ::xml_schema::flags f = 0,
+         ::xml_schema::container* c = 0);
+
+  SLJ_t (const SLJ_t& x,
+         ::xml_schema::flags f = 0,
+         ::xml_schema::container* c = 0);
+
+  virtual SLJ_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~SLJ_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  factor_optional factor_;
+};
+
+class potentialforce_t: public ::xml_schema::type
+{
+  public:
+  // LJ
+  // 
+  typedef ::xml_schema::string LJ_type;
+  typedef ::xsd::cxx::tree::optional< LJ_type > LJ_optional;
+  typedef ::xsd::cxx::tree::traits< LJ_type, char > LJ_traits;
+
+  const LJ_optional&
+  LJ () const;
+
+  LJ_optional&
+  LJ ();
+
+  void
+  LJ (const LJ_type& x);
+
+  void
+  LJ (const LJ_optional& x);
+
+  void
+  LJ (::std::auto_ptr< LJ_type > p);
+
+  // Gravity
+  // 
+  typedef ::xml_schema::string Gravity_type;
+  typedef ::xsd::cxx::tree::optional< Gravity_type > Gravity_optional;
+  typedef ::xsd::cxx::tree::traits< Gravity_type, char > Gravity_traits;
+
+  const Gravity_optional&
+  Gravity () const;
+
+  Gravity_optional&
+  Gravity ();
+
+  void
+  Gravity (const Gravity_type& x);
+
+  void
+  Gravity (const Gravity_optional& x);
+
+  void
+  Gravity (::std::auto_ptr< Gravity_type > p);
+
+  // SLJ
+  // 
+  typedef ::SLJ_t SLJ_type;
+  typedef ::xsd::cxx::tree::optional< SLJ_type > SLJ_optional;
+  typedef ::xsd::cxx::tree::traits< SLJ_type, char > SLJ_traits;
+
+  const SLJ_optional&
+  SLJ () const;
+
+  SLJ_optional&
+  SLJ ();
+
+  void
+  SLJ (const SLJ_type& x);
+
+  void
+  SLJ (const SLJ_optional& x);
+
+  void
+  SLJ (::std::auto_ptr< SLJ_type > p);
+
+  // Constructors.
+  //
+  potentialforce_t ();
+
+  potentialforce_t (const ::xercesc::DOMElement& e,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+  potentialforce_t (const potentialforce_t& x,
+                    ::xml_schema::flags f = 0,
+                    ::xml_schema::container* c = 0);
+
+  virtual potentialforce_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~potentialforce_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  LJ_optional LJ_;
+  Gravity_optional Gravity_;
+  SLJ_optional SLJ_;
+};
+
 class params_t: public ::xml_schema::type
 {
   public:
@@ -935,6 +1086,23 @@ class params_t: public ::xml_schema::type
   void
   outputfmt (::std::auto_ptr< outputfmt_type > p);
 
+  // potentialforce
+  // 
+  typedef ::potentialforce_t potentialforce_type;
+  typedef ::xsd::cxx::tree::traits< potentialforce_type, char > potentialforce_traits;
+
+  const potentialforce_type&
+  potentialforce () const;
+
+  potentialforce_type&
+  potentialforce ();
+
+  void
+  potentialforce (const potentialforce_type& x);
+
+  void
+  potentialforce (::std::auto_ptr< potentialforce_type > p);
+
   // algorithm
   // 
   typedef ::algorithm_t algorithm_type;
@@ -963,6 +1131,7 @@ class params_t: public ::xml_schema::type
             const sigma_type&,
             const t_start_type&,
             const outputfmt_type&,
+            const potentialforce_type&,
             const algorithm_type&);
 
   params_t (const dimension_type&,
@@ -974,6 +1143,7 @@ class params_t: public ::xml_schema::type
             const sigma_type&,
             const t_start_type&,
             const outputfmt_type&,
+            ::std::auto_ptr< potentialforce_type >&,
             ::std::auto_ptr< algorithm_type >&);
 
   params_t (const ::xercesc::DOMElement& e,
@@ -1014,6 +1184,7 @@ class params_t: public ::xml_schema::type
   temperatureStepSize_optional temperatureStepSize_;
   ::xsd::cxx::tree::one< t_start_type > t_start_;
   ::xsd::cxx::tree::one< outputfmt_type > outputfmt_;
+  ::xsd::cxx::tree::one< potentialforce_type > potentialforce_;
   ::xsd::cxx::tree::one< algorithm_type > algorithm_;
 };
 
@@ -1923,4 +2094,4 @@ simulationfile (::xml_schema::dom::auto_ptr< ::xercesc::DOMDocument >& d,
 //
 // End epilogue.
 
-#endif // C__USERS_FLORIAN_DIETZ_DOCUMENTS_GIT_HUB_MOL_SIM_DS_SIMULATIONFILE_H
+#endif // XML_SIMULATIONFILE_H

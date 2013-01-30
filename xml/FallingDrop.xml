@@ -29,7 +29,9 @@ This file can therefore be ignored.
 
     <t_end>40</t_end>
     <t_start>0.0</t_start>
-
+    <potentialforce>
+      <LJ></LJ>
+    </potentialforce>
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.5</cutoff_radius>

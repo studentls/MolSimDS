@@ -51,6 +51,11 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 	Release(); // to free mem
 
 	fr.makeParticleContainer(&particles);
+
+	// set a force calculation method...
+	if(desc.potentialForce == PF_SLJ)forceCalculator = Simulation::forceSLJCalculator;
+	else if(desc.potentialForce == PF_GRAVITY)forceCalculator = Simulation::forceGravitationCalculator;
+	else forceCalculator = Simulation::forceLJCalculator;
 	
 	// is particles a valid pointer? - If not file has not been parsed correctly...
 	if(!particles)return E_FILEERROR;
@@ -208,7 +213,7 @@ void Simulation::calculateF() {
 		((MembraneContainer*)particles)->ApplyMembraneForces();
 	
 	// call particles.IteratePairwise() on forceCalculator
-		particles->IteratePairwise(forceCalculator, (void*)&desc);
+	particles->IteratePairwise(forceCalculator, (void*)&desc);
 
 	// call gravityCalculator to add gravity force for each particle
 	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.
@@ -228,7 +233,88 @@ void Simulation::forceResetter(void* data, Particle& p) {
 	p.resetForce();
 }
 
-void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
+void Simulation::forceSLJCalculator(void* data, Particle& p1, Particle& p2)
+{
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	// assert indices
+	assert(p1.type >= 0);
+	assert(p2.type >= 0);
+	assert(p1.type < desc->materials.size());
+	assert(p2.type < desc->materials.size());
+
+	double eps24 = desc->getEpsilon24(p1.type, p2.type);
+	double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
+
+	// optimized version
+	double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
+				// cache this for better performance
+	double temp1 = sigmaSq * invdistSq; 
+	double pow6 = temp1 * temp1 * temp1;
+	double pow12 = pow6 * pow6;
+
+	double temp2 = pow6 - 2.0 * pow12;
+
+	double prefactor = eps24 * invdistSq; // cache also here values...
+	double factor = prefactor * temp2;
+
+	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
+
+
+	// calculate smoothing factor
+	double S = 1.0;
+
+	double distance = p1.x.distance(p2.x);
+
+	if(distance >= desc->cutoffRadius)
+	{
+		S = 0.0;
+	}
+	else if(distance <= desc ->SLJfactor)
+	{
+		S = 1.0;
+	}
+	else
+	{
+		// use smooth function
+		S = 1.0 - (distance - desc->SLJfactor)*(distance - desc->SLJfactor)
+			+ (3.0 * desc->cutoffRadius - desc->SLJfactor - 2.0 * distance) /
+			((desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor));
+	}
+	
+	// simply multiply LJ potential with linear smoothing function
+	force = force * S;
+
+	// add individual particle to particle force to sum
+	p1.addForce(force);
+	
+	// new function to avoid unnecessary object construction
+	p2.substractForce(force);
+}
+
+void Simulation::forceGravitationCalculator(void* data, Particle& p1, Particle& p2)
+{
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	// using simple force calculation model
+	double invdist = 1.0 / p1.x.distance(p2.x);
+	
+	// use for speed up
+	double denominator = invdist * invdist * invdist; 
+
+	double p1m = desc->materials[p1.type].mass;
+	double p2m = desc->materials[p2.type].mass;
+
+	double factor = p1m * p2m * denominator * desc->gravitational_constant;
+	
+	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
+	
+	// add individual particle to particle force to sum
+	p1.addForce(force);
+	p2.substractForce(force);
+}	
+
+void Simulation::forceLJCalculator(void* data, Particle& p1, Particle& p2)
 {
 #ifdef DEBUG
 	// assert data is a valid pointer!
@@ -247,25 +333,6 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	assert(p1.type < desc->materials.size());
 	assert(p2.type < desc->materials.size());
 
-	//// cache this later for better performance...
-	//double epsilon = sqrt(desc->materials[p1.type].epsilon * desc->materials[p2.type].epsilon);
-	//double sigma = (desc->materials[p1.type].sigma  + desc->materials[p2.type].sigma) * 0.5;
-
-	// slow version
-	//// calculate force via Lennard-Jones Potential
-	//// these calculations are rather straightforward, looking at the formula
-	//double dist = p1.x.distance(p2.x);
-	//double temp1 = sigma / dist;
-	//// this is faster than power functions or manual multiplication
-	//double pow2 = temp1 * temp1;
-	//double pow3 = pow2 * temp1;
-	//double pow6 = pow3 * pow3;
-	//double pow12 = pow6 * pow6;
-
-	//double temp2 = pow6 - 2.0 * pow12;
-	//double prefactor = 24.0 * epsilon / dist / dist;
-	//double factor = prefactor * temp2;
-	
 	double eps24 = desc->getEpsilon24(p1.type, p2.type);
 	double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
 
@@ -280,14 +347,6 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 
 	double prefactor = eps24 * invdistSq; // cache also here values...
 	double factor = prefactor * temp2;
-
-	// DEPRECATED
-	// using simple force calculation model
-	//double invdist = 1.0 / p1.x.distance(p2.x);
-	// use for speed up
-	//double denominator = invdist * invdist * invdist; 
-	//double factor = p1.m * p2.m * denominator * desc->gravitational_constant;
-	
 
 	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
 	

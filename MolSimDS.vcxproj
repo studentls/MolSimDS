@@ -159,7 +159,10 @@
       <GenOstream Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenOstream>
     </CXX_Tree_Mapping_Rule>
     <CXX_Tree_Mapping_Rule Include="xml\simulationfile.xsd">
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../src/XMLFile</OutDir>
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ProjectDir)src/XMLFile</OutDir>
+      <SubType>Designer</SubType>
+      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.h</HeaderSuffix>
+      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.cpp</SourceSuffix>
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>

@@ -54,6 +54,14 @@ struct CachedMaterial
 	double epsilon24; // 24.0 * epsilon
 };
 
+/// enum to hold allowed force methods
+enum EPotentialForce
+{
+	PF_LJ,		/// lennard jones potential
+	PF_SLJ,		/// smoothed lennard jones potential
+	PF_GRAVITY /// gravity force
+};
+
 /// a class that describes common Simulation params
 /// @param delta_t step size
 /// @param start_time start time of simulation
@@ -97,6 +105,11 @@ public:
 	double					totalMass;								/// totalMass
 	double					kineticEnergy;							/// calculated kinetic Energy
 
+	double					SLJfactor;								/// smoothed Lennard Jones potential factor
+	double					cutoffRadius;							/// cutoffRadius
+
+	EPotentialForce			potentialForce;
+
 	/// stores all materials in the simulation
 	std::vector<Material>	materials;
 
@@ -134,6 +147,12 @@ public:
 
 		totalMass = 0.0;
 		kineticEnergy = 0.0;
+
+		SLJfactor = 1.0;
+		cutoffRadius = 1.1225;
+
+		// use LJ as a standard
+		potentialForce = PF_LJ;
 	}
 
 	/// copy constructor
@@ -169,6 +188,10 @@ public:
 
 		totalMass = 0.0;
 		kineticEnergy = 0.0;
+
+		SLJfactor = desc.SLJfactor;
+		cutoffRadius = desc.cutoffRadius;
+		potentialForce = desc.potentialForce;
 	}
 
 	~SimulationDesc()
@@ -205,6 +228,10 @@ public:
 
 		totalMass = desc.totalMass;
 		kineticEnergy = desc.kineticEnergy;
+
+		SLJfactor = desc.SLJfactor;
+		cutoffRadius = desc.cutoffRadius;
+		potentialForce = desc.potentialForce;
 
 		// do not copy cache!
 		cached_mat = NULL;

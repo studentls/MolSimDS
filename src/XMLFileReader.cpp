@@ -126,6 +126,25 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		desc.gravitational_constant = file->params().gravity().get();
 	else desc.gravitational_constant = 0.0;
 
+	// save cutoff radius if linked cell is used...
+	if(file->params().algorithm().LinkedCell().present())
+	{
+		LinkedCell_t& lc = file->params().algorithm().LinkedCell().get();
+
+		double cutoffDistance = lc.cutoff_radius();
+
+		desc.cutoffRadius = cutoffDistance;
+	}
+
+	// set potential force method
+	if(file->params().potentialforce().LJ().present())desc.potentialForce = PF_LJ;
+	if(file->params().potentialforce().Gravity().present())desc.potentialForce = PF_GRAVITY;
+	if(file->params().potentialforce().SLJ().present())
+	{
+		desc.potentialForce = PF_SLJ;
+		desc.SLJfactor = file->params().potentialforce().SLJ().get().factor().get();
+	}
+
 	//file parsed...
 	fileParsed = true;
 

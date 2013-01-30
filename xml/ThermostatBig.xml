@@ -28,7 +28,9 @@ author: F.Dietz & L.Spiegelberg
     
     <t_end>50.0</t_end>
     <t_start>0.0</t_start>
-    
+    <potentialforce>
+      <LJ></LJ>
+    </potentialforce>
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.5</cutoff_radius>
