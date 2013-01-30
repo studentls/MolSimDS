@@ -112,6 +112,7 @@ public:
 
 	unsigned int			iterationsTillTStatisticsCalculation;			/// steps, till thermostatistical data is generated
 	unsigned int			iterationsPerTStatisticsCalculation;			/// how many steps shall be averaged?
+	double					rdfdelta_t;
 
 	/// stores all materials in the simulation
 	std::vector<Material>	materials;
@@ -156,7 +157,8 @@ public:
 
 		// no statistics per default
 		iterationsTillTStatisticsCalculation = 0;	
-		iterationsPerTStatisticsCalculation = 0;	
+		iterationsPerTStatisticsCalculation = 0;
+		rdfdelta_t = 0.1;
 
 		// use LJ as a standard
 		potentialForce = PF_LJ;
@@ -202,6 +204,7 @@ public:
 
 		iterationsTillTStatisticsCalculation = desc.iterationsTillTStatisticsCalculation;	
 		iterationsPerTStatisticsCalculation  = desc.iterationsPerTStatisticsCalculation;	
+		rdfdelta_t = desc.rdfdelta_t;
 	}											
 
 	~SimulationDesc()
@@ -246,6 +249,7 @@ public:
 		
 		iterationsTillTStatisticsCalculation = desc.iterationsTillTStatisticsCalculation;	
 		iterationsPerTStatisticsCalculation  = desc.iterationsPerTStatisticsCalculation;	
+		rdfdelta_t = desc.rdfdelta_t;
 
 		// do not copy cache!
 		cached_mat = NULL;

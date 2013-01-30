@@ -31,7 +31,7 @@ author: F.Dietz & L.Spiegelberg
     <potentialforce>
       <LJ></LJ>
     </potentialforce>
-    <thermodynamicaldata iterationsTillCalculation="100" iterationsPerCalculation="4"></thermodynamicaldata>
+    <thermodynamicaldata iterationsTillCalculation="100" iterationsPerCalculation="4" deltat="0.2"></thermodynamicaldata>
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.5</cutoff_radius>

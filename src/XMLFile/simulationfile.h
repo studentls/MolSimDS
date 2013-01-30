@@ -1988,6 +1988,24 @@ class thermodynamicaldata: public ::xsd::cxx::tree::fundamental_base< ::xml_sche
   void
   iterationsPerCalculation (const iterationsPerCalculation_optional& x);
 
+  // deltat
+  // 
+  typedef ::xml_schema::decimal deltat_type;
+  typedef ::xsd::cxx::tree::optional< deltat_type > deltat_optional;
+  typedef ::xsd::cxx::tree::traits< deltat_type, char, ::xsd::cxx::tree::schema_type::decimal > deltat_traits;
+
+  const deltat_optional&
+  deltat () const;
+
+  deltat_optional&
+  deltat ();
+
+  void
+  deltat (const deltat_type& x);
+
+  void
+  deltat (const deltat_optional& x);
+
   // Constructors.
   //
   thermodynamicaldata (const ::xml_schema::unsigned_int&,
@@ -2018,6 +2036,7 @@ class thermodynamicaldata: public ::xsd::cxx::tree::fundamental_base< ::xml_sche
   protected:
   ::xsd::cxx::tree::one< iterationsTillCalculation_type > iterationsTillCalculation_;
   iterationsPerCalculation_optional iterationsPerCalculation_;
+  deltat_optional deltat_;
 };
 
 class outputfmt: public ::xml_schema::string

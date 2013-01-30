@@ -69,6 +69,13 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 		// set capacity
 		thermostatistics->initialPositions.setsize(particles->getParticleCount());
 
+		// set rdf intervals		
+		int countofrdfintervals = desc.cutoffRadius / desc.rdfdelta_t;
+		//adjust delta
+		thermostatistics->delta_t = desc.cutoffRadius / (double)countofrdfintervals;
+		thermostatistics->distanceCounter.setsize(countofrdfintervals);
+		for(int i = 0; i < thermostatistics->distanceCounter.size(); i++)thermostatistics->distanceCounter[i] = 0;
+
 		// copy initial positions...
 		std::vector<Particle> tmp = particles->getParticles();
 		for(std::vector<Particle>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
@@ -612,8 +619,31 @@ void Simulation::diffusionCalculator(void* data, Particle& p)
 	tdata->diffusionValues.last()[1] += p.x.distanceSq(tdata->initialPositions[p.id]);
 }
 
+void Simulation::rdfCalculator(void* data, Particle& p1, Particle& p2)
+{
+	// cast
+	ThermostatisticalData *tdata = (ThermostatisticalData*)data;
+
+	// find right interval
+	double distance = p1.x.distance(p2.x);
+
+	// sort into right interval
+	int index = distance / tdata->delta_t;
+
+	if(index < 0)index = 0;
+	if(index >= tdata->distanceCounter.size())index = tdata->distanceCounter.size() - 1;
+
+	assert(index >= 0 && index < tdata->distanceCounter.size());
+
+	tdata->distanceCounter[index]++;
+
+}
+
 void Simulation::calculateThermostatisticalData(const double t)
 {
+	// clear halo!
+	if(particles->getType() == PCT_LINKEDCELL)((LinkedCellParticleContainer*)particles)->clearHaloParticles();
+	
 	// calc diffusion
 
 	// add zero sum...
@@ -624,8 +654,20 @@ void Simulation::calculateThermostatisticalData(const double t)
 	// divide by N-1!!! this is a mistake in the formula, as 1/N is not an unbiased estimator!
 	thermostatistics->diffusionValues.last()[1] /= (double)(thermostatistics->initialPositions.size() - 1);
 
-	// only for testing
-	LOG4CXX_INFO(generalOutputLogger, "diffusion: "<<thermostatistics->diffusionValues.last()[1]);
+	// calc rdf
+	for(int i = 0; i < thermostatistics->distanceCounter.size(); i++)thermostatistics->distanceCounter[i] = 0;
+	particles->IteratePairwise(Simulation::rdfCalculator, (void*)thermostatistics);
+
+	// calc local density
+	for(int i = 0; i < thermostatistics->distanceCounter.size(); i++)
+	{
+		double a = i * thermostatistics->delta_t;
+		a = a * a * a;
+		double b = (i+1) * thermostatistics->delta_t;
+		b = b * b * b;
+		double density = (double)thermostatistics->distanceCounter[i] / (4.0 * PI / 3.0 * (b - a));
+		thermostatistics->rdfValues.push_back(utils::Vector<double, 2>(t, density));
+	}
 }
 
 err_type Simulation::writeThermostatisticalDataToFile()
@@ -643,7 +685,11 @@ err_type Simulation::writeThermostatisticalDataToFile()
 	}
 
 	// print header
-	fprintf(pFile, "point of time, diffusion\n");
+	fprintf(pFile, "steps, point of time, diffusion");
+
+	// add columns for rdf
+	for(int j = 0; j < thermostatistics->rdfValues.size(); j++)fprintf(pFile, ", rdf%d", j);
+	fprintf(pFile, "\n");
 
 	// calc num diffusion pairs
 	int count = thermostatistics->diffusionValues.size() / desc.iterationsPerTStatisticsCalculation;
@@ -652,15 +698,31 @@ err_type Simulation::writeThermostatisticalDataToFile()
 	for(int i = 0; i < count; i++)
 	{
 		Vector<double, 2> avg = Vector<double, 2>(0, 0);
+		TFastArray<double> avgrdf;
+		int numrdfsamples = thermostatistics->distanceCounter.size();
+		avgrdf.setsize(numrdfsamples);		
+		for(int k = 0; k < numrdfsamples; k++)avgrdf[k] = 0;
+
 		for(int j = 0; j < desc.iterationsPerTStatisticsCalculation; j++)
 		{
 			avg = avg + thermostatistics->diffusionValues[i * desc.iterationsPerTStatisticsCalculation + j];
+
+			for(int k = 0; k < numrdfsamples; k++)
+			{
+				avgrdf[k] += thermostatistics->rdfValues[(i * desc.iterationsPerTStatisticsCalculation + j) * numrdfsamples + k][1];
+			}
 		}
 		avg[0] /= (double)desc.iterationsPerTStatisticsCalculation;
 		avg[1] /= (double)desc.iterationsPerTStatisticsCalculation;
 
+		for(int k = 0; k < numrdfsamples; k++)avgrdf[k] /= (double)desc.iterationsPerTStatisticsCalculation;
+
 		// write to file
-		fprintf(pFile, "%lf, %lf\n", avg[0], avg[1]);
+		fprintf(pFile, "%d, %lf, %lf", (int)((avg[0] - desc.start_time)/ desc.delta_t), avg[0], avg[1]);
+
+		// add columns for rdf
+		for(int j = 0; j < numrdfsamples; j++)fprintf(pFile, ", %lf", avgrdf[j]);
+		fprintf(pFile, "\n");
 	}
 
 	fclose(pFile);

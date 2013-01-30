@@ -154,6 +154,8 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 
 		if(tsdata.iterationsPerCalculation().present())desc.iterationsPerTStatisticsCalculation = tsdata.iterationsPerCalculation().get();
 		else desc.iterationsPerTStatisticsCalculation = 1;
+
+		if(tsdata.deltat().present())desc.rdfdelta_t = tsdata.deltat().get();
 	}
 
 	//file parsed...

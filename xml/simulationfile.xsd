@@ -131,7 +131,9 @@ author: Leonhard Spiegelberg & Florian Dietz
               <xsd:attribute name="iterationsTillCalculation" type="xsd:unsignedInt" use="required"></xsd:attribute>
               <!-- specify how many iterations shall be used to average -->
               <xsd:attribute name="iterationsPerCalculation"  type="xsd:unsignedInt" use="optional"></xsd:attribute>
-            </xsd:extension>
+              <!-- used for rdf calculation -->
+              <xsd:attribute name="deltat" type="xsd:decimal" use="optional"></xsd:attribute>
+             </xsd:extension>
           </xsd:simpleContent>
         </xsd:complexType>
       </xsd:element>

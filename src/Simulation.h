@@ -38,6 +38,16 @@ struct ThermostatisticalData
 	/// diffusion (first coordinate is time t_i, second the diffusion value for this time
 	/// a writeoutput everytime the statistical data is generated is suggested
 	utils::TFastArray<utils::Vector<double, 2> > diffusionValues;
+
+	/// array to store distances
+	utils::TFastArray<unsigned int> distanceCounter;
+
+	/// delta t for the radial pair distribution function
+	double delta_t;
+
+	/// radial pair distribution function value pairs
+	/// first is time, second is rdf
+	utils::TFastArray<utils::Vector<double, 2> > rdfValues;
 };
 
 /// a class that is used to represent a simulation
@@ -88,6 +98,9 @@ private:
 
 	/// helper function to calculate Diffusion (takes as argument a ThermodynamicalStatistics data structure)
 	static void					diffusionCalculator(void*, Particle&);
+
+	/// helper function to calculate radial pair distribution function
+	static void					rdfCalculator(void*, Particle&, Particle&);
 
 	/// helper to give each particle an id
 	static void					idAssigner(void*, Particle&);

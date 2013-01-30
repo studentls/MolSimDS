@@ -1579,6 +1579,30 @@ iterationsPerCalculation (const iterationsPerCalculation_optional& x)
   this->iterationsPerCalculation_ = x;
 }
 
+const thermodynamicaldata::deltat_optional& thermodynamicaldata::
+deltat () const
+{
+  return this->deltat_;
+}
+
+thermodynamicaldata::deltat_optional& thermodynamicaldata::
+deltat ()
+{
+  return this->deltat_;
+}
+
+void thermodynamicaldata::
+deltat (const deltat_type& x)
+{
+  this->deltat_.set (x);
+}
+
+void thermodynamicaldata::
+deltat (const deltat_optional& x)
+{
+  this->deltat_ = x;
+}
+
 
 // outputfmt
 // 
@@ -3752,7 +3776,8 @@ thermodynamicaldata (const ::xml_schema::unsigned_int& _xsd_unsigned_int_base,
                      const iterationsTillCalculation_type& iterationsTillCalculation)
 : ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type > (_xsd_unsigned_int_base),
   iterationsTillCalculation_ (iterationsTillCalculation, ::xml_schema::flags (), this),
-  iterationsPerCalculation_ (::xml_schema::flags (), this)
+  iterationsPerCalculation_ (::xml_schema::flags (), this),
+  deltat_ (::xml_schema::flags (), this)
 {
 }
 
@@ -3762,7 +3787,8 @@ thermodynamicaldata (const thermodynamicaldata& x,
                      ::xml_schema::container* c)
 : ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type > (x, f, c),
   iterationsTillCalculation_ (x.iterationsTillCalculation_, f, this),
-  iterationsPerCalculation_ (x.iterationsPerCalculation_, f, this)
+  iterationsPerCalculation_ (x.iterationsPerCalculation_, f, this),
+  deltat_ (x.deltat_, f, this)
 {
 }
 
@@ -3772,7 +3798,8 @@ thermodynamicaldata (const ::xercesc::DOMElement& e,
                      ::xml_schema::container* c)
 : ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type > (e, f | ::xml_schema::flags::base, c),
   iterationsTillCalculation_ (f, this),
-  iterationsPerCalculation_ (f, this)
+  iterationsPerCalculation_ (f, this),
+  deltat_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -3800,6 +3827,12 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     if (n.name () == "iterationsPerCalculation" && n.namespace_ ().empty ())
     {
       this->iterationsPerCalculation_.set (iterationsPerCalculation_traits::create (i, f, this));
+      continue;
+    }
+
+    if (n.name () == "deltat" && n.namespace_ ().empty ())
+    {
+      this->deltat_.set (deltat_traits::create (i, f, this));
       continue;
     }
   }
