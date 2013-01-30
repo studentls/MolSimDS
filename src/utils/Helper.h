@@ -111,6 +111,11 @@ namespace utils
 		int min = (seconds / 60) % 60;
 		int h = (seconds / 3600) % 60;
 
+		// negative numbers not allowed...
+		if(sec < 0)sec = 0;
+		if(min < 0)min = 0;
+		if(h < 0)h = 0;
+
 		std::stringstream str;
 		if(h < 10)str<<"0";
 		str<<h<<":";

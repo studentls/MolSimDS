@@ -143,22 +143,6 @@
     <ClCompile Include="src\XMLFile\simulationfile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">
-      <FileType>XSD</FileType>
-      <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenInline>
-      <GenForward Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenForward>
-      <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenSerialization>
-      <GenOstream Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenOstream>
-      <RootElement Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </RootElement>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./src/XMLFile</OutDir>
-      <GenDoxygen Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenDoxygen>
-      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.h</HeaderSuffix>
-      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.cpp</SourceSuffix>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">./src/XMLFile</OutDir>
-      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.h</HeaderSuffix>
-      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">.cpp</SourceSuffix>
-    </CXX_Tree_Mapping_Rule>
     <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
       <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenInline>
       <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenSerialization>
@@ -174,30 +158,19 @@
       <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenSerialization>
       <GenOstream Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenOstream>
     </CXX_Tree_Mapping_Rule>
+    <CXX_Tree_Mapping_Rule Include="xml\simulationfile.xsd">
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../src/XMLFile</OutDir>
+    </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FallingDrop.xml" />
-    <None Include="FallingDropInitialize.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="listexample.xml" />
-    <None Include="Membrane.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="PerformanceTest.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="PeriodicBoundaries.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="RayleighTaylor3D.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ThermostatBig.xml" />
-    <None Include="ThermostatSmall.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ViewerTest.xml" />
+    <None Include="xml\FallingDrop.xml" />
+    <None Include="xml\FallingDropInitialize.xml" />
+    <None Include="xml\Membrane.xml" />
+    <None Include="xml\PerformanceTest.xml" />
+    <None Include="xml\RayleighTaylor3D.xml" />
+    <None Include="xml\RayleighTaylor3DPerf.xml" />
+    <None Include="xml\ThermostatBig.xml" />
+    <None Include="xml\ThermostatSmall.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
