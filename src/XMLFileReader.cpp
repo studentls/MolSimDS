@@ -145,6 +145,17 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		desc.SLJfactor = file->params().potentialforce().SLJ().get().factor().get();
 	}
 
+	// get params for thermostatisticaldata
+	if(file->params().thermodynamicaldata().present())
+	{
+		params_t::thermodynamicaldata_type& tsdata = file->params().thermodynamicaldata().get();
+
+		desc.iterationsTillTStatisticsCalculation = tsdata.iterationsTillCalculation();
+
+		if(tsdata.iterationsPerCalculation().present())desc.iterationsPerTStatisticsCalculation = tsdata.iterationsPerCalculation().get();
+		else desc.iterationsPerTStatisticsCalculation = 1;
+	}
+
 	//file parsed...
 	fileParsed = true;
 

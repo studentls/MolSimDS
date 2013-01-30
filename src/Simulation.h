@@ -29,88 +29,114 @@
 
 #include "SimulationDesc.h"
 
+/// helper struct, stores thermodynamical statistics
+struct ThermostatisticalData
+{
+	/// initial positions(necessary for diffusion computation
+	utils::TFastArray<utils::Vector<double, 3> > initialPositions;
+
+	/// diffusion (first coordinate is time t_i, second the diffusion value for this time
+	/// a writeoutput everytime the statistical data is generated is suggested
+	utils::TFastArray<utils::Vector<double, 2> > diffusionValues;
+};
+
 /// a class that is used to represent a simulation
 class Simulation
 {
 private:
 	/// stores values that are used for calculations for this Simulation
-	SimulationDesc			desc;
+	SimulationDesc				desc;
 
 	/// stores a simulation's statistical data
-	SimulationStatistics	statistics;
+	SimulationStatistics		statistics;
+
+	/// Thermodynamical statistics
+	ThermostatisticalData		*thermostatistics;
 
 	/// stores the particles used in this Simulation
-	ParticleContainer		*particles;
+	ParticleContainer			*particles;
 
 	/// performs one time step based on delta_t
-	void					performStep();
+	void						performStep();
 
 	/// calculate the force for all particles
-	void					calculateF();
+	void						calculateF();
 
 	/// resets the force on a particle for a new iteration. Used in calculateF()
-	static void				forceResetter(void*, Particle& p);
+	static void					forceResetter(void*, Particle& p);
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	/// use Lennard Jones (12, 6) potential for inter molecular forces
-	static void				forceLJCalculator(void*, Particle&, Particle&);
+	static void					forceLJCalculator(void*, Particle&, Particle&);
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	/// use Smoothed Lennard Jones (12, 6) potential for inter molecular forces
-	static void				forceSLJCalculator(void*, Particle&, Particle&);
+	static void					forceSLJCalculator(void*, Particle&, Particle&);
 
 	/// calculate and apply the force between a pair of particles. Used in calculateF()
 	/// use gravitational forces for inter molecular forces
-	static void				forceGravitationCalculator(void*, Particle&, Particle&);
+	static void					forceGravitationCalculator(void*, Particle&, Particle&);
 
 	/// member variable holding a possible inter molecular force calculation function
-	void					(*forceCalculator)(void*, Particle&, Particle&);
+	void						(*forceCalculator)(void*, Particle&, Particle&);
 
 	/// apply a pulling force to a membrane. Used in Run()
-	static void				forceCalculatorMembranePull(void*, Particle&);
+	static void					forceCalculatorMembranePull(void*, Particle&);
 
 	/// calculate Gravity force for each particle
-	static void				gravityCalculator(void*, Particle&);
+	static void					gravityCalculator(void*, Particle&);
+
+	/// helper function to calculate Diffusion (takes as argument a ThermodynamicalStatistics data structure)
+	static void					diffusionCalculator(void*, Particle&);
+
+	/// helper to give each particle an id
+	static void					idAssigner(void*, Particle&);
 
 	/// calculate the position for all particles
-	void					calculateX();
+	void						calculateX();
 
 	/// calculate the new position of a particle for a new iteration. Used in calculateX()
-	static void				posCalculator(void*, Particle&);
+	static void					posCalculator(void*, Particle&);
 
 	/// calculate the velocity for all particles
-	void					calculateV();
+	void						calculateV();
 
 	/// calculate the new velocity of a particle for a new iteration. Used in calculateV()
-	static void				velCalculator(void*, Particle& p);
+	static void					velCalculator(void*, Particle& p);
 	
 	/// plot the particles to a xyz-file
 	/// @param iteration the number of this iteration
-	void					plotParticles(int iteration);
+	void						plotParticles(int iteration);
 
 	/// calculates kinetic energy of the system and outputs into a double
-	static void				kineticEnergyCalculator(void* data, Particle& p);
+	static void					kineticEnergyCalculator(void* data, Particle& p);
 
 	/// calculates summed mass of all particles, data is a double pointer
-	static void				totalMassCalculator(void *data, Particle& p);
+	static void					totalMassCalculator(void *data, Particle& p);
 
 	/// set Brownianmotion hard
-	static void				setBrownianMotionCalculator(void *data, Particle& p);
+	static void					setBrownianMotionCalculator(void *data, Particle& p);
 
 	/// initialize particles to given temperature
-	void					initializeThermostat();
+	void						initializeThermostat();
 
 	/// adjust temperature
-	void					adjustThermostat();
+	void						adjustThermostat();
+
+	/// calculate thermostatistical data
+	void						calculateThermostatisticalData(const double t);
+
+	/// writes CSV files for thermostatistical data
+	err_type						writeThermostatisticalDataToFile();
 
 	/// apply beta(Velocity Scale Factor) to particles
-	static void				applyTemperatureScalingFactor(void *data, Particle& p);
+	static void					applyTemperatureScalingFactor(void *data, Particle& p);
 
 	/// send particles to viewer
-	void					notifyViewer();
+	void						notifyViewer();
 
 public:
-	Simulation():particles(NULL)			{}
+	Simulation():particles(NULL), thermostatistics(NULL)			{}
 
 	~Simulation()							{ Release(); }
 	

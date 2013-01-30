@@ -186,4 +186,6 @@ err_type PerformanceTest::saveCSV(const char *filename)
 
 
 	fclose(pFile);
+
+	return S_OK;
 }

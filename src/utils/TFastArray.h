@@ -112,6 +112,27 @@ public:
 		_size--;
 		return index + 1;
 	}
+
+	/// set manually capacity
+	void			setcapacity(size_t capacity)
+	{
+		_capacity = capacity;
+		_data = (T*)realloc(_data, sizeof(T) * _capacity);		
+	}
+
+	/// set manually size
+	void			setsize(size_t size)
+	{
+		if(size > _capacity)
+		{
+			_capacity = size;
+			_data = (T*)realloc(_data, sizeof(T) * _capacity);		
+		}
+		_size = size;
+	}
+
+	/// get reference to last object
+	inline T& last()	{return _data[_size -1];}
 };
 
 }

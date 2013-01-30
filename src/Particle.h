@@ -60,6 +60,9 @@ public:
 	/// type of the particle, used to index a particle
 	short type;
 
+	/// id of the particle
+	int id;
+
 	/// get the current force acting on the Particle
 	utils::Vector<double, 3> getF() const {return f;}
 
@@ -112,6 +115,7 @@ public:
 		x		= p.x;
 		v		= p.v;
 		type	= p.type;
+		id		= p.id;
 		directNeighbors = p.directNeighbors;
 		diagonalNeighbors = p.diagonalNeighbors;
 

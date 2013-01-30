@@ -110,6 +110,9 @@ public:
 
 	EPotentialForce			potentialForce;
 
+	unsigned int			iterationsTillTStatisticsCalculation;			/// steps, till thermostatistical data is generated
+	unsigned int			iterationsPerTStatisticsCalculation;			/// how many steps shall be averaged?
+
 	/// stores all materials in the simulation
 	std::vector<Material>	materials;
 
@@ -150,6 +153,10 @@ public:
 
 		SLJfactor = 1.0;
 		cutoffRadius = 1.1225;
+
+		// no statistics per default
+		iterationsTillTStatisticsCalculation = 0;	
+		iterationsPerTStatisticsCalculation = 0;	
 
 		// use LJ as a standard
 		potentialForce = PF_LJ;
@@ -192,7 +199,10 @@ public:
 		SLJfactor = desc.SLJfactor;
 		cutoffRadius = desc.cutoffRadius;
 		potentialForce = desc.potentialForce;
-	}
+
+		iterationsTillTStatisticsCalculation = desc.iterationsTillTStatisticsCalculation;	
+		iterationsPerTStatisticsCalculation  = desc.iterationsPerTStatisticsCalculation;	
+	}											
 
 	~SimulationDesc()
 	{
@@ -232,6 +242,10 @@ public:
 		SLJfactor = desc.SLJfactor;
 		cutoffRadius = desc.cutoffRadius;
 		potentialForce = desc.potentialForce;
+
+		
+		iterationsTillTStatisticsCalculation = desc.iterationsTillTStatisticsCalculation;	
+		iterationsPerTStatisticsCalculation  = desc.iterationsPerTStatisticsCalculation;	
 
 		// do not copy cache!
 		cached_mat = NULL;

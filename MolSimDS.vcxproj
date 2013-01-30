@@ -166,6 +166,7 @@
     </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
+    <None Include="xml\ArgonEquilibration.xml" />
     <None Include="xml\FallingDrop.xml" />
     <None Include="xml\FallingDropInitialize.xml" />
     <None Include="xml\Membrane.xml" />

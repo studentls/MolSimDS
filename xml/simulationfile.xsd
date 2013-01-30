@@ -124,7 +124,17 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="initialTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="targetTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="temperatureStepSize" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
-
+      <xsd:element name="thermodynamicaldata" minOccurs="0" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:unsignedInt">
+              <xsd:attribute name="iterationsTillCalculation" type="xsd:unsignedInt" use="required"></xsd:attribute>
+              <!-- specify how many iterations shall be used to average -->
+              <xsd:attribute name="iterationsPerCalculation"  type="xsd:unsignedInt" use="optional"></xsd:attribute>
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
       <xsd:element name="t_start" type="xsd:decimal"></xsd:element>
       <xsd:element name="outputfmt">
         <xsd:simpleType>

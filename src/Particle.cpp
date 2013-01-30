@@ -15,6 +15,7 @@ Particle::Particle(const int type_arg) {
 	f = 0.0;
 	old_f = 0.0;
 	v = 0.0;
+	id = -1;
 	directNeighbors = std::vector<int>();
 	diagonalNeighbors = std::vector<int>();
 }
@@ -26,6 +27,7 @@ Particle::Particle(const Particle& other) {
 	f = other.f;
 	old_f = other.old_f;
 	type = other.type;
+	id = other.id;
 	directNeighbors = other.directNeighbors;
 	diagonalNeighbors = other.diagonalNeighbors;
 }
@@ -40,6 +42,7 @@ Particle::Particle(const	utils::Vector<double, 3>& x_arg,
     type = type_arg;
     f = 0.0;
     old_f = 0.0;
+	id = -1;
 	directNeighbors = std::vector<int>();
 	diagonalNeighbors = std::vector<int>();
 }

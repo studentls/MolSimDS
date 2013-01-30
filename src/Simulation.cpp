@@ -57,6 +57,27 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 	else if(desc.potentialForce == PF_GRAVITY)forceCalculator = Simulation::forceGravitationCalculator;
 	else forceCalculator = Simulation::forceLJCalculator;
 	
+	// initialize thermostatisticaldata if specified in desc
+	if(desc.iterationsTillTStatisticsCalculation > 0)
+	{
+		this->thermostatistics = new ThermostatisticalData;
+
+		// set id
+		int id = 0;
+		particles->Iterate(Simulation::idAssigner, (void*)&id);
+
+		// set capacity
+		thermostatistics->initialPositions.setsize(particles->getParticleCount());
+
+		// copy initial positions...
+		std::vector<Particle> tmp = particles->getParticles();
+		for(std::vector<Particle>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+		{
+			assert(it->id >= 0 && it->id < thermostatistics->initialPositions.capacity());
+			thermostatistics->initialPositions[it->id] = (it->x);
+		}
+	}
+
 	// is particles a valid pointer? - If not file has not been parsed correctly...
 	if(!particles)return E_FILEERROR;
 
@@ -135,6 +156,16 @@ err_type Simulation::Run()
 			plotParticles(iteration);
 		}
 		
+		// calculate statistical data if wished
+		if(desc.iterationsTillTStatisticsCalculation > 0)
+		{
+			if(iteration % desc.iterationsTillTStatisticsCalculation < desc.iterationsPerTStatisticsCalculation)
+				calculateThermostatisticalData((double)iteration * desc.delta_t + desc.start_time);
+
+			// output data
+			if(iteration != 0 && iteration % desc.iterationsTillTStatisticsCalculation == 0)writeThermostatisticalDataToFile();
+		}
+
 		// output info every 5s
 		if(progress_timer.getElapsedTime() > 5.0f)
 		{
@@ -178,9 +209,15 @@ err_type Simulation::Run()
 	// has the user aborted? is runnign set to false?
 	if(!running)LOG4CXX_INFO(simulationLogger, ">> simulation aborted by user");
 
-	//generate statistical data
+	// generate statistical data
 	statistics.time = timer.getElapsedTime();
 	statistics.timeperstep = statistics.time / statistics.step_count;
+
+	// write statistics to file
+	if(desc.iterationsTillTStatisticsCalculation > 0)	
+			// output data
+			if(iteration != 0 && iteration % desc.iterationsTillTStatisticsCalculation == 0)writeThermostatisticalDataToFile();
+
 
 	// output that the output has finished
 	cout << endl;
@@ -191,6 +228,9 @@ err_type Simulation::Run()
 
 err_type Simulation::Release()
 {	
+	// delete thermostatistics
+	SAFE_DELETE(thermostatistics);
+
 	// delete Particle data
 	if(particles)particles->Clear();
 
@@ -561,6 +601,73 @@ void Simulation::adjustThermostat()
 	
 }
 
+void Simulation::diffusionCalculator(void* data, Particle& p)
+{
+	// cast
+	ThermostatisticalData *tdata = (ThermostatisticalData*)data;
+
+	assert(p.id >= 0 && p.id < tdata->initialPositions.size());
+
+	// add to sum
+	tdata->diffusionValues.last()[1] += p.x.distanceSq(tdata->initialPositions[p.id]);
+}
+
+void Simulation::calculateThermostatisticalData(const double t)
+{
+	// calc diffusion
+
+	// add zero sum...
+	this->thermostatistics->diffusionValues.push_back(utils::Vector<double, 2>(t, 0.0));
+	// use iterate
+	particles->Iterate(Simulation::diffusionCalculator, (void*)thermostatistics);
+
+	// divide by N-1!!! this is a mistake in the formula, as 1/N is not an unbiased estimator!
+	thermostatistics->diffusionValues.last()[1] /= (double)(thermostatistics->initialPositions.size() - 1);
+
+	// only for testing
+	LOG4CXX_INFO(generalOutputLogger, "diffusion: "<<thermostatistics->diffusionValues.last()[1]);
+}
+
+err_type Simulation::writeThermostatisticalDataToFile()
+{
+	using namespace utils;
+
+	std::string filename = desc.outname +"_thermostatistics.csv";
+	
+	// open file
+	FILE *pFile = fopen(filename.c_str(), "w");
+	if(!pFile)
+	{
+		LOG4CXX_ERROR(generalOutputLogger, ">> error: failed to write thermostatistical data!");
+		return E_FILEERROR;
+	}
+
+	// print header
+	fprintf(pFile, "point of time, diffusion\n");
+
+	// calc num diffusion pairs
+	int count = thermostatistics->diffusionValues.size() / desc.iterationsPerTStatisticsCalculation;
+
+	// go through and average
+	for(int i = 0; i < count; i++)
+	{
+		Vector<double, 2> avg = Vector<double, 2>(0, 0);
+		for(int j = 0; j < desc.iterationsPerTStatisticsCalculation; j++)
+		{
+			avg = avg + thermostatistics->diffusionValues[i * desc.iterationsPerTStatisticsCalculation + j];
+		}
+		avg[0] /= (double)desc.iterationsPerTStatisticsCalculation;
+		avg[1] /= (double)desc.iterationsPerTStatisticsCalculation;
+
+		// write to file
+		fprintf(pFile, "%lf, %lf\n", avg[0], avg[1]);
+	}
+
+	fclose(pFile);
+
+	return S_OK;
+}
+
 void Simulation::notifyViewer()
 {
 	using namespace std;
@@ -590,4 +697,16 @@ void Simulation::notifyViewer()
 
 	Viewer::Instance().UnlockParticles(&particles);
 #endif
+}
+
+
+void Simulation::idAssigner(void* data, Particle& p)
+{
+	int *id =(int*)data;
+
+	// set id
+	p.id = *id;
+
+	// inc temp variable
+	(*id)++;
 }

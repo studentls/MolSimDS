@@ -197,5 +197,8 @@
     <None Include="xml\ThermostatSmall.xml">
       <Filter>xml</Filter>
     </None>
+    <None Include="xml\ArgonEquilibration.xml">
+      <Filter>xml</Filter>
+    </None>
   </ItemGroup>
 </Project>

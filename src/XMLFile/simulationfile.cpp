@@ -761,6 +761,36 @@ temperatureStepSize (const temperatureStepSize_optional& x)
   this->temperatureStepSize_ = x;
 }
 
+const params_t::thermodynamicaldata_optional& params_t::
+thermodynamicaldata () const
+{
+  return this->thermodynamicaldata_;
+}
+
+params_t::thermodynamicaldata_optional& params_t::
+thermodynamicaldata ()
+{
+  return this->thermodynamicaldata_;
+}
+
+void params_t::
+thermodynamicaldata (const thermodynamicaldata_type& x)
+{
+  this->thermodynamicaldata_.set (x);
+}
+
+void params_t::
+thermodynamicaldata (const thermodynamicaldata_optional& x)
+{
+  this->thermodynamicaldata_ = x;
+}
+
+void params_t::
+thermodynamicaldata (::std::auto_ptr< thermodynamicaldata_type > x)
+{
+  this->thermodynamicaldata_.set (x);
+}
+
 const params_t::t_start_type& params_t::
 t_start () const
 {
@@ -1501,6 +1531,52 @@ void condition::
 type (::std::auto_ptr< type_type > x)
 {
   this->type_.set (x);
+}
+
+
+// thermodynamicaldata
+// 
+
+const thermodynamicaldata::iterationsTillCalculation_type& thermodynamicaldata::
+iterationsTillCalculation () const
+{
+  return this->iterationsTillCalculation_.get ();
+}
+
+thermodynamicaldata::iterationsTillCalculation_type& thermodynamicaldata::
+iterationsTillCalculation ()
+{
+  return this->iterationsTillCalculation_.get ();
+}
+
+void thermodynamicaldata::
+iterationsTillCalculation (const iterationsTillCalculation_type& x)
+{
+  this->iterationsTillCalculation_.set (x);
+}
+
+const thermodynamicaldata::iterationsPerCalculation_optional& thermodynamicaldata::
+iterationsPerCalculation () const
+{
+  return this->iterationsPerCalculation_;
+}
+
+thermodynamicaldata::iterationsPerCalculation_optional& thermodynamicaldata::
+iterationsPerCalculation ()
+{
+  return this->iterationsPerCalculation_;
+}
+
+void thermodynamicaldata::
+iterationsPerCalculation (const iterationsPerCalculation_type& x)
+{
+  this->iterationsPerCalculation_.set (x);
+}
+
+void thermodynamicaldata::
+iterationsPerCalculation (const iterationsPerCalculation_optional& x)
+{
+  this->iterationsPerCalculation_ = x;
 }
 
 
@@ -2329,6 +2405,7 @@ params_t (const dimension_type& dimension,
   initialTemperature_ (::xml_schema::flags (), this),
   targetTemperature_ (::xml_schema::flags (), this),
   temperatureStepSize_ (::xml_schema::flags (), this),
+  thermodynamicaldata_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   potentialforce_ (potentialforce, ::xml_schema::flags (), this),
@@ -2362,6 +2439,7 @@ params_t (const dimension_type& dimension,
   initialTemperature_ (::xml_schema::flags (), this),
   targetTemperature_ (::xml_schema::flags (), this),
   temperatureStepSize_ (::xml_schema::flags (), this),
+  thermodynamicaldata_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
   outputfmt_ (outputfmt, ::xml_schema::flags (), this),
   potentialforce_ (potentialforce, ::xml_schema::flags (), this),
@@ -2387,6 +2465,7 @@ params_t (const params_t& x,
   initialTemperature_ (x.initialTemperature_, f, this),
   targetTemperature_ (x.targetTemperature_, f, this),
   temperatureStepSize_ (x.temperatureStepSize_, f, this),
+  thermodynamicaldata_ (x.thermodynamicaldata_, f, this),
   t_start_ (x.t_start_, f, this),
   outputfmt_ (x.outputfmt_, f, this),
   potentialforce_ (x.potentialforce_, f, this),
@@ -2412,6 +2491,7 @@ params_t (const ::xercesc::DOMElement& e,
   initialTemperature_ (f, this),
   targetTemperature_ (f, this),
   temperatureStepSize_ (f, this),
+  thermodynamicaldata_ (f, this),
   t_start_ (f, this),
   outputfmt_ (f, this),
   potentialforce_ (f, this),
@@ -2576,6 +2656,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!this->temperatureStepSize_)
       {
         this->temperatureStepSize_.set (temperatureStepSize_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // thermodynamicaldata
+    //
+    if (n.name () == "thermodynamicaldata" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< thermodynamicaldata_type > r (
+        thermodynamicaldata_traits::create (i, f, this));
+
+      if (!this->thermodynamicaldata_)
+      {
+        this->thermodynamicaldata_.set (r);
         continue;
       }
     }
@@ -3647,6 +3741,86 @@ _clone (::xml_schema::flags f,
 
 condition::
 ~condition ()
+{
+}
+
+// thermodynamicaldata
+//
+
+thermodynamicaldata::
+thermodynamicaldata (const ::xml_schema::unsigned_int& _xsd_unsigned_int_base,
+                     const iterationsTillCalculation_type& iterationsTillCalculation)
+: ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type > (_xsd_unsigned_int_base),
+  iterationsTillCalculation_ (iterationsTillCalculation, ::xml_schema::flags (), this),
+  iterationsPerCalculation_ (::xml_schema::flags (), this)
+{
+}
+
+thermodynamicaldata::
+thermodynamicaldata (const thermodynamicaldata& x,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+: ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type > (x, f, c),
+  iterationsTillCalculation_ (x.iterationsTillCalculation_, f, this),
+  iterationsPerCalculation_ (x.iterationsPerCalculation_, f, this)
+{
+}
+
+thermodynamicaldata::
+thermodynamicaldata (const ::xercesc::DOMElement& e,
+                     ::xml_schema::flags f,
+                     ::xml_schema::container* c)
+: ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type > (e, f | ::xml_schema::flags::base, c),
+  iterationsTillCalculation_ (f, this),
+  iterationsPerCalculation_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+    this->parse (p, f);
+  }
+}
+
+void thermodynamicaldata::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  while (p.more_attributes ())
+  {
+    const ::xercesc::DOMAttr& i (p.next_attribute ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    if (n.name () == "iterationsTillCalculation" && n.namespace_ ().empty ())
+    {
+      this->iterationsTillCalculation_.set (iterationsTillCalculation_traits::create (i, f, this));
+      continue;
+    }
+
+    if (n.name () == "iterationsPerCalculation" && n.namespace_ ().empty ())
+    {
+      this->iterationsPerCalculation_.set (iterationsPerCalculation_traits::create (i, f, this));
+      continue;
+    }
+  }
+
+  if (!iterationsTillCalculation_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_attribute< char > (
+      "iterationsTillCalculation",
+      "");
+  }
+}
+
+thermodynamicaldata* thermodynamicaldata::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class thermodynamicaldata (*this, f, c);
+}
+
+thermodynamicaldata::
+~thermodynamicaldata ()
 {
 }
 

@@ -238,6 +238,7 @@ class material_t;
 class data_t;
 class simulationfile_t;
 class condition;
+class thermodynamicaldata;
 class outputfmt;
 
 #include <memory>    // std::auto_ptr
@@ -1055,6 +1056,27 @@ class params_t: public ::xml_schema::type
   void
   temperatureStepSize (const temperatureStepSize_optional& x);
 
+  // thermodynamicaldata
+  // 
+  typedef ::thermodynamicaldata thermodynamicaldata_type;
+  typedef ::xsd::cxx::tree::optional< thermodynamicaldata_type > thermodynamicaldata_optional;
+  typedef ::xsd::cxx::tree::traits< thermodynamicaldata_type, char > thermodynamicaldata_traits;
+
+  const thermodynamicaldata_optional&
+  thermodynamicaldata () const;
+
+  thermodynamicaldata_optional&
+  thermodynamicaldata ();
+
+  void
+  thermodynamicaldata (const thermodynamicaldata_type& x);
+
+  void
+  thermodynamicaldata (const thermodynamicaldata_optional& x);
+
+  void
+  thermodynamicaldata (::std::auto_ptr< thermodynamicaldata_type > p);
+
   // t_start
   // 
   typedef ::xml_schema::decimal t_start_type;
@@ -1182,6 +1204,7 @@ class params_t: public ::xml_schema::type
   initialTemperature_optional initialTemperature_;
   targetTemperature_optional targetTemperature_;
   temperatureStepSize_optional temperatureStepSize_;
+  thermodynamicaldata_optional thermodynamicaldata_;
   ::xsd::cxx::tree::one< t_start_type > t_start_;
   ::xsd::cxx::tree::one< outputfmt_type > outputfmt_;
   ::xsd::cxx::tree::one< potentialforce_type > potentialforce_;
@@ -1928,6 +1951,73 @@ class condition: public ::xml_schema::string
   protected:
   ::xsd::cxx::tree::one< value_type > value_;
   type_optional type_;
+};
+
+class thermodynamicaldata: public ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type >
+{
+  public:
+  // iterationsTillCalculation
+  // 
+  typedef ::xml_schema::unsigned_int iterationsTillCalculation_type;
+  typedef ::xsd::cxx::tree::traits< iterationsTillCalculation_type, char > iterationsTillCalculation_traits;
+
+  const iterationsTillCalculation_type&
+  iterationsTillCalculation () const;
+
+  iterationsTillCalculation_type&
+  iterationsTillCalculation ();
+
+  void
+  iterationsTillCalculation (const iterationsTillCalculation_type& x);
+
+  // iterationsPerCalculation
+  // 
+  typedef ::xml_schema::unsigned_int iterationsPerCalculation_type;
+  typedef ::xsd::cxx::tree::optional< iterationsPerCalculation_type > iterationsPerCalculation_optional;
+  typedef ::xsd::cxx::tree::traits< iterationsPerCalculation_type, char > iterationsPerCalculation_traits;
+
+  const iterationsPerCalculation_optional&
+  iterationsPerCalculation () const;
+
+  iterationsPerCalculation_optional&
+  iterationsPerCalculation ();
+
+  void
+  iterationsPerCalculation (const iterationsPerCalculation_type& x);
+
+  void
+  iterationsPerCalculation (const iterationsPerCalculation_optional& x);
+
+  // Constructors.
+  //
+  thermodynamicaldata (const ::xml_schema::unsigned_int&,
+                       const iterationsTillCalculation_type&);
+
+  thermodynamicaldata (const ::xercesc::DOMElement& e,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+  thermodynamicaldata (const thermodynamicaldata& x,
+                       ::xml_schema::flags f = 0,
+                       ::xml_schema::container* c = 0);
+
+  virtual thermodynamicaldata*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~thermodynamicaldata ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  ::xsd::cxx::tree::one< iterationsTillCalculation_type > iterationsTillCalculation_;
+  iterationsPerCalculation_optional iterationsPerCalculation_;
 };
 
 class outputfmt: public ::xml_schema::string
