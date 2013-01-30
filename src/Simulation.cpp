@@ -35,7 +35,9 @@ err_type Simulation::Init(const SimulationDesc& desc)
 
 err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 {
-
+    // does file exist?
+    if(!utils::fileExists(filename))return E_FILENOTFOUND;
+    
 	XMLFileReader fr;
 
 	if(FAILED(fr.readFile(filename)))return E_FILEERROR;

@@ -363,7 +363,7 @@ void MolSim::printHelloMessage()
 
 	line();
 	cout << endl;
-	LOG4CXX_INFO(generalOutputLogger, "(c) 2012 by F.Dietz & L.Spiegelberg"); 
+	LOG4CXX_INFO(generalOutputLogger, "(c) 2012-2013 by F.Dietz & L.Spiegelberg"); 
 	cout << endl;
 	LOG4CXX_INFO(generalOutputLogger, "Molecular Simulator handling *.txt files");
 	line();

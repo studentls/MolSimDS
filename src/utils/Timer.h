@@ -25,6 +25,11 @@
 #include <sys/time.h>
 #endif
 
+// mac os x
+#ifdef MACINTOSH
+#include <sys/time.h>
+#endif
+
 namespace utils
 {
 	/// defines a timer class, used to accurately measure time with high accurate timers
@@ -38,15 +43,19 @@ namespace utils
 #endif
 
 #ifdef LINUX
-		//last saved timestamp
+		// last saved timestamp
 		timespec	lLastTime;
+#endif
+#ifdef MACINTOSH
+        // last timestamp
+        timeval lLastTime;
 #endif
 
 	public:
 
 		Timer()
 		{
-			reset();
+            reset();
 		}
 
 		/// reset timer
@@ -58,6 +67,9 @@ namespace utils
 #ifdef LINUX
 		//use CLOCK_PROCESS_CPUTIME_ID to measure CPU Performance, not IO
 		clock_gettime(CLOCK_MONOTONIC, &lLastTime);
+#endif
+#ifdef MACINTOSH
+            gettimeofday(&lLastTime, NULL);
 #endif
 		}
 
@@ -102,6 +114,26 @@ namespace utils
 			if(reset)this->reset();
 			
 			return elapsed;
+#endif
+#ifdef MACINTOSH
+            timeval lTime, lDiff;
+            gettimeofday(&lTime, NULL);
+            
+            lDiff.tv_sec = lTime.tv_sec - lLastTime.tv_sec;
+			lDiff.tv_usec = lTime.tv_usec - lLastTime.tv_usec;
+            
+			//is there a carry?
+			if(lDiff.tv_usec < 0)
+			{
+				lDiff.tv_sec -= 1;
+				lDiff.tv_usec += 1000000000; //10^9
+			}
+			
+			double elapsed = (double)lDiff.tv_sec + (double)lDiff.tv_usec / 1000000000.0;
+            
+            if(reset)this->reset();
+            
+            return elapsed;
 #endif
 			return 0.0;
 		}

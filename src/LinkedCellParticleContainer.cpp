@@ -891,3 +891,14 @@ void IndexLayer::constructInternalSliceIndices(const int zOffset, const LinkedCe
 					}
 		}
 }
+
+
+// layer fixes
+IndexStrip::IndexStrip()
+{
+    utils::TFastArray<utils::Vector<unsigned int, 2> >();
+}
+IndexLayer::IndexLayer()
+{
+    utils::TFastArray<utils::Vector<unsigned int, 2> >();
+}

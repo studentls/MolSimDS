@@ -34,11 +34,10 @@ err_type PerformanceTest::Run(const char *xmlFile)
 	err_type res = S_OK;
 	int perfstepcount = 1000; // use 1000 steps to analyse Performance as a maximum
 	int maximumthreads = 16; // perf up to 16 threads
-#ifdef ICE
-	// compiling the Code on LRZ's HPC ICE will cause an internal OMP error without this line
+
+	// treshold maximum threads!
 	int numprocs = omp_get_num_procs();
 	maximumthreads = (maximumthreads > numprocs) ? numprocs : maximumthreads;
-#endif
 
 	LOG4CXX_INFO(generalOutputLogger, ">> init performance tests for file "<<xmlFile);
 
@@ -46,6 +45,10 @@ err_type PerformanceTest::Run(const char *xmlFile)
 	Simulation sim;
 
 	res = sim.CreateSimulationFromXMLFile(xmlFile);
+    
+    // file not found?
+    if(res == E_FILENOTFOUND)LOG4CXX_ERROR(generalOutputLogger, ">> error: file "<<xmlFile<<" not found!");
+    
 	if(FAILED(res))return res;
 
 	// modify simulation desc

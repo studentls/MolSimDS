@@ -79,10 +79,7 @@ private:
 		return x + cellCount[0] * y;
 	}
 public:
-	IndexStrip()
-	{
-		TFastArray<utils::Vector<unsigned int, 2> >();
-	}
+	IndexStrip();
 
 	/// method to construct indices for a vertical strip(for 2D)
 	/// @param verticalCellCount amount for how many cells indices shall be constructed
@@ -123,10 +120,7 @@ class IndexLayer : public utils::TFastArray<utils::Vector<unsigned int, 2> >
 private:
 
 public:
-	IndexLayer()
-	{
-		TFastArray<utils::Vector<unsigned int, 2> >();
-	}
+	IndexLayer();
 
 
 	/// method to construct an interaction layer, layer interaction pairs will be constructed between zOffset and zOffset+1 layer
