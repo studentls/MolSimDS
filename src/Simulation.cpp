@@ -35,7 +35,9 @@ err_type Simulation::Init(const SimulationDesc& desc)
 
 err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 {
-
+    // does file exist?
+    if(!utils::fileExists(filename))return E_FILENOTFOUND;
+    
 	XMLFileReader fr;
 
 	if(FAILED(fr.readFile(filename)))return E_FILEERROR;
@@ -92,45 +94,84 @@ err_type Simulation::Run()
 	statistics.step_count = (desc.end_time - desc.start_time) / desc.delta_t;
 
 	// output that calculation have started ("starting calculation...")
-	LOG4CXX_TRACE(simulationLogger, "starting calculation...");
+	LOG4CXX_TRACE(simulationLogger, ">> starting calculation...");
+	LOG4CXX_TRACE(simulationLogger, "\n   progress\t\t\telapsed time / remaining time\n");
 
 	//start timer
 	utils::Timer timer;
+	utils::Timer progress_timer; // update progress view
+
+	// additional running variable to finish if events occur
+	bool running = true;
+
+#ifndef ICE
+	// has the user requested a viewer to run?
+	bool viewer = Viewer::Instance().IsRunning();
+#endif
+	// calculate how many steps will be 1%
+	int stepsperpercent = statistics.step_count / 100;
 
 	// iterate until the end time is reached...
-	while (current_time < desc.end_time) {
+	while (current_time < desc.end_time && running) {
 
 		// thermostat present? if yes apply(for iteration 0 thermostat is already set)
 		if(desc.applyThermostat())
 			if( iteration % desc.iterationsTillThermostatApplication == 0 && iteration != 0)
 				adjustThermostat();
 		
+		if (particles->getType() == PCT_MEMBRANE && iteration < ((MembraneContainer*)particles)->pullIterations)
+			particles->Iterate(forceCalculatorMembranePull, (void*)&desc);
+		
 		// perform one iteration step
 		performStep();
 
-	    // TODO: reset to 100
-		// plot the particles on every hundredth iteration, beginning with the first
+		// plot the particles on every desiredth iteration, beginning with the first
 		if (iteration % desc.iterationsperoutput == 0) {
 			plotParticles(iteration);
-			
-#ifndef DEBUG
-			// output that an iteration has finished
-			if(iteration % 25 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
-#else
-			// output that an iteration has finished
-			if(iteration % 5 == 0)
-			LOG4CXX_TRACE(simulationLogger, "Iteration " << iteration << " finished.");
-#endif
 		}
 		
+		// output info every 5s
+		if(progress_timer.getElapsedTime() > 5.0f)
+		{
+			stringstream str;
+
+			str<<"   [";
+
+			int max = 15;
+			int count = max * iteration / statistics.step_count;
+
+			for(int i = 0; i < count; i++)
+				str<<".";
+			for(int i = count; i < max; i++)
+				str<<" ";
+			// calc how many seconds iterations will approximately last from now onwards
+			int seconds = (int)(timer.getElapsedTime() / (double)iteration * statistics.step_count);
+
+			str<<"]  \t"<<(int)(100 * iteration / statistics.step_count)<<"%  \t"<<utils::secondsToHMS((int)timer.getElapsedTime())<<" / "<<utils::secondsToHMS(seconds);
+
+			LOG4CXX_TRACE(simulationLogger, str.str().c_str());
+
+			progress_timer.reset();
+		}
+		
+#ifndef ICE	
+		// is a viewer active?
+		if(viewer)
+		{
+			// update running dependend to the status of the viewer
+			running = Viewer::Instance().IsRunning();
+
+			// if running, notify(send particle data to viewer)
+			if(running)notifyViewer();
+		}
+#endif
 		// increment loop values
 		iteration++;
 		current_time += desc.delta_t;
 	}
 
-	// TODO:
-	// create file containing the particles here
+	// has the user aborted? is runnign set to false?
+	if(!running)LOG4CXX_INFO(simulationLogger, ">> simulation aborted by user");
 
 	//generate statistical data
 	statistics.time = timer.getElapsedTime();
@@ -138,7 +179,7 @@ err_type Simulation::Run()
 
 	// output that the output has finished
 	cout << endl;
-	LOG4CXX_TRACE(simulationLogger, "output written. Terminating...");
+	LOG4CXX_TRACE(simulationLogger, ">> output written. Terminating...\n");
 
 	return S_OK;
 }
@@ -162,8 +203,12 @@ void Simulation::calculateF() {
 	// call particles.Iterate() on forceResetter
 	particles->Iterate(forceResetter, (void*)&desc);
 
+	// if it's a membrane, calculate the membrane forces
+	if (particles->getType() == PCT_MEMBRANE)
+		((MembraneContainer*)particles)->ApplyMembraneForces();
+	
 	// call particles.IteratePairwise() on forceCalculator
-	particles->IteratePairwise(forceCalculator, (void*)&desc);
+		particles->IteratePairwise(forceCalculator, (void*)&desc);
 
 	// call gravityCalculator to add gravity force for each particle
 	if(desc.gravitational_constant != 0.0) // bad floating point variable check, but in this case o.k.
@@ -171,9 +216,11 @@ void Simulation::calculateF() {
 
 	// apply Boundary conditions, if LinkedCell Algorithm is used...
 	if(particles->getType() == PCT_LINKEDCELL)
-	{
 		((LinkedCellParticleContainer*)particles)->ApplyBoundaryConditions(forceCalculator, (void*)&desc);
-	}
+
+	// apply Boundary conditions, if Membrane Algorithm is used...
+	if(particles->getType() == PCT_MEMBRANE)
+		((MembraneContainer*)particles)->ApplyReflectiveBoundaryAtBottom(forceCalculator, (void*)&desc);
 }
 
 void Simulation::forceResetter(void* data, Particle& p) {
@@ -251,15 +298,37 @@ void Simulation::forceCalculator(void* data, Particle& p1, Particle& p2)
 	p2.substractForce(force);
 }
 
+void Simulation::forceCalculatorMembranePull(void* data, Particle& p)
+{
+#ifdef DEBUG
+	// assert data is a valid pointer!
+	if(!data)
+	{
+		LOG4CXX_ERROR(simulationLogger, "error: data is not a valid pointer!");
+		return;
+	}
+#endif
+
+	SimulationDesc *desc = (SimulationDesc*)data;
+
+	utils::Vector<double, 3> pull;
+	pull[2] = 0.8;
+
+	if (p.type == 1)
+		p.addForce(pull);
+}
+
 void Simulation::gravityCalculator(void *data, Particle& p)
 {
 	SimulationDesc *desc = (SimulationDesc*)data;
 
 	// add gravitational force, based on G = m * g
 	utils::Vector<double, 3> grav_force;
+	// act on the last dimension
+	int dimensionToAffect = desc->dimensions - 1;
 
-	// only y - component is affected...
-	grav_force[1] = p.m * desc->gravitational_constant;
+	// only the last dimension is affected...
+	grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
 
 	p.addForce(grav_force);
 }
@@ -287,7 +356,9 @@ void Simulation::posCalculator(void* data, Particle& p) {
 	// calc new pos
 	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// x_i ( t^{n+1} ) = x_i (t^n) + delta_t * p_i (t^n) + delta_t^2 * f_i (t^n) * 0.5 / m_i
-	p.x = (p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * 0.5 * (1.0 / p.m));
+	//p.x = p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * 0.5 * (1.0 / p.m);
+	// Cache here!
+	p.x = p.x + desc->delta_t * p.v + desc->delta_t * desc->delta_t * p.getF() * desc->getHalfInvMass(p.type);
 }
 
 void Simulation::calculateV() {
@@ -310,7 +381,8 @@ void Simulation::velCalculator(void* data, Particle& p) {
 	// calc new vel
 	// base calculation on Velocity-Störmer-Verlet-Algorithm
 	// v_i ( t^{n+1} ) = v_i(t^n) + dt * (F_i(t^n) + F_i(T^{n+1} ) ) / 2m_i
-	p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / p.m ));
+	//p.v = (p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * 0.5 * (1.0 / desc->materials[p.type].mass));
+	p.v = p.v +  desc->delta_t * (p.getF() + p.getOldF() ) * desc->getHalfInvMass(p.type);
 }
 
 void Simulation::plotParticles(int iteration) {
@@ -325,7 +397,7 @@ void Simulation::plotParticles(int iteration) {
 		{
 			// VTK Output
 			outputWriter::VTKWriter writer;
-			writer.plotParticles(particles->getParticles(), desc.outname, iteration);
+			writer.plotParticles(particles->getParticles(), desc.materials, desc.outname, iteration);
 			break;
 		}
 	case SOF_XYZ:
@@ -351,18 +423,18 @@ void Simulation::plotParticles(int iteration) {
 
 void Simulation::kineticEnergyCalculator(void *data, Particle& p)
 {
-	double *eout = (double*)data;
+	SimulationDesc *desc = (SimulationDesc*)data;
 
 	// calc according to
 	// Task 1, Sheet 4
-	*eout += p.m * p.v.L2NormSq() * 0.5;
+	desc->kineticEnergy += desc->materials[p.type].mass * p.v.L2NormSq() * 0.5;
 }
 
 void Simulation::totalMassCalculator(void *data, Particle& p)
 {
-	double *sum = (double*)data;
+	SimulationDesc *desc = (SimulationDesc*)data;
 
-	*sum += p.m;
+	desc->totalMass += desc->materials[p.type].mass;
 }
 
 void Simulation::setBrownianMotionCalculator(void *data, Particle& p)
@@ -390,9 +462,11 @@ void Simulation::initializeThermostat()
 	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
 
 	// we need the total mass of all particles...
-	double totalMass = 0.0;
-	particles->Iterate(totalMassCalculator, (void*)&totalMass);
-
+	
+	desc.totalMass = 0.0;
+	particles->Iterate(totalMassCalculator, (void*)&desc);
+	double totalMass = desc.totalMass;
+	
 	// calculate inital velocity that is set for each particle
 	desc.brownianMotionFactor = sqrt(2.0 * EnergyProposed / (desc.dimensions * totalMass));
 
@@ -413,9 +487,10 @@ void Simulation::adjustThermostat()
 	// calc beta
 
 	//get energy of the system
-	double EnergyAtTheMoment = 0.0;
-	particles->Iterate(kineticEnergyCalculator, (double*)&EnergyAtTheMoment);
-
+	desc.kineticEnergy = 0.0;	
+	particles->Iterate(kineticEnergyCalculator, (void*)&desc);
+	double EnergyAtTheMoment = desc.kineticEnergy;
+	
 	// proposed energy
 	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
 
@@ -425,4 +500,35 @@ void Simulation::adjustThermostat()
 	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
 
 	
+}
+
+void Simulation::notifyViewer()
+{
+	using namespace std;
+#ifndef ICE
+	// notify viewer
+		
+	VParticle *particles = NULL;
+
+	// wish to store 500 particles
+	int count = this->particles->getParticleCount();
+
+	count = Viewer::Instance().LockParticles(&particles, count);
+	
+	int pos = 0;
+
+	// add particles from particle container
+	vector<Particle> vp = this->particles->getParticles();
+	if(!vp.empty())
+		for(vector<Particle>::iterator it = vp.begin(); it != vp.end(); it++)
+		{
+			particles[pos].x = it->x[0];
+			particles[pos].y = it->x[1];
+			particles[pos].z = it->x[2];
+			particles[pos].type = it->type;
+			pos++;
+		}
+
+	Viewer::Instance().UnlockParticles(&particles);
+#endif
 }

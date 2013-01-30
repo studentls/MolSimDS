@@ -37,10 +37,9 @@ public:
 					   const Vec3& vLowerLeftFrontCorner,
 					   const utils::Vector<unsigned int, 3>& dimensions,
 					   const double meshWidth,
-					   const double mass,
-					   const Vec3& vInitialVelocity,
-					   const double dBrownianMotion = 0.1,// set this later individual, use default value at the moment
-					   const int type = 0) 
+					   const Vec3& vInitialVelocity, const int type,
+					   const double dBrownianMotion = 0.1// set this later individual, use default value at the moment
+					   ) 
 	{
 		// acknowledge that default constructor sets forces to zero...
 		Particle p;
@@ -58,7 +57,6 @@ public:
 
 					p.v		= vInitialVelocity;
 					p.type	= type;
-					p.m		= mass;
 
 					// apply Brownian motion via Boltzmann distribution
 
@@ -83,12 +81,12 @@ public:
 	static void makeSphere(ParticleContainer& pc,
 							const Vec3& vCenter,
 							const Vec3& vInitialVelocity,
-							const double mass,
 							const unsigned int radius,
 							const double meshWidth,
+							const int type,
 							const unsigned int dimensions = 2,
-							const double dBrownianMotion = 0.1,// set this later individual, use default value at the moment
-							const int type = 0)
+							const double dBrownianMotion = 0.1// set this later individual, use default value at the moment
+							)
 	{
 		assert(dimensions >=2 && dimensions <= 3);
 
@@ -110,7 +108,6 @@ public:
 
 						p.v			= vInitialVelocity;
 						p.type		= type;
-						p.m			= mass;
 
 						// apply Brownian motion via Boltzmann distribution
 						MaxwellBoltzmannDistribution(p, dBrownianMotion, dimensions);
@@ -135,7 +132,6 @@ public:
 
 							p.v			= vInitialVelocity;
 							p.type		= type;
-							p.m			= mass;
 
 							// apply Brownian motion via Boltzmann distribution
 							MaxwellBoltzmannDistribution(p, dBrownianMotion, dimensions);

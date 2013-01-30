@@ -44,6 +44,7 @@ private:
 		mat.name = "default";
 		mat.epsilon = 1.0;
 		mat.sigma = 1.0;
+		mat.mass = 1.0;
 		return mat;
 	}
 

@@ -17,6 +17,7 @@
 #include "ParticleContainer.h"
 #include "utils/utils.h"
 
+
 // use flag System for Boundaries
 // to combine flags use e.g. BC_RIGHT | BC_LEFT
 // reflective boundaries
@@ -35,6 +36,11 @@
 #define BC_PERIODIC_YAXIS	0x200
 #define BC_PERIODIC_ZAXIS	0x400
 
+
+// forward declaration
+class IndexLayer;
+class LinkedCellParticleContainer;
+
 struct PeriodicBoundary
 {
 	unsigned int cell1;	/// index for first cell
@@ -42,6 +48,90 @@ struct PeriodicBoundary
 	double	xAxis;		/// distance on x - axis (0 or length of area on axis)
 	double	yAxis;		/// distance on y - axis (0 or length of area on axis)
 	double	zAxis;		/// distance on y - axis (0 or length of area on axis)
+};
+
+
+/// indices for Cells used for OpenMP parallelization
+/// structure to hold a strip of Indices
+class  IndexStrip : public utils::TFastArray<utils::Vector<unsigned int, 2> >
+{
+private:
+	/// little helper function, to create fast a pair
+	/// @param i1 first index
+	/// @param i2 second index
+	utils::Vector<unsigned int, 2> makePair(const unsigned int i1, const unsigned int i2)
+	{
+		utils::Vector<unsigned int, 2> res;
+		res[0] = i1;
+		res[1] = i2;
+
+		return res;
+	}
+
+	/// little helper function, to create fast a 1D index
+	/// @param x first index
+	/// @param y second index
+	/// @param cellCount 3D-vector with domain dimensions
+	unsigned int Index2DTo1D(const unsigned int x, const unsigned int y, const utils::Vector<unsigned int, 3>&		cellCount)
+	{
+		assert(x + cellCount[0] * y < cellCount[0] * cellCount[1]);
+
+		return x + cellCount[0] * y;
+	}
+public:
+	IndexStrip();
+
+	/// method to construct indices for a vertical strip(for 2D)
+	/// @param verticalCellCount amount for how many cells indices shall be constructed
+	/// @param leftStart index of the left Cell. Indices will be constructed for verticalCellCount cells between leftStart and leftStart+1 Cells
+	/// @param cellCount 3D Vector containing domain cell count in each dimension
+	void	constructVerticalStripIndices(const int leftStart, const int verticalCellCount, const utils::Vector<unsigned int, 3>		cellCount)
+	{
+		for(int i = 0; i < verticalCellCount - 1; i++)
+		{
+			// - pair
+			this->push_back(makePair(Index2DTo1D(leftStart, i, cellCount),
+									 Index2DTo1D(leftStart + 1, i, cellCount)));
+			// | left pair
+			this->push_back(makePair(Index2DTo1D(leftStart, i, cellCount),
+									 Index2DTo1D(leftStart, i + 1, cellCount)));
+			//  right | pair
+			this->push_back(makePair(Index2DTo1D(leftStart + 1, i, cellCount),
+									 Index2DTo1D(leftStart + 1, i + 1, cellCount)));
+			// \ pair
+			this->push_back(makePair(Index2DTo1D(leftStart, i, cellCount),
+									 Index2DTo1D(leftStart + 1, i + 1, cellCount)));
+			// / pair
+			this->push_back(makePair(Index2DTo1D(leftStart + 1, i, cellCount),
+									 Index2DTo1D(leftStart, i + 1, cellCount)));
+		}
+
+		// final pair
+		
+		this->push_back(makePair(Index2DTo1D(leftStart, verticalCellCount - 1, cellCount),
+									Index2DTo1D(leftStart + 1, verticalCellCount - 1, cellCount)));
+	}
+};
+
+/// class used for 3D parallelization
+/// holds indices for a layer of cells, to interact with another layer
+class IndexLayer : public utils::TFastArray<utils::Vector<unsigned int, 2> >
+{
+private:
+
+public:
+	IndexLayer();
+
+
+	/// method to construct an interaction layer, layer interaction pairs will be constructed between zOffset and zOffset+1 layer
+	/// @param zOffset offset of the layer(e.g. the z Coordinate of the lower of the two interacted layers)
+	/// @param pc a LCParticleContainer, used for its internal index calculations
+	void constructVerticalInteractionSlice(const int zOffset, const LinkedCellParticleContainer *pc);
+
+	/// method to construct for a layer, internal pairs(necessary for a top layer)
+	/// @param zOffset offset of the layer(e.g. the z Coordinate of the layer for which internal (x,y) pairs shall be constructed)
+	/// @param pc a LCParticleContainer, used for its internal index calculations
+	void constructInternalSliceIndices(const int zOffset, const LinkedCellParticleContainer *pc);
 };
 
 /// a class that is used to store Particles and iterate over them
@@ -65,7 +155,7 @@ private:
 	utils::Vector<unsigned int, 3>		cellCount;
 
 	/// get total cell count
-	inline unsigned int					getCellCount()
+	inline unsigned int					getCellCount() const
 	{
 		unsigned int sum = 1;
 		for(int i = 0; i < dim; i++)
@@ -93,6 +183,14 @@ private:
 	/// note that here the space is very important, as g++ has problems otherwise parsing it
 	std::vector<utils::Vector<unsigned int, 2> >	cellPairs;
 
+	/// used for OpenMP
+	/// 2D
+	utils::TFastArray<IndexStrip>					oddStrips;	/// contains index data for odd strips
+	utils::TFastArray<IndexStrip>					evenStrips; /// contains index pairs for even strips
+	/// 3D
+	utils::TFastArray<IndexLayer>					oddLayers;	/// contains index data for odd layers
+	utils::TFastArray<IndexLayer>					evenLayers; /// contains index pairs for even layers
+
 	/// array of indices of halo cells
 	std::vector<unsigned int>						haloIndices;
 
@@ -102,7 +200,7 @@ private:
 	/// little helper function, to create fast a pair
 	/// @param i1 first index
 	/// @param i2 second index
-	utils::Vector<unsigned int, 2> makePair(const unsigned int i1, const unsigned int i2)
+	utils::Vector<unsigned int, 2> makePair(const unsigned int i1, const unsigned int i2) const
 	{
 		utils::Vector<unsigned int, 2> res;
 		res[0] = i1;
@@ -115,7 +213,7 @@ private:
 	/// @param i1 first index
 	/// @param i2 second index
 	/// @param i3 third index
-	utils::Vector<unsigned int, 3> makeTriple(const unsigned int i1, const unsigned int i2, const unsigned int i3)
+	utils::Vector<unsigned int, 3> makeTriple(const unsigned int i1, const unsigned int i2, const unsigned int i3) const
 	{
 		utils::Vector<unsigned int, 3> res;
 		res[0] = i1;
@@ -146,21 +244,21 @@ private:
 
 	/// helper function to convert fast 2D indices to 1D based on cellCount
 	/// note that indices should be asserted!
-	inline unsigned int Index2DTo1D(unsigned int x, unsigned int y)
+	inline unsigned int Index2DTo1D(unsigned int x, unsigned int y) const
 	{
 		return x + cellCount[0] * y;
 	}
 
 	/// helper function to convert fast 3D indices to 1D based on cellCount
 	/// note that indices should be asserted!
-	inline unsigned int Index3DTo1D(unsigned int x, unsigned int y, unsigned int z)
+	inline unsigned int Index3DTo1D(unsigned int x, unsigned int y, unsigned int z) const
 	{
 		return x + cellCount[0] * (y + z * cellCount[1]);
 	}
 
 	/// helper function to convert 1D index to 2D indices
 	/// @return pair of 2D indices (x, y)
-	inline utils::Vector<unsigned int, 2> Index1DTo2D(const unsigned int index)
+	inline utils::Vector<unsigned int, 2> Index1DTo2D(const unsigned int index) const 
 	{
 		utils::Vector<unsigned int, 2> res;
 		
@@ -175,7 +273,7 @@ private:
 
 	/// helper function to convert 1D index to 3D indices
 	/// @return pair of 3D indices (x, y)
-	inline utils::Vector<unsigned int, 3> Index1DTo3D(const unsigned int index)
+	inline utils::Vector<unsigned int, 3> Index1DTo3D(const unsigned int index) const 
 	{
 		utils::Vector<unsigned int, 3> res;
 		
@@ -286,6 +384,9 @@ private:
 	/// function which will calculate all necessary index array
 	void	calcIndices();
 
+	/// function to calcualte Indices for Multithreading
+	void	calcMTIndices();
+
 	/// function to calculate indices of the r-th frame from the outside
 	/// e.g. r = 0 will return indices of the halo frame
 	///		 r = 1 the indices of the boundary cells
@@ -360,6 +461,27 @@ private:
 				
 		// make index
 		return Index3DTo1D(xIndex, yIndex, zIndex);
+	}
+
+	/// method to calculate pairwise interactions between two cells(used for forces e.g.)
+	/// @param func function to apply pairwise
+	/// @param data pointer given to func
+	/// @param i index of first cell
+	/// @param j index of second cell
+	inline void interactCells(void(*func)(void*, Particle&, Particle&), void *data, const int i, const int j)
+	{
+		// if one cell is empty go break
+		if(Cells[i].empty() || Cells[j].empty())return;
+
+		// for all particles in cell_i
+		for(int  k = 0; k < Cells[i].size(); k++)
+		{		
+			// calc force, based on actio / reaction between cell_i and cell_j
+			for(int l = 0; l < Cells[j].size(); l++)
+			{
+					func(data, Cells[i][k], Cells[j][l]);
+			}			
+		}
 	}
 
 
@@ -545,6 +667,11 @@ public:
 			for(int yp = -1; yp <= 1; yp++)
 				for(int zp = -1; zp <= 1; zp++)
 				{
+					// test individual correctness
+					if(x + xp < 0 || x + xp >= cellCount[0])continue;
+					if(y + yp < 0 || y + yp >= cellCount[1])continue;
+					if(z + zp < 0 || z + zp >= cellCount[2])continue;
+
 					int index = x +xp + (y + yp) * cellCount[0] + (z + zp) * cellCount[0] * cellCount[1];
 
 					//valid?
@@ -563,21 +690,6 @@ public:
 	/// @param func function pointer, to calculate interaction with boundary particle
 	/// @data optional data given to func
 	void IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data);
-
-	/// add particles from *.txt file
-	void							AddParticlesFromFile(const char *filename)
-	{
-		//...
-	}
-
-	/// our new fileformat, replace later AddParticlesFromFile
-	/// @return return true if file could be read
-	bool							AddParticlesFromFileNew(const char *filename)
-	{
-		//	... 
-		// nothing
-		return true;
-	}
 
 	/// removes all particles
 	void							Clear()
@@ -703,7 +815,6 @@ public:
 						Cells[index].push_back(p);
 						// remove particle from current cell (i-th cell)
 						it = Cells[i].erase(it);
-
 					}
 				}
 
@@ -728,9 +839,29 @@ public:
 	/// @return new vector of boundary particles
 	std::vector<Particle>			getBoundaryParticles();
 
+	/// method to retrieve a Bounding Box, which surrounds all particles
+	/// @return returns a BoundingBox, which defines extent and center of all particles in the container(bounding box)
+	utils::BoundingBox				getBoundingBox()
+	{
+		using namespace utils;
+
+		// easy task here, everything is stored!
+		BoundingBox bb;
+
+		bb.extent = this->calcSimulationAreaExtent();
+		bb.center = bb.extent * 0.5 + frontLowerLeftCorner;
+		
+		return bb;
+	}
+
+	/// @return amount of cells in each direction
+	utils::Vector<unsigned int, 3>	getCellExtent()	{return this->cellCount - utils::Vector<unsigned int, 3>(2);}
 
 	// befriend with ParticleContainerTest in order to test private functions
 	friend class					ParticleContainerTest;
+
+	// befriend with the index classes
+	friend class					IndexLayer;
 };
 
 #endif 

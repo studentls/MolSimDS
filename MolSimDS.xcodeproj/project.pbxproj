@@ -7,21 +7,25 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		54B4DB6E1687C370006618ED /* FileReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB421687C370006618ED /* FileReader.cpp */; };
-		54B4DB6F1687C370006618ED /* LinkedCellParticleContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB441687C370006618ED /* LinkedCellParticleContainer.cpp */; };
-		54B4DB701687C370006618ED /* ListParticleContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB461687C370006618ED /* ListParticleContainer.cpp */; };
-		54B4DB711687C370006618ED /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB481687C370006618ED /* Logging.cpp */; };
-		54B4DB721687C370006618ED /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB4A1687C370006618ED /* main.cpp */; };
-		54B4DB731687C370006618ED /* MaxwellBoltzmannDistribution.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB4B1687C370006618ED /* MaxwellBoltzmannDistribution.cpp */; };
-		54B4DB741687C370006618ED /* MolSim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB4D1687C370006618ED /* MolSim.cpp */; };
-		54B4DB751687C370006618ED /* vtk-unstructured.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB501687C370006618ED /* vtk-unstructured.cpp */; };
-		54B4DB761687C370006618ED /* VTKWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB541687C370006618ED /* VTKWriter.cpp */; };
-		54B4DB771687C370006618ED /* XYZWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB561687C370006618ED /* XYZWriter.cpp */; };
-		54B4DB781687C370006618ED /* Particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB581687C370006618ED /* Particle.cpp */; };
-		54B4DB791687C370006618ED /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB5D1687C370006618ED /* Simulation.cpp */; };
-		54B4DB7A1687C370006618ED /* TXTFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB5F1687C370006618ED /* TXTFile.cpp */; };
-		54B4DB7B1687C370006618ED /* simulationfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB691687C370006618ED /* simulationfile.cpp */; };
-		54B4DB7C1687C370006618ED /* XMLFileReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 54B4DB6B1687C370006618ED /* XMLFileReader.cpp */; };
+		541F5E4D16B93B48000A795F /* FileReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E1716B93B48000A795F /* FileReader.cpp */; };
+		541F5E4E16B93B48000A795F /* LinkedCellParticleContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E1916B93B48000A795F /* LinkedCellParticleContainer.cpp */; };
+		541F5E4F16B93B48000A795F /* ListParticleContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E1B16B93B48000A795F /* ListParticleContainer.cpp */; };
+		541F5E5016B93B48000A795F /* Logging.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E1D16B93B48000A795F /* Logging.cpp */; };
+		541F5E5116B93B48000A795F /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E1F16B93B48000A795F /* main.cpp */; };
+		541F5E5216B93B48000A795F /* MaxwellBoltzmannDistribution.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2016B93B48000A795F /* MaxwellBoltzmannDistribution.cpp */; };
+		541F5E5316B93B48000A795F /* MembraneContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2216B93B48000A795F /* MembraneContainer.cpp */; };
+		541F5E5416B93B48000A795F /* MolSim.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2416B93B48000A795F /* MolSim.cpp */; };
+		541F5E5516B93B48000A795F /* vtk-unstructured.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2716B93B48000A795F /* vtk-unstructured.cpp */; };
+		541F5E5616B93B48000A795F /* VTKWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2B16B93B48000A795F /* VTKWriter.cpp */; };
+		541F5E5716B93B48000A795F /* XYZWriter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2D16B93B48000A795F /* XYZWriter.cpp */; };
+		541F5E5816B93B48000A795F /* Particle.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E2F16B93B48000A795F /* Particle.cpp */; };
+		541F5E5916B93B48000A795F /* PerformanceTest.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E3416B93B48000A795F /* PerformanceTest.cpp */; };
+		541F5E5A16B93B48000A795F /* Simulation.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E3616B93B48000A795F /* Simulation.cpp */; };
+		541F5E5B16B93B48000A795F /* TXTFile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E3916B93B48000A795F /* TXTFile.cpp */; };
+		541F5E5C16B93B48000A795F /* Color.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E3D16B93B48000A795F /* Color.cpp */; };
+		541F5E5D16B93B48000A795F /* Viewer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E4516B93B48000A795F /* Viewer.cpp */; };
+		541F5E5E16B93B48000A795F /* simulationfile.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E4816B93B48000A795F /* simulationfile.cpp */; };
+		541F5E5F16B93B48000A795F /* XMLFileReader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 541F5E4A16B93B48000A795F /* XMLFileReader.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -37,48 +41,58 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		5432C7191687C2F000C7BAEF /* MolSimDS */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; name = MolSimDS; path = molsim; sourceTree = BUILT_PRODUCTS_DIR; };
-		54B4DB421687C370006618ED /* FileReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileReader.cpp; sourceTree = "<group>"; };
-		54B4DB431687C370006618ED /* FileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileReader.h; sourceTree = "<group>"; };
-		54B4DB441687C370006618ED /* LinkedCellParticleContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinkedCellParticleContainer.cpp; sourceTree = "<group>"; };
-		54B4DB451687C370006618ED /* LinkedCellParticleContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkedCellParticleContainer.h; sourceTree = "<group>"; };
-		54B4DB461687C370006618ED /* ListParticleContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListParticleContainer.cpp; sourceTree = "<group>"; };
-		54B4DB471687C370006618ED /* ListParticleContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListParticleContainer.h; sourceTree = "<group>"; };
-		54B4DB481687C370006618ED /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logging.cpp; sourceTree = "<group>"; };
-		54B4DB491687C370006618ED /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
-		54B4DB4A1687C370006618ED /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
-		54B4DB4B1687C370006618ED /* MaxwellBoltzmannDistribution.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MaxwellBoltzmannDistribution.cpp; sourceTree = "<group>"; };
-		54B4DB4C1687C370006618ED /* MaxwellBoltzmannDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxwellBoltzmannDistribution.h; sourceTree = "<group>"; };
-		54B4DB4D1687C370006618ED /* MolSim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MolSim.cpp; sourceTree = "<group>"; };
-		54B4DB4E1687C370006618ED /* MolSim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MolSim.h; sourceTree = "<group>"; };
-		54B4DB501687C370006618ED /* vtk-unstructured.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "vtk-unstructured.cpp"; sourceTree = "<group>"; };
-		54B4DB511687C370006618ED /* vtk-unstructured.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vtk-unstructured.h"; sourceTree = "<group>"; };
-		54B4DB521687C370006618ED /* vtk-unstructured.ixx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vtk-unstructured.ixx"; sourceTree = "<group>"; };
-		54B4DB531687C370006618ED /* vtk-unstructured.xsd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "vtk-unstructured.xsd"; sourceTree = "<group>"; };
-		54B4DB541687C370006618ED /* VTKWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VTKWriter.cpp; sourceTree = "<group>"; };
-		54B4DB551687C370006618ED /* VTKWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTKWriter.h; sourceTree = "<group>"; };
-		54B4DB561687C370006618ED /* XYZWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XYZWriter.cpp; sourceTree = "<group>"; };
-		54B4DB571687C370006618ED /* XYZWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYZWriter.h; sourceTree = "<group>"; };
-		54B4DB581687C370006618ED /* Particle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particle.cpp; sourceTree = "<group>"; };
-		54B4DB591687C370006618ED /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particle.h; sourceTree = "<group>"; };
-		54B4DB5A1687C370006618ED /* ParticleContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleContainer.h; sourceTree = "<group>"; };
-		54B4DB5B1687C370006618ED /* ParticleContainerTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleContainerTest.h; sourceTree = "<group>"; };
-		54B4DB5C1687C370006618ED /* ParticleGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleGenerator.h; sourceTree = "<group>"; };
-		54B4DB5D1687C370006618ED /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
-		54B4DB5E1687C370006618ED /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Simulation.h; sourceTree = "<group>"; };
-		54B4DB5F1687C370006618ED /* TXTFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TXTFile.cpp; sourceTree = "<group>"; };
-		54B4DB601687C370006618ED /* TXTFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXTFile.h; sourceTree = "<group>"; };
-		54B4DB621687C370006618ED /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
-		54B4DB631687C370006618ED /* Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
-		54B4DB641687C370006618ED /* Plane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Plane.h; sourceTree = "<group>"; };
-		54B4DB651687C370006618ED /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
-		54B4DB661687C370006618ED /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
-		54B4DB671687C370006618ED /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
-		54B4DB691687C370006618ED /* simulationfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simulationfile.cpp; sourceTree = "<group>"; };
-		54B4DB6A1687C370006618ED /* simulationfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simulationfile.h; sourceTree = "<group>"; };
-		54B4DB6B1687C370006618ED /* XMLFileReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XMLFileReader.cpp; sourceTree = "<group>"; };
-		54B4DB6C1687C370006618ED /* XMLFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLFileReader.h; sourceTree = "<group>"; };
-		54B4DB6D1687C370006618ED /* XMLFileReaderTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLFileReaderTest.h; sourceTree = "<group>"; };
+		541F5E1716B93B48000A795F /* FileReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FileReader.cpp; sourceTree = "<group>"; };
+		541F5E1816B93B48000A795F /* FileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileReader.h; sourceTree = "<group>"; };
+		541F5E1916B93B48000A795F /* LinkedCellParticleContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinkedCellParticleContainer.cpp; sourceTree = "<group>"; };
+		541F5E1A16B93B48000A795F /* LinkedCellParticleContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinkedCellParticleContainer.h; sourceTree = "<group>"; };
+		541F5E1B16B93B48000A795F /* ListParticleContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ListParticleContainer.cpp; sourceTree = "<group>"; };
+		541F5E1C16B93B48000A795F /* ListParticleContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ListParticleContainer.h; sourceTree = "<group>"; };
+		541F5E1D16B93B48000A795F /* Logging.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Logging.cpp; sourceTree = "<group>"; };
+		541F5E1E16B93B48000A795F /* Logging.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Logging.h; sourceTree = "<group>"; };
+		541F5E1F16B93B48000A795F /* main.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
+		541F5E2016B93B48000A795F /* MaxwellBoltzmannDistribution.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MaxwellBoltzmannDistribution.cpp; sourceTree = "<group>"; };
+		541F5E2116B93B48000A795F /* MaxwellBoltzmannDistribution.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MaxwellBoltzmannDistribution.h; sourceTree = "<group>"; };
+		541F5E2216B93B48000A795F /* MembraneContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MembraneContainer.cpp; sourceTree = "<group>"; };
+		541F5E2316B93B48000A795F /* MembraneContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MembraneContainer.h; sourceTree = "<group>"; };
+		541F5E2416B93B48000A795F /* MolSim.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MolSim.cpp; sourceTree = "<group>"; };
+		541F5E2516B93B48000A795F /* MolSim.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MolSim.h; sourceTree = "<group>"; };
+		541F5E2716B93B48000A795F /* vtk-unstructured.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = "vtk-unstructured.cpp"; sourceTree = "<group>"; };
+		541F5E2816B93B48000A795F /* vtk-unstructured.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "vtk-unstructured.h"; sourceTree = "<group>"; };
+		541F5E2916B93B48000A795F /* vtk-unstructured.ixx */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = "vtk-unstructured.ixx"; sourceTree = "<group>"; };
+		541F5E2A16B93B48000A795F /* vtk-unstructured.xsd */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xml; path = "vtk-unstructured.xsd"; sourceTree = "<group>"; };
+		541F5E2B16B93B48000A795F /* VTKWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = VTKWriter.cpp; sourceTree = "<group>"; };
+		541F5E2C16B93B48000A795F /* VTKWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VTKWriter.h; sourceTree = "<group>"; };
+		541F5E2D16B93B48000A795F /* XYZWriter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XYZWriter.cpp; sourceTree = "<group>"; };
+		541F5E2E16B93B48000A795F /* XYZWriter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XYZWriter.h; sourceTree = "<group>"; };
+		541F5E2F16B93B48000A795F /* Particle.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Particle.cpp; sourceTree = "<group>"; };
+		541F5E3016B93B48000A795F /* Particle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Particle.h; sourceTree = "<group>"; };
+		541F5E3116B93B48000A795F /* ParticleContainer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleContainer.h; sourceTree = "<group>"; };
+		541F5E3216B93B48000A795F /* ParticleContainerTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleContainerTest.h; sourceTree = "<group>"; };
+		541F5E3316B93B48000A795F /* ParticleGenerator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ParticleGenerator.h; sourceTree = "<group>"; };
+		541F5E3416B93B48000A795F /* PerformanceTest.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PerformanceTest.cpp; sourceTree = "<group>"; };
+		541F5E3516B93B48000A795F /* PerformanceTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PerformanceTest.h; sourceTree = "<group>"; };
+		541F5E3616B93B48000A795F /* Simulation.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Simulation.cpp; sourceTree = "<group>"; };
+		541F5E3716B93B48000A795F /* Simulation.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Simulation.h; sourceTree = "<group>"; };
+		541F5E3816B93B48000A795F /* SimulationDesc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimulationDesc.h; sourceTree = "<group>"; };
+		541F5E3916B93B48000A795F /* TXTFile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TXTFile.cpp; sourceTree = "<group>"; };
+		541F5E3A16B93B48000A795F /* TXTFile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TXTFile.h; sourceTree = "<group>"; };
+		541F5E3C16B93B48000A795F /* Base.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Base.h; sourceTree = "<group>"; };
+		541F5E3D16B93B48000A795F /* Color.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Color.cpp; sourceTree = "<group>"; };
+		541F5E3E16B93B48000A795F /* Color.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Color.h; sourceTree = "<group>"; };
+		541F5E3F16B93B48000A795F /* Helper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Helper.h; sourceTree = "<group>"; };
+		541F5E4016B93B48000A795F /* Plane.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Plane.h; sourceTree = "<group>"; };
+		541F5E4116B93B48000A795F /* TFastArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TFastArray.h; sourceTree = "<group>"; };
+		541F5E4216B93B48000A795F /* Timer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Timer.h; sourceTree = "<group>"; };
+		541F5E4316B93B48000A795F /* utils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utils.h; sourceTree = "<group>"; };
+		541F5E4416B93B48000A795F /* Vector.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vector.h; sourceTree = "<group>"; };
+		541F5E4516B93B48000A795F /* Viewer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Viewer.cpp; sourceTree = "<group>"; };
+		541F5E4616B93B48000A795F /* Viewer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Viewer.h; sourceTree = "<group>"; };
+		541F5E4816B93B48000A795F /* simulationfile.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = simulationfile.cpp; sourceTree = "<group>"; };
+		541F5E4916B93B48000A795F /* simulationfile.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = simulationfile.h; sourceTree = "<group>"; };
+		541F5E4A16B93B48000A795F /* XMLFileReader.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = XMLFileReader.cpp; sourceTree = "<group>"; };
+		541F5E4B16B93B48000A795F /* XMLFileReader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLFileReader.h; sourceTree = "<group>"; };
+		541F5E4C16B93B48000A795F /* XMLFileReaderTest.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = XMLFileReaderTest.h; sourceTree = "<group>"; };
+		5432C7191687C2F000C7BAEF /* molsim */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = molsim; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -92,6 +106,88 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		541F5E1616B93B48000A795F /* src */ = {
+			isa = PBXGroup;
+			children = (
+				541F5E1716B93B48000A795F /* FileReader.cpp */,
+				541F5E1816B93B48000A795F /* FileReader.h */,
+				541F5E1916B93B48000A795F /* LinkedCellParticleContainer.cpp */,
+				541F5E1A16B93B48000A795F /* LinkedCellParticleContainer.h */,
+				541F5E1B16B93B48000A795F /* ListParticleContainer.cpp */,
+				541F5E1C16B93B48000A795F /* ListParticleContainer.h */,
+				541F5E1D16B93B48000A795F /* Logging.cpp */,
+				541F5E1E16B93B48000A795F /* Logging.h */,
+				541F5E1F16B93B48000A795F /* main.cpp */,
+				541F5E2016B93B48000A795F /* MaxwellBoltzmannDistribution.cpp */,
+				541F5E2116B93B48000A795F /* MaxwellBoltzmannDistribution.h */,
+				541F5E2216B93B48000A795F /* MembraneContainer.cpp */,
+				541F5E2316B93B48000A795F /* MembraneContainer.h */,
+				541F5E2416B93B48000A795F /* MolSim.cpp */,
+				541F5E2516B93B48000A795F /* MolSim.h */,
+				541F5E2616B93B48000A795F /* outputWriter */,
+				541F5E2F16B93B48000A795F /* Particle.cpp */,
+				541F5E3016B93B48000A795F /* Particle.h */,
+				541F5E3116B93B48000A795F /* ParticleContainer.h */,
+				541F5E3216B93B48000A795F /* ParticleContainerTest.h */,
+				541F5E3316B93B48000A795F /* ParticleGenerator.h */,
+				541F5E3416B93B48000A795F /* PerformanceTest.cpp */,
+				541F5E3516B93B48000A795F /* PerformanceTest.h */,
+				541F5E3616B93B48000A795F /* Simulation.cpp */,
+				541F5E3716B93B48000A795F /* Simulation.h */,
+				541F5E3816B93B48000A795F /* SimulationDesc.h */,
+				541F5E3916B93B48000A795F /* TXTFile.cpp */,
+				541F5E3A16B93B48000A795F /* TXTFile.h */,
+				541F5E3B16B93B48000A795F /* utils */,
+				541F5E4516B93B48000A795F /* Viewer.cpp */,
+				541F5E4616B93B48000A795F /* Viewer.h */,
+				541F5E4716B93B48000A795F /* XMLFile */,
+				541F5E4A16B93B48000A795F /* XMLFileReader.cpp */,
+				541F5E4B16B93B48000A795F /* XMLFileReader.h */,
+				541F5E4C16B93B48000A795F /* XMLFileReaderTest.h */,
+			);
+			path = src;
+			sourceTree = SOURCE_ROOT;
+		};
+		541F5E2616B93B48000A795F /* outputWriter */ = {
+			isa = PBXGroup;
+			children = (
+				541F5E2716B93B48000A795F /* vtk-unstructured.cpp */,
+				541F5E2816B93B48000A795F /* vtk-unstructured.h */,
+				541F5E2916B93B48000A795F /* vtk-unstructured.ixx */,
+				541F5E2A16B93B48000A795F /* vtk-unstructured.xsd */,
+				541F5E2B16B93B48000A795F /* VTKWriter.cpp */,
+				541F5E2C16B93B48000A795F /* VTKWriter.h */,
+				541F5E2D16B93B48000A795F /* XYZWriter.cpp */,
+				541F5E2E16B93B48000A795F /* XYZWriter.h */,
+			);
+			path = outputWriter;
+			sourceTree = "<group>";
+		};
+		541F5E3B16B93B48000A795F /* utils */ = {
+			isa = PBXGroup;
+			children = (
+				541F5E3C16B93B48000A795F /* Base.h */,
+				541F5E3D16B93B48000A795F /* Color.cpp */,
+				541F5E3E16B93B48000A795F /* Color.h */,
+				541F5E3F16B93B48000A795F /* Helper.h */,
+				541F5E4016B93B48000A795F /* Plane.h */,
+				541F5E4116B93B48000A795F /* TFastArray.h */,
+				541F5E4216B93B48000A795F /* Timer.h */,
+				541F5E4316B93B48000A795F /* utils.h */,
+				541F5E4416B93B48000A795F /* Vector.h */,
+			);
+			path = utils;
+			sourceTree = "<group>";
+		};
+		541F5E4716B93B48000A795F /* XMLFile */ = {
+			isa = PBXGroup;
+			children = (
+				541F5E4816B93B48000A795F /* simulationfile.cpp */,
+				541F5E4916B93B48000A795F /* simulationfile.h */,
+			);
+			path = XMLFile;
+			sourceTree = "<group>";
+		};
 		5432C70E1687C2F000C7BAEF = {
 			isa = PBXGroup;
 			children = (
@@ -103,7 +199,7 @@
 		5432C71A1687C2F000C7BAEF /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				5432C7191687C2F000C7BAEF /* MolSimDS */,
+				5432C7191687C2F000C7BAEF /* molsim */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -111,81 +207,9 @@
 		5432C71C1687C2F000C7BAEF /* MolSimDS */ = {
 			isa = PBXGroup;
 			children = (
-				54B4DB411687C370006618ED /* src */,
+				541F5E1616B93B48000A795F /* src */,
 			);
 			path = MolSimDS;
-			sourceTree = "<group>";
-		};
-		54B4DB411687C370006618ED /* src */ = {
-			isa = PBXGroup;
-			children = (
-				54B4DB421687C370006618ED /* FileReader.cpp */,
-				54B4DB431687C370006618ED /* FileReader.h */,
-				54B4DB441687C370006618ED /* LinkedCellParticleContainer.cpp */,
-				54B4DB451687C370006618ED /* LinkedCellParticleContainer.h */,
-				54B4DB461687C370006618ED /* ListParticleContainer.cpp */,
-				54B4DB471687C370006618ED /* ListParticleContainer.h */,
-				54B4DB481687C370006618ED /* Logging.cpp */,
-				54B4DB491687C370006618ED /* Logging.h */,
-				54B4DB4A1687C370006618ED /* main.cpp */,
-				54B4DB4B1687C370006618ED /* MaxwellBoltzmannDistribution.cpp */,
-				54B4DB4C1687C370006618ED /* MaxwellBoltzmannDistribution.h */,
-				54B4DB4D1687C370006618ED /* MolSim.cpp */,
-				54B4DB4E1687C370006618ED /* MolSim.h */,
-				54B4DB4F1687C370006618ED /* outputWriter */,
-				54B4DB581687C370006618ED /* Particle.cpp */,
-				54B4DB591687C370006618ED /* Particle.h */,
-				54B4DB5A1687C370006618ED /* ParticleContainer.h */,
-				54B4DB5B1687C370006618ED /* ParticleContainerTest.h */,
-				54B4DB5C1687C370006618ED /* ParticleGenerator.h */,
-				54B4DB5D1687C370006618ED /* Simulation.cpp */,
-				54B4DB5E1687C370006618ED /* Simulation.h */,
-				54B4DB5F1687C370006618ED /* TXTFile.cpp */,
-				54B4DB601687C370006618ED /* TXTFile.h */,
-				54B4DB611687C370006618ED /* utils */,
-				54B4DB681687C370006618ED /* XMLFile */,
-				54B4DB6B1687C370006618ED /* XMLFileReader.cpp */,
-				54B4DB6C1687C370006618ED /* XMLFileReader.h */,
-				54B4DB6D1687C370006618ED /* XMLFileReaderTest.h */,
-			);
-			path = src;
-			sourceTree = SOURCE_ROOT;
-		};
-		54B4DB4F1687C370006618ED /* outputWriter */ = {
-			isa = PBXGroup;
-			children = (
-				54B4DB501687C370006618ED /* vtk-unstructured.cpp */,
-				54B4DB511687C370006618ED /* vtk-unstructured.h */,
-				54B4DB521687C370006618ED /* vtk-unstructured.ixx */,
-				54B4DB531687C370006618ED /* vtk-unstructured.xsd */,
-				54B4DB541687C370006618ED /* VTKWriter.cpp */,
-				54B4DB551687C370006618ED /* VTKWriter.h */,
-				54B4DB561687C370006618ED /* XYZWriter.cpp */,
-				54B4DB571687C370006618ED /* XYZWriter.h */,
-			);
-			path = outputWriter;
-			sourceTree = "<group>";
-		};
-		54B4DB611687C370006618ED /* utils */ = {
-			isa = PBXGroup;
-			children = (
-				54B4DB621687C370006618ED /* Base.h */,
-				54B4DB631687C370006618ED /* Helper.h */,
-				54B4DB641687C370006618ED /* Plane.h */,
-				54B4DB651687C370006618ED /* Timer.h */,
-				54B4DB661687C370006618ED /* utils.h */,
-				54B4DB671687C370006618ED /* Vector.h */,
-			);
-			path = utils;
-			sourceTree = "<group>";
-		};
-		54B4DB681687C370006618ED /* XMLFile */ = {
-			isa = PBXGroup;
-			children = (
-				54B4DB691687C370006618ED /* simulationfile.cpp */,
-				54B4DB6A1687C370006618ED /* simulationfile.h */,
-			);
-			path = XMLFile;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -205,7 +229,7 @@
 			);
 			name = molsim;
 			productName = MolSimDS;
-			productReference = 5432C7191687C2F000C7BAEF /* MolSimDS */;
+			productReference = 5432C7191687C2F000C7BAEF /* molsim */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -239,21 +263,25 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				54B4DB6E1687C370006618ED /* FileReader.cpp in Sources */,
-				54B4DB6F1687C370006618ED /* LinkedCellParticleContainer.cpp in Sources */,
-				54B4DB701687C370006618ED /* ListParticleContainer.cpp in Sources */,
-				54B4DB711687C370006618ED /* Logging.cpp in Sources */,
-				54B4DB721687C370006618ED /* main.cpp in Sources */,
-				54B4DB731687C370006618ED /* MaxwellBoltzmannDistribution.cpp in Sources */,
-				54B4DB741687C370006618ED /* MolSim.cpp in Sources */,
-				54B4DB751687C370006618ED /* vtk-unstructured.cpp in Sources */,
-				54B4DB761687C370006618ED /* VTKWriter.cpp in Sources */,
-				54B4DB771687C370006618ED /* XYZWriter.cpp in Sources */,
-				54B4DB781687C370006618ED /* Particle.cpp in Sources */,
-				54B4DB791687C370006618ED /* Simulation.cpp in Sources */,
-				54B4DB7A1687C370006618ED /* TXTFile.cpp in Sources */,
-				54B4DB7B1687C370006618ED /* simulationfile.cpp in Sources */,
-				54B4DB7C1687C370006618ED /* XMLFileReader.cpp in Sources */,
+				541F5E4D16B93B48000A795F /* FileReader.cpp in Sources */,
+				541F5E4E16B93B48000A795F /* LinkedCellParticleContainer.cpp in Sources */,
+				541F5E4F16B93B48000A795F /* ListParticleContainer.cpp in Sources */,
+				541F5E5016B93B48000A795F /* Logging.cpp in Sources */,
+				541F5E5116B93B48000A795F /* main.cpp in Sources */,
+				541F5E5216B93B48000A795F /* MaxwellBoltzmannDistribution.cpp in Sources */,
+				541F5E5316B93B48000A795F /* MembraneContainer.cpp in Sources */,
+				541F5E5416B93B48000A795F /* MolSim.cpp in Sources */,
+				541F5E5516B93B48000A795F /* vtk-unstructured.cpp in Sources */,
+				541F5E5616B93B48000A795F /* VTKWriter.cpp in Sources */,
+				541F5E5716B93B48000A795F /* XYZWriter.cpp in Sources */,
+				541F5E5816B93B48000A795F /* Particle.cpp in Sources */,
+				541F5E5916B93B48000A795F /* PerformanceTest.cpp in Sources */,
+				541F5E5A16B93B48000A795F /* Simulation.cpp in Sources */,
+				541F5E5B16B93B48000A795F /* TXTFile.cpp in Sources */,
+				541F5E5C16B93B48000A795F /* Color.cpp in Sources */,
+				541F5E5D16B93B48000A795F /* Viewer.cpp in Sources */,
+				541F5E5E16B93B48000A795F /* simulationfile.cpp in Sources */,
+				541F5E5F16B93B48000A795F /* XMLFileReader.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -324,10 +352,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LIBRARY = "libstdc++";
+				ENABLE_OPENMP_SUPPORT = YES;
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+					"-lglfw",
+					"-framework",
+					IOKit,
+					"-lboost_thread",
+					"-lboost_system",
 					"-llog4cxx",
 					"-lcppunit",
 					"-lxerces-c-3.1",
@@ -340,10 +381,23 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				CLANG_CXX_LIBRARY = "libstdc++";
+				ENABLE_OPENMP_SUPPORT = YES;
+				GCC_ENABLE_SSE3_EXTENSIONS = YES;
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				HEADER_SEARCH_PATHS = /usr/local/include;
 				LIBRARY_SEARCH_PATHS = /usr/local/lib;
+				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
+					"-framework",
+					Cocoa,
+					"-framework",
+					OpenGL,
+					"-lglfw",
+					"-framework",
+					IOKit,
+					"-lboost_thread",
+					"-lboost_system",
 					"-llog4cxx",
 					"-lcppunit",
 					"-lxerces-c-3.1",

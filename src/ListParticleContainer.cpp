@@ -61,70 +61,33 @@ void ListParticleContainer::IteratePairwise(void(*func)(void *data, Particle&, P
 			}
 }
 
-void ListParticleContainer::AddParticlesFromFile(const char *filename)
+utils::BoundingBox ListParticleContainer::getBoundingBox()
 {
-	// read the file
-	FileReader fileReader;
-	fileReader.readFile(particles, filename);
-}
+	using namespace utils;
+	using namespace std;
 
-/// Quick 'n' Dirty Method
-bool ListParticleContainer::AddParticlesFromFileNew(const char *filename)
-{
-	// implement later a separate class
+	// some work has to be done here,
+	// calc bounding box
+	BoundingBox bb;
 
-	FILE *pFile = NULL;
-	char buffer[512]; // only 512 characters per line allowed
+	Vector<double, 3> vmin(999999.9f);	//+infty
+	Vector<double, 3> vmax(-9999999.9f); //-infty
 
-	pFile = fopen(filename, "r");
-
-	// valid handle?
-	if(!pFile)return false;
-
-	while(!feof(pFile))
+	if(!particles.empty())
 	{
-		memset(buffer, 0, 512 * sizeof(char));
-		fgets(buffer, 512, pFile);
-
-		// if line starts with # or is an empty line ignore
-		if(buffer[0] == '#' || buffer[0] == '\n')continue;
-		
-		// include in doxygen
-		/// the only allowed syntax will be 
-		/// cuboid x1 x2 x3 v1 v2 v3 mass n1 n2 n3 meshwidth
-		/// where x1, x2, x3 are the componets of the position vector
-		///  of the lower left front corner of the cuboid
-		/// v1 v2 v3 are the initial velocity parameters
-		/// n1 n2 n3 are the dimensions of the cuboid
-		/// meshwidth is the distance between two particles
-		/// mass the initial mass
-		
-		utils::Vector<unsigned int, 3> dim;
-		char cmd[256];
-		Vec3 v;
-		Vec3 x;
-		double mass;
-		double meshwidth;
-		
-		if(sscanf(buffer, "%s %lf %lf %lf %lf %lf %lf %lf %d %d %d  %lf", 
-			&cmd, &x[0], &x[1], &x[2], &v[0], &v[1], &v[2], &mass, &dim[0], &dim[1], &dim[2], &meshwidth))
+		for(vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
 		{
-			if(strcmp(cmd, "cuboid") == 0)
+			for(int i = 0; i < 3; i++)
 			{
-				// assert values
-				// max range for dim should be 1000x1000x1000
-				for(int i = 0; i < 3; i++)assert(dim[i] < 1000);
-
-				ParticleGenerator::makeCuboid(*this,
-					x, dim, meshwidth, mass, v);
-			}
+				vmin[i] = min(vmin[i], it->x[i]);
+				vmax[i] = max(vmax[i], it->x[i]);
+			}			
 		}
-		else LOG4CXX_ERROR(particleGenerationLogger, " >> matching error, file corrupted?");
-		
 	}
 
+	// calc area(bounding box)
+	bb.extent = vmax - vmin;
+	bb.center = (vmax + vmin) * 0.5;
 
-	fclose(pFile);
-
-	return true;
+	return bb;
 }

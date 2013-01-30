@@ -56,11 +56,12 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalDependencies>log4cxx.lib;cppunitd.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);opengl32.lib;glut32.lib;glu32.lib</AdditionalDependencies>
+      <AdditionalDependencies>log4cxx.lib;cppunitd.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies);opengl32.lib;glut32.lib;glu32.lib;glfw.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -74,13 +75,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);.\src</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <OpenMPSupport>true</OpenMPSupport>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>cppunit.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;apr-1.lib;aprutil-1.lib;log4cxx.lib;%(AdditionalDependencies);opengl32.lib;glut32.lib;glu32.lib</AdditionalDependencies>
+      <AdditionalDependencies>glew32.lib;cppunit.lib;xerces-c_3.lib;odbc32.lib;odbccp32.lib;apr-1.lib;aprutil-1.lib;log4cxx.lib;%(AdditionalDependencies);opengl32.lib;glut32.lib;glu32.lib;glfw.lib</AdditionalDependencies>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
   </ItemDefinitionGroup>
@@ -90,6 +93,7 @@
     <ClInclude Include="src\ListParticleContainer.h" />
     <ClInclude Include="src\Logging.h" />
     <ClInclude Include="src\MaxwellBoltzmannDistribution.h" />
+    <ClInclude Include="src\MembraneContainer.h" />
     <ClInclude Include="src\MolSim.h" />
     <ClInclude Include="src\outputWriter\vtk-unstructured.h" />
     <ClInclude Include="src\outputWriter\VTKWriter.h" />
@@ -98,14 +102,19 @@
     <ClInclude Include="src\ParticleContainer.h" />
     <ClInclude Include="src\ParticleContainerTest.h" />
     <ClInclude Include="src\ParticleGenerator.h" />
+    <ClInclude Include="src\PerformanceTest.h" />
     <ClInclude Include="src\Simulation.h" />
+    <ClInclude Include="src\SimulationDesc.h" />
     <ClInclude Include="src\TXTFile.h" />
     <ClInclude Include="src\utils\Base.h" />
+    <ClInclude Include="src\utils\Color.h" />
     <ClInclude Include="src\utils\Helper.h" />
     <ClInclude Include="src\utils\Plane.h" />
+    <ClInclude Include="src\utils\TFastArray.h" />
     <ClInclude Include="src\utils\Timer.h" />
     <ClInclude Include="src\utils\utils.h" />
     <ClInclude Include="src\utils\Vector.h" />
+    <ClInclude Include="src\Viewer.h" />
     <ClInclude Include="src\XMLFileReader.h" />
     <ClInclude Include="src\XMLFileReaderTest.h" />
     <ClInclude Include="src\XMLFile\simulationfile.h" />
@@ -117,6 +126,7 @@
     <ClCompile Include="src\Logging.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\MaxwellBoltzmannDistribution.cpp" />
+    <ClCompile Include="src\MembraneContainer.cpp" />
     <ClCompile Include="src\MolSim.cpp" />
     <ClCompile Include="src\outputWriter\vtk-unstructured.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\libxsd;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
@@ -124,26 +134,15 @@
     <ClCompile Include="src\outputWriter\VTKWriter.cpp" />
     <ClCompile Include="src\outputWriter\XYZWriter.cpp" />
     <ClCompile Include="src\Particle.cpp" />
+    <ClCompile Include="src\PerformanceTest.cpp" />
     <ClCompile Include="src\Simulation.cpp" />
     <ClCompile Include="src\TXTFile.cpp" />
+    <ClCompile Include="src\utils\Color.cpp" />
+    <ClCompile Include="src\Viewer.cpp" />
     <ClCompile Include="src\XMLFileReader.cpp" />
     <ClCompile Include="src\XMLFile\simulationfile.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CXX_Tree_Mapping_Rule Include="simulationfile.xsd">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <FileType>XSD</FileType>
-      <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenInline>
-      <GenForward Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenForward>
-      <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenSerialization>
-      <GenOstream Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenOstream>
-      <RootElement Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-      </RootElement>
-      <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">./src/XMLFile</OutDir>
-      <GenDoxygen Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</GenDoxygen>
-      <HeaderSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.h</HeaderSuffix>
-      <SourceSuffix Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.cpp</SourceSuffix>
-    </CXX_Tree_Mapping_Rule>
     <CXX_Tree_Mapping_Rule Include="src\outputWriter\vtk-unstructured.xsd">
       <GenInline Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenInline>
       <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenSerialization>
@@ -159,33 +158,19 @@
       <GenSerialization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenSerialization>
       <GenOstream Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</GenOstream>
     </CXX_Tree_Mapping_Rule>
+    <CXX_Tree_Mapping_Rule Include="xml\simulationfile.xsd">
+      <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">../src/XMLFile</OutDir>
+    </CXX_Tree_Mapping_Rule>
   </ItemGroup>
   <ItemGroup>
-    <None Include="example.xml" />
-    <None Include="FallingDrop.xml" />
-    <None Include="FallingDropInitialize.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="listexample.xml" />
-    <None Include="PerformanceTest.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="PeriodicBoundaries.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="periodicBoundaryTest.xml" />
-    <None Include="sphereexample.xml" />
-    <None Include="Task2.xml" />
-    <None Include="Task3.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="test.xml">
-      <SubType>Designer</SubType>
-    </None>
-    <None Include="ThermostatBig.xml" />
-    <None Include="ThermostatSmall.xml">
-      <SubType>Designer</SubType>
-    </None>
+    <None Include="xml\FallingDrop.xml" />
+    <None Include="xml\FallingDropInitialize.xml" />
+    <None Include="xml\Membrane.xml" />
+    <None Include="xml\PerformanceTest.xml" />
+    <None Include="xml\RayleighTaylor3D.xml" />
+    <None Include="xml\RayleighTaylor3DPerf.xml" />
+    <None Include="xml\ThermostatBig.xml" />
+    <None Include="xml\ThermostatSmall.xml" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

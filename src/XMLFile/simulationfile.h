@@ -226,6 +226,7 @@ class dim3_t;
 class List_t;
 class conditions_t;
 class LinkedCell_t;
+class Membrane_t;
 class algorithm_t;
 class params_t;
 class particle_t;
@@ -546,6 +547,53 @@ class LinkedCell_t: public ::xml_schema::type
   conditions_optional conditions_;
 };
 
+class Membrane_t: public ::xml_schema::type
+{
+  public:
+  // pull_iterations
+  // 
+  typedef ::xml_schema::unsigned_int pull_iterations_type;
+  typedef ::xsd::cxx::tree::traits< pull_iterations_type, char > pull_iterations_traits;
+
+  const pull_iterations_type&
+  pull_iterations () const;
+
+  pull_iterations_type&
+  pull_iterations ();
+
+  void
+  pull_iterations (const pull_iterations_type& x);
+
+  // Constructors.
+  //
+  Membrane_t (const pull_iterations_type&);
+
+  Membrane_t (const ::xercesc::DOMElement& e,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  Membrane_t (const Membrane_t& x,
+              ::xml_schema::flags f = 0,
+              ::xml_schema::container* c = 0);
+
+  virtual Membrane_t*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~Membrane_t ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  ::xsd::cxx::tree::one< pull_iterations_type > pull_iterations_;
+};
+
 class algorithm_t: public ::xml_schema::type
 {
   public:
@@ -591,6 +639,27 @@ class algorithm_t: public ::xml_schema::type
   void
   LinkedCell (::std::auto_ptr< LinkedCell_type > p);
 
+  // Membrane
+  // 
+  typedef ::Membrane_t Membrane_type;
+  typedef ::xsd::cxx::tree::optional< Membrane_type > Membrane_optional;
+  typedef ::xsd::cxx::tree::traits< Membrane_type, char > Membrane_traits;
+
+  const Membrane_optional&
+  Membrane () const;
+
+  Membrane_optional&
+  Membrane ();
+
+  void
+  Membrane (const Membrane_type& x);
+
+  void
+  Membrane (const Membrane_optional& x);
+
+  void
+  Membrane (::std::auto_ptr< Membrane_type > p);
+
   // Constructors.
   //
   algorithm_t ();
@@ -620,6 +689,7 @@ class algorithm_t: public ::xml_schema::type
   protected:
   List_optional List_;
   LinkedCell_optional LinkedCell_;
+  Membrane_optional Membrane_;
 };
 
 class params_t: public ::xml_schema::type
@@ -984,20 +1054,6 @@ class particle_t: public ::xml_schema::type
   void
   V (::std::auto_ptr< V_type > p);
 
-  // m
-  // 
-  typedef ::xml_schema::decimal m_type;
-  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
-
-  const m_type&
-  m () const;
-
-  m_type&
-  m ();
-
-  void
-  m (const m_type& x);
-
   // material
   // 
   typedef ::xml_schema::string material_type;
@@ -1022,8 +1078,7 @@ class particle_t: public ::xml_schema::type
   // Constructors.
   //
   particle_t (const X_type&,
-              const V_type&,
-              const m_type&);
+              const V_type&);
 
   particle_t (const ::xercesc::DOMElement& e,
               ::xml_schema::flags f = 0,
@@ -1050,7 +1105,6 @@ class particle_t: public ::xml_schema::type
   protected:
   ::xsd::cxx::tree::one< X_type > X_;
   ::xsd::cxx::tree::one< V_type > V_;
-  ::xsd::cxx::tree::one< m_type > m_;
   material_optional material_;
 };
 
@@ -1122,20 +1176,6 @@ class cuboid_t: public ::xml_schema::type
   void
   h (const h_type& x);
 
-  // m
-  // 
-  typedef ::xml_schema::decimal m_type;
-  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
-
-  const m_type&
-  m () const;
-
-  m_type&
-  m ();
-
-  void
-  m (const m_type& x);
-
   // material
   // 
   typedef ::xml_schema::string material_type;
@@ -1162,8 +1202,7 @@ class cuboid_t: public ::xml_schema::type
   cuboid_t (const X_type&,
             const V_type&,
             const N_type&,
-            const h_type&,
-            const m_type&);
+            const h_type&);
 
   cuboid_t (const ::xercesc::DOMElement& e,
             ::xml_schema::flags f = 0,
@@ -1192,7 +1231,6 @@ class cuboid_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< N_type > N_;
   ::xsd::cxx::tree::one< h_type > h_;
-  ::xsd::cxx::tree::one< m_type > m_;
   material_optional material_;
 };
 
@@ -1261,20 +1299,6 @@ class sphere_t: public ::xml_schema::type
   void
   h (const h_type& x);
 
-  // m
-  // 
-  typedef ::xml_schema::decimal m_type;
-  typedef ::xsd::cxx::tree::traits< m_type, char, ::xsd::cxx::tree::schema_type::decimal > m_traits;
-
-  const m_type&
-  m () const;
-
-  m_type&
-  m ();
-
-  void
-  m (const m_type& x);
-
   // dimensions
   // 
   typedef ::xml_schema::integer dimensions_type;
@@ -1316,7 +1340,6 @@ class sphere_t: public ::xml_schema::type
             const V_type&,
             const r_type&,
             const h_type&,
-            const m_type&,
             const dimensions_type&);
 
   sphere_t (const ::xercesc::DOMElement& e,
@@ -1346,7 +1369,6 @@ class sphere_t: public ::xml_schema::type
   ::xsd::cxx::tree::one< V_type > V_;
   ::xsd::cxx::tree::one< r_type > r_;
   ::xsd::cxx::tree::one< h_type > h_;
-  ::xsd::cxx::tree::one< m_type > m_;
   ::xsd::cxx::tree::one< dimensions_type > dimensions_;
   material_optional material_;
 };
@@ -1411,6 +1433,24 @@ class material_t: public ::xml_schema::type
   void
   sigma (const sigma_optional& x);
 
+  // mass
+  // 
+  typedef ::xml_schema::decimal mass_type;
+  typedef ::xsd::cxx::tree::optional< mass_type > mass_optional;
+  typedef ::xsd::cxx::tree::traits< mass_type, char, ::xsd::cxx::tree::schema_type::decimal > mass_traits;
+
+  const mass_optional&
+  mass () const;
+
+  mass_optional&
+  mass ();
+
+  void
+  mass (const mass_type& x);
+
+  void
+  mass (const mass_optional& x);
+
   // Constructors.
   //
   material_t ();
@@ -1441,6 +1481,7 @@ class material_t: public ::xml_schema::type
   name_optional name_;
   epsilon_optional epsilon_;
   sigma_optional sigma_;
+  mass_optional mass_;
 };
 
 class data_t: public ::xml_schema::type

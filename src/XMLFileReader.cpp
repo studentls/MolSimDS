@@ -35,7 +35,7 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 	try
 	{
 		::xml_schema::flags flags;
-		flags = !validate ? ::xml_schema::flags::dont_validate : 0;
+			flags = !validate ? ::xml_schema::flags::dont_validate : 0;
 
 		file = std::auto_ptr<simulationfile_t>(simulationfile(filename, flags));
 	
@@ -79,6 +79,7 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		mat.epsilon = it->epsilon().get();
 		mat.sigma = it->sigma().get();
 		mat.name = it->name().get();
+		mat.mass = it->mass().get();
 
 		// add
 		desc.materials.push_back(mat);
@@ -105,6 +106,14 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		desc.temperatureStepSize = 0;
 	}
 	
+	// if necessary add default materials...	
+	if(file->params().algorithm().Membrane().present())
+	{
+		// add 2 default materials
+		desc.materials.push_back(createDefaultMaterial());
+		desc.materials.push_back(createDefaultMaterial());
+	}	
+
 	// dimension
 	desc.dimensions = file->params().dimension();
 
@@ -179,9 +188,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		p.v[0] = it->V().at(0);
 		p.v[1] = it->V().at(1);
 		p.v[2] = (it->V().size() > 2) ? it->V().at(2) : 0;
-
-		p.m = it->m();
-
+		
 		// set type to corresponding material
 		if(it->material().present())
 		{
@@ -203,7 +210,6 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		// construct variables
 		utils::Vector<double, 3> corner;
 		utils::Vector<double, 3> v;
-		double m;
 		double h;
 		utils::Vector<unsigned int, 3> dim;
 
@@ -214,9 +220,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		v[0] = it->V().at(0);
 		v[1] = it->V().at(1);
 		v[2] = (it->V().size() > 2) ? it->V().at(2) : 0;
-
-		m = it->m();
-
+		
 		h = it->h();
 
 		dim[0] = it->N().at(0);
@@ -234,7 +238,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		}
 
 		// make Cuboid and add to particle
-		ParticleGenerator::makeCuboid(pc, corner, dim, h, m, v, desc.brownianMotionFactor, type);
+		ParticleGenerator::makeCuboid(pc, corner, dim, h, v, type, desc.brownianMotionFactor);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
@@ -261,9 +265,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		v[0] = it->V().at(0);
 		v[1] = it->V().at(1);
 		v[2] = (it->V().size() > 2) ? it->V().at(2) : 0;
-
-		m = it->m();
-
+		
 		h = it->h();
 
 		dim = it->dimensions();
@@ -280,7 +282,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		}
 
 		// make Cuboid and add to particle
-		ParticleGenerator::makeSphere(pc, center, v, m, radius, h, dim, desc.brownianMotionFactor, type);
+		ParticleGenerator::makeSphere(pc, center, v,radius, h, dim, desc.brownianMotionFactor, type);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	
@@ -382,12 +384,47 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		(*out) = container;
 
 	}
+	else if(file->params().algorithm().Membrane().present())
+	{
+		// use the membrane list
+		Membrane_t& lc = file->params().algorithm().Membrane().get();
+		unsigned int pullIterations = lc.pull_iterations();;
+		container = new MembraneContainer(pullIterations);
+		
+		// add 2 default materials
+		desc.materials.push_back(createDefaultMaterial());
+		desc.materials.push_back(createDefaultMaterial());
+
+		// hardcoded contents for the container
+		utils::Vector<unsigned int, 2> dimensions(50, 50);
+		Vec3 lowerLeftFrontCorner(15.0, 15.0, 1.5);
+		((MembraneContainer*)container)->SetMembrane(lowerLeftFrontCorner, dimensions, 2.2);
+
+		(*out) = container;
+	}
 	else
 	{
 		// use in this case, the simple ListParticleContainer
 		container = new ListParticleContainer(particles);
 
 		(*out) = container;
+	}
+
+
+	// secure check, see if types are all valid!
+	std::vector<Particle> tmp = (*out)->getParticles();
+	if(tmp.empty())return S_OK;
+	else
+	{
+		// go through particles and check type
+		for(std::vector<Particle>::const_iterator it = tmp.begin(); it != tmp.end(); ++it)
+		{
+			if(it->type < 0 || it->type >= desc.materials.size())
+			{
+				LOG4CXX_ERROR(generalOutputLogger, ">> error: invalid type found! total failure!");
+				return E_UNKNOWN;
+			}
+		}
 	}
 
 	return S_OK;

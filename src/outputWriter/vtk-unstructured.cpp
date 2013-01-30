@@ -40,6 +40,573 @@
 
 #include "vtk-unstructured.h"
 
+// DataArrayList_t
+//
+
+DataArrayList_t::
+DataArrayList_t ()
+: ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > ( ::xml_schema::flags (0), this)
+{
+}
+
+DataArrayList_t::
+DataArrayList_t (size_type n, const ::xml_schema::decimal& x)
+: ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (n, x, this)
+{
+}
+
+DataArrayList_t::
+DataArrayList_t (const DataArrayList_t& o,
+                 ::xml_schema::flags f,
+                 ::xml_schema::container* c)
+: ::xml_schema::simple_type (o, f, c),
+  ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal > (o, f, this)
+{
+}
+
+// DataArray_t
+// 
+
+const DataArray_t::type_type& DataArray_t::
+type () const
+{
+  return this->type_.get ();
+}
+
+DataArray_t::type_type& DataArray_t::
+type ()
+{
+  return this->type_.get ();
+}
+
+void DataArray_t::
+type (const type_type& x)
+{
+  this->type_.set (x);
+}
+
+void DataArray_t::
+type (::std::auto_ptr< type_type > x)
+{
+  this->type_.set (x);
+}
+
+const DataArray_t::Name_type& DataArray_t::
+Name () const
+{
+  return this->Name_.get ();
+}
+
+DataArray_t::Name_type& DataArray_t::
+Name ()
+{
+  return this->Name_.get ();
+}
+
+void DataArray_t::
+Name (const Name_type& x)
+{
+  this->Name_.set (x);
+}
+
+void DataArray_t::
+Name (::std::auto_ptr< Name_type > x)
+{
+  this->Name_.set (x);
+}
+
+const DataArray_t::NumberOfComponents_type& DataArray_t::
+NumberOfComponents () const
+{
+  return this->NumberOfComponents_.get ();
+}
+
+DataArray_t::NumberOfComponents_type& DataArray_t::
+NumberOfComponents ()
+{
+  return this->NumberOfComponents_.get ();
+}
+
+void DataArray_t::
+NumberOfComponents (const NumberOfComponents_type& x)
+{
+  this->NumberOfComponents_.set (x);
+}
+
+const DataArray_t::format_type& DataArray_t::
+format () const
+{
+  return this->format_.get ();
+}
+
+const DataArray_t::format_type& DataArray_t::
+format_default_value ()
+{
+  return format_default_value_;
+}
+
+const DataArray_t::offset_optional& DataArray_t::
+offset () const
+{
+  return this->offset_;
+}
+
+DataArray_t::offset_optional& DataArray_t::
+offset ()
+{
+  return this->offset_;
+}
+
+void DataArray_t::
+offset (const offset_type& x)
+{
+  this->offset_.set (x);
+}
+
+void DataArray_t::
+offset (const offset_optional& x)
+{
+  this->offset_ = x;
+}
+
+
+// PieceUnstructuredGrid_t
+// 
+
+const PieceUnstructuredGrid_t::PointData_type& PieceUnstructuredGrid_t::
+PointData () const
+{
+  return this->PointData_.get ();
+}
+
+PieceUnstructuredGrid_t::PointData_type& PieceUnstructuredGrid_t::
+PointData ()
+{
+  return this->PointData_.get ();
+}
+
+void PieceUnstructuredGrid_t::
+PointData (const PointData_type& x)
+{
+  this->PointData_.set (x);
+}
+
+void PieceUnstructuredGrid_t::
+PointData (::std::auto_ptr< PointData_type > x)
+{
+  this->PointData_.set (x);
+}
+
+const PieceUnstructuredGrid_t::CellData_type& PieceUnstructuredGrid_t::
+CellData () const
+{
+  return this->CellData_.get ();
+}
+
+PieceUnstructuredGrid_t::CellData_type& PieceUnstructuredGrid_t::
+CellData ()
+{
+  return this->CellData_.get ();
+}
+
+void PieceUnstructuredGrid_t::
+CellData (const CellData_type& x)
+{
+  this->CellData_.set (x);
+}
+
+void PieceUnstructuredGrid_t::
+CellData (::std::auto_ptr< CellData_type > x)
+{
+  this->CellData_.set (x);
+}
+
+const PieceUnstructuredGrid_t::Points_type& PieceUnstructuredGrid_t::
+Points () const
+{
+  return this->Points_.get ();
+}
+
+PieceUnstructuredGrid_t::Points_type& PieceUnstructuredGrid_t::
+Points ()
+{
+  return this->Points_.get ();
+}
+
+void PieceUnstructuredGrid_t::
+Points (const Points_type& x)
+{
+  this->Points_.set (x);
+}
+
+void PieceUnstructuredGrid_t::
+Points (::std::auto_ptr< Points_type > x)
+{
+  this->Points_.set (x);
+}
+
+const PieceUnstructuredGrid_t::Cells_type& PieceUnstructuredGrid_t::
+Cells () const
+{
+  return this->Cells_.get ();
+}
+
+PieceUnstructuredGrid_t::Cells_type& PieceUnstructuredGrid_t::
+Cells ()
+{
+  return this->Cells_.get ();
+}
+
+void PieceUnstructuredGrid_t::
+Cells (const Cells_type& x)
+{
+  this->Cells_.set (x);
+}
+
+void PieceUnstructuredGrid_t::
+Cells (::std::auto_ptr< Cells_type > x)
+{
+  this->Cells_.set (x);
+}
+
+const PieceUnstructuredGrid_t::NumberOfPoints_type& PieceUnstructuredGrid_t::
+NumberOfPoints () const
+{
+  return this->NumberOfPoints_.get ();
+}
+
+PieceUnstructuredGrid_t::NumberOfPoints_type& PieceUnstructuredGrid_t::
+NumberOfPoints ()
+{
+  return this->NumberOfPoints_.get ();
+}
+
+void PieceUnstructuredGrid_t::
+NumberOfPoints (const NumberOfPoints_type& x)
+{
+  this->NumberOfPoints_.set (x);
+}
+
+const PieceUnstructuredGrid_t::NumberOfCells_type& PieceUnstructuredGrid_t::
+NumberOfCells () const
+{
+  return this->NumberOfCells_.get ();
+}
+
+PieceUnstructuredGrid_t::NumberOfCells_type& PieceUnstructuredGrid_t::
+NumberOfCells ()
+{
+  return this->NumberOfCells_.get ();
+}
+
+void PieceUnstructuredGrid_t::
+NumberOfCells (const NumberOfCells_type& x)
+{
+  this->NumberOfCells_.set (x);
+}
+
+
+// UnstructuredGrid_t
+// 
+
+const UnstructuredGrid_t::Piece_type& UnstructuredGrid_t::
+Piece () const
+{
+  return this->Piece_.get ();
+}
+
+UnstructuredGrid_t::Piece_type& UnstructuredGrid_t::
+Piece ()
+{
+  return this->Piece_.get ();
+}
+
+void UnstructuredGrid_t::
+Piece (const Piece_type& x)
+{
+  this->Piece_.set (x);
+}
+
+void UnstructuredGrid_t::
+Piece (::std::auto_ptr< Piece_type > x)
+{
+  this->Piece_.set (x);
+}
+
+
+// PolyData_t
+// 
+
+const PolyData_t::greeting_type& PolyData_t::
+greeting () const
+{
+  return this->greeting_.get ();
+}
+
+PolyData_t::greeting_type& PolyData_t::
+greeting ()
+{
+  return this->greeting_.get ();
+}
+
+void PolyData_t::
+greeting (const greeting_type& x)
+{
+  this->greeting_.set (x);
+}
+
+void PolyData_t::
+greeting (::std::auto_ptr< greeting_type > x)
+{
+  this->greeting_.set (x);
+}
+
+
+// VTKFile_t
+// 
+
+const VTKFile_t::UnstructuredGrid_optional& VTKFile_t::
+UnstructuredGrid () const
+{
+  return this->UnstructuredGrid_;
+}
+
+VTKFile_t::UnstructuredGrid_optional& VTKFile_t::
+UnstructuredGrid ()
+{
+  return this->UnstructuredGrid_;
+}
+
+void VTKFile_t::
+UnstructuredGrid (const UnstructuredGrid_type& x)
+{
+  this->UnstructuredGrid_.set (x);
+}
+
+void VTKFile_t::
+UnstructuredGrid (const UnstructuredGrid_optional& x)
+{
+  this->UnstructuredGrid_ = x;
+}
+
+void VTKFile_t::
+UnstructuredGrid (::std::auto_ptr< UnstructuredGrid_type > x)
+{
+  this->UnstructuredGrid_.set (x);
+}
+
+const VTKFile_t::PolyData_optional& VTKFile_t::
+PolyData () const
+{
+  return this->PolyData_;
+}
+
+VTKFile_t::PolyData_optional& VTKFile_t::
+PolyData ()
+{
+  return this->PolyData_;
+}
+
+void VTKFile_t::
+PolyData (const PolyData_type& x)
+{
+  this->PolyData_.set (x);
+}
+
+void VTKFile_t::
+PolyData (const PolyData_optional& x)
+{
+  this->PolyData_ = x;
+}
+
+void VTKFile_t::
+PolyData (::std::auto_ptr< PolyData_type > x)
+{
+  this->PolyData_.set (x);
+}
+
+const VTKFile_t::type_type& VTKFile_t::
+type () const
+{
+  return this->type_.get ();
+}
+
+VTKFile_t::type_type& VTKFile_t::
+type ()
+{
+  return this->type_.get ();
+}
+
+void VTKFile_t::
+type (const type_type& x)
+{
+  this->type_.set (x);
+}
+
+void VTKFile_t::
+type (::std::auto_ptr< type_type > x)
+{
+  this->type_.set (x);
+}
+
+const VTKFile_t::version_type& VTKFile_t::
+version () const
+{
+  return this->version_.get ();
+}
+
+const VTKFile_t::version_type& VTKFile_t::
+version_default_value ()
+{
+  return version_default_value_;
+}
+
+const VTKFile_t::byte_order_type& VTKFile_t::
+byte_order () const
+{
+  return this->byte_order_.get ();
+}
+
+const VTKFile_t::byte_order_type& VTKFile_t::
+byte_order_default_value ()
+{
+  return byte_order_default_value_;
+}
+
+
+// type
+// 
+
+type::
+type (value v)
+: ::xml_schema::string (_xsd_type_literals_[v])
+{
+}
+
+type::
+type (const char* v)
+: ::xml_schema::string (v)
+{
+}
+
+type::
+type (const ::std::string& v)
+: ::xml_schema::string (v)
+{
+}
+
+type::
+type (const ::xml_schema::string& v)
+: ::xml_schema::string (v)
+{
+}
+
+type::
+type (const type& v,
+      ::xml_schema::flags f,
+      ::xml_schema::container* c)
+: ::xml_schema::string (v, f, c)
+{
+}
+
+type& type::
+operator= (value v)
+{
+  static_cast< ::xml_schema::string& > (*this) = 
+  ::xml_schema::string (_xsd_type_literals_[v]);
+
+  return *this;
+}
+
+
+// PointData
+// 
+
+const PointData::DataArray_sequence& PointData::
+DataArray () const
+{
+  return this->DataArray_;
+}
+
+PointData::DataArray_sequence& PointData::
+DataArray ()
+{
+  return this->DataArray_;
+}
+
+void PointData::
+DataArray (const DataArray_sequence& s)
+{
+  this->DataArray_ = s;
+}
+
+
+// CellData
+// 
+
+const CellData::DataArray_sequence& CellData::
+DataArray () const
+{
+  return this->DataArray_;
+}
+
+CellData::DataArray_sequence& CellData::
+DataArray ()
+{
+  return this->DataArray_;
+}
+
+void CellData::
+DataArray (const DataArray_sequence& s)
+{
+  this->DataArray_ = s;
+}
+
+
+// Points
+// 
+
+const Points::DataArray_sequence& Points::
+DataArray () const
+{
+  return this->DataArray_;
+}
+
+Points::DataArray_sequence& Points::
+DataArray ()
+{
+  return this->DataArray_;
+}
+
+void Points::
+DataArray (const DataArray_sequence& s)
+{
+  this->DataArray_ = s;
+}
+
+
+// Cells
+// 
+
+const Cells::DataArray_sequence& Cells::
+DataArray () const
+{
+  return this->DataArray_;
+}
+
+Cells::DataArray_sequence& Cells::
+DataArray ()
+{
+  return this->DataArray_;
+}
+
+void Cells::
+DataArray (const DataArray_sequence& s)
+{
+  this->DataArray_ = s;
+}
+
+
 #include <xsd/cxx/xml/dom/parsing-source.hxx>
 
 // DataArrayList_t

@@ -56,7 +56,9 @@ class ParticleContainerTest : public CppUnit::TestFixture
 	CPPUNIT_TEST(testListParticleContainerIterationPairwise);
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetHalo);	
 	CPPUNIT_TEST(testLinkedCellParticleContainerGetBoundary);	
-	CPPUNIT_TEST(testLinkedCellParticleContainerIndices);
+	//CPPUNIT_TEST(testLinkedCellParticleContainerIndices);
+	CPPUNIT_TEST(testLinkedCellOpenMPIndices2D);
+	CPPUNIT_TEST(testLinkedCellOpenMPIndices3D);
 	CPPUNIT_TEST_SUITE_END();
 private:
 
@@ -66,7 +68,7 @@ private:
 		double *d = ((double*)data);
 
 		//add masses...
-		*d += p.m;
+		*d += 1.0;
 	}
 
 	/// test function, summing up data pairwise
@@ -83,7 +85,6 @@ private:
 	void addSimpleParticlesToParticleContainerFromArray(std::vector<Particle> &particles, double *positions, const int count, const double mass, const int type)
 	{
 		Particle p;
-		p.m = mass;
 		p.type = type;
 		for(int i = 0; i < count; i++)
 		{
@@ -103,7 +104,7 @@ private:
 		utils::Vector<double, 3> extent;
 		utils::Vector<unsigned int, 3> N;
 		utils::Vector<double, 3> lowercorner;
-		ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+		ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, vel, 0.0, 1);
 
 		int dim = dimz == 0 ? 2 : 3;
 		lowercorner[0] = 0.0;
@@ -114,10 +115,7 @@ private:
 		N[1] = dimy;
 		N[2] = dimz;
 
-		for(int i = 0; i < dim; i++)
-			{
-				extent[i] = N[i] - 2;
-			}
+		for(int i = 0; i < dim; i++)extent[i] = N[i];
 
 		//construct container...
 		LinkedCellParticleContainer *pc = new LinkedCellParticleContainer(dim, lpc.getParticles(), 1.0, lowercorner, extent, BC_NONE, 1.0);
@@ -130,6 +128,7 @@ public:
 
 	void tearDown()	{}
 
+	/// test iteration function by a simple sum function
 	void testListParticleContainerIteration()
 	{
 		ListParticleContainer PC;
@@ -154,6 +153,7 @@ public:
 		CPPUNIT_ASSERT( -epsilon < (sum - (double)iParticleCount)  && (sum - (double)iParticleCount) < epsilon);
 	}
 
+	/// test pairwise iteration function by a simple sum function
 	void testListParticleContainerIterationPairwise()
 	{
 		ListParticleContainer PC;
@@ -181,6 +181,7 @@ public:
 	
 	}
 
+	/// test if halo particles are retunred properly for constructed linked cell particle container
 	void testLinkedCellParticleContainerGetHalo()
 	{
 		
@@ -220,7 +221,7 @@ public:
 			}
 
 			ListParticleContainer lpc;
-			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, vel, 0.0, 1);
 
 			lowercorner[0] = 0.0;
 			lowercorner[1] = 0.0;
@@ -234,12 +235,8 @@ public:
 
 			CPPUNIT_ASSERT(!halo.empty());
 
-			int sum = 0;
-			// perform sum check
-			for(std::vector<Particle>::iterator it = halo.begin(); it != halo.end(); it++)
-			{
-				sum += it->type;
-			}
+			// sum is count of halo particles...
+			int sum = halo.size();
 
 			SAFE_DELETE(pc);
 
@@ -259,7 +256,7 @@ public:
 		}
 	}
 
-
+	/// test if boundary particles are retunred properly for constructed linked cell particle container
 	void testLinkedCellParticleContainerGetBoundary()
 	{
 		
@@ -299,7 +296,7 @@ public:
 			}
 
 			ListParticleContainer lpc;
-			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, 1.0, vel, 0.0, 1);
+			ParticleGenerator::makeCuboid(lpc, lowercorner, N, 1.0, vel, 0);
 
 			lowercorner[0] = 0.0;
 			lowercorner[1] = 0.0;
@@ -313,12 +310,8 @@ public:
 
 			CPPUNIT_ASSERT(!boundary.empty());
 
-			int sum = 0;
-			// perform sum check
-			for(std::vector<Particle>::iterator it = boundary.begin(); it != boundary.end(); it++)
-			{
-				sum += it->type;
-			}
+			// count of boundary particles...
+			int sum = boundary.size();
 
 			SAFE_DELETE(pc);
 
@@ -344,6 +337,7 @@ public:
 
 	}
 
+	/// test if indices are constructed correctly for linked cell particle container
 	void testLinkedCellParticleContainerIndices()
 	{
 		using namespace utils;
@@ -378,6 +372,118 @@ public:
 
 		SAFE_DELETE(pc2D);
 		SAFE_DELETE(pc3D);
+	}
+
+	/// tests if the construction of stripped indices works properly
+	void testLinkedCellOpenMPIndices2D()
+	{
+		// create a indexstrip
+		IndexStrip strip;
+
+		// construct for a domain of 10x7x1 indices for the first strip
+		strip.constructVerticalStripIndices(0, 7, utils::Vector<unsigned int, 3>(10, 7, 1));
+
+		// there should be 4(n-1) + n pairs, where n denotes cellCount[1] for one strip
+		CPPUNIT_ASSERT(strip.size() == 4*(7 - 1) + 7);
+
+		// now test for several domain sizes in 2D
+		for(int nx = 1; nx < 5; nx++)
+			for(int ny = 1; ny < 5; ny++)
+			{
+				// construct every time a linked cell particle container
+				LinkedCellParticleContainer *pc2D = this->createSimpleLC(nx, ny, 0);
+
+				// halo cells shall also be noticed!
+				int dimx = nx + 2;
+				int dimy = ny + 2;
+
+				// compare sizes
+				// every strip should have 4(dimy - 1) +  dimy pairs contained
+				// and oddstrips + evenstrips should equal dimx - 1
+				CPPUNIT_ASSERT(pc2D->evenStrips.size() + pc2D->oddStrips.size() == dimx - 1);
+
+				for(int i = 0; i < pc2D->evenStrips.size(); i++)
+					CPPUNIT_ASSERT(pc2D->evenStrips[i].size() == 4 * (dimy - 1) + dimy);
+
+				for(int i = 0; i < pc2D->oddStrips.size(); i++)
+					CPPUNIT_ASSERT(pc2D->oddStrips[i].size() == 4 * (dimy - 1) + dimy);
+
+				SAFE_DELETE(pc2D);
+			}
+
+		// maybe include here a correctness check...
+		// ...
+		LOG4CXX_INFO(generalOutputLogger, "add correctness check for strip Indices");
+	}
+
+	/// tests if the construction of layeredd indices works properly
+	void testLinkedCellOpenMPIndices3D()
+	{
+		// now test for several domain sizes in 3D
+		for(int nx = 1; nx < 5; nx++)
+			for(int ny = 1; ny < 5; ny++)
+				for(int nz = 1; nz < 5; nz++)
+				{		
+					// simply compare count of layered pairs with the known count of 3d indices
+					int sum = 0;
+					// construct every time a linked cell particle container
+					LinkedCellParticleContainer *pc3D = this->createSimpleLC(nx, ny, nz);
+
+					sum = pc3D->cellPairs.size();
+		
+					int sum2 = 0;
+					for(int i = 0; i < pc3D->evenLayers.size(); i++)sum2 += pc3D->evenLayers[i].size();
+					for(int i = 0; i < pc3D->oddLayers.size(); i++)sum2 += pc3D->oddLayers[i].size();
+
+					// use single threaded generated pairs as comparison, go through pairs and compare mt vs. st
+					// print missing pairs
+					for(std::vector<utils::Vector<unsigned int, 2> >::iterator it = pc3D->cellPairs.begin(); it != pc3D->cellPairs.end(); ++it)
+					{
+						// get pair
+						utils::Vector<unsigned int, 2> pair = *it;
+
+						// search for pair
+						bool found = false;
+			
+						// even
+						for(int i = 0; i < pc3D->evenLayers.size(); i++)
+							for(int j = 0; j < pc3D->evenLayers[i].size(); j++)
+							{
+								utils::Vector<unsigned int, 2> t = pc3D->evenLayers[i][j];
+
+								if(t[0] == pair[0] && t[1] == pair[1])found = true;
+								if(t[0] == pair[1] && t[1] == pair[0])found = true;
+							}				
+
+						// odd
+						for(int i = 0; i < pc3D->oddLayers.size(); i++)
+							for(int j = 0; j < pc3D->oddLayers[i].size(); j++)
+							{
+								utils::Vector<unsigned int, 2> t = pc3D->oddLayers[i][j];
+
+								if(t[0] == pair[0] && t[1] == pair[1])found = true;
+								if(t[0] == pair[1] && t[1] == pair[0])found = true;
+							}
+
+						// pair not found? print out!
+						if(!found)
+						{
+							int x1 = pc3D->Index1DTo3D(pair[0])[0];
+							int x2 = pc3D->Index1DTo3D(pair[0])[1];
+							int x3 = pc3D->Index1DTo3D(pair[0])[2];
+							int y1 = pc3D->Index1DTo3D(pair[1])[0];
+							int y2 = pc3D->Index1DTo3D(pair[1])[1];
+							int y3 = pc3D->Index1DTo3D(pair[1])[2];
+
+							LOG4CXX_ERROR(generalOutputLogger, "pair [ ( "<<x1<<", "<<x2<<", "<<x3<<" ),("<<y1<<", "<<y2<<", "<<y3<<" ) not found");
+						}
+						CPPUNIT_ASSERT(found);
+					}
+
+					// equal?
+					CPPUNIT_ASSERT(sum == sum2);
+				}
+
 	}
 };
 

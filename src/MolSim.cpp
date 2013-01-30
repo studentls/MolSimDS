@@ -56,9 +56,46 @@ err_type MolSim::Init(int argc, char *argsv[])
 	if(FAILED(sim->Init(desc)))return E_UNKNOWN;
 
 	// use xml file
-	if(FAILED(sim->CreateSimulationFromXMLFile(argsv[1])))return E_INVALIDPARAM;
+	if(FAILED(sim->CreateSimulationFromXMLFile(simFileName.c_str())))return E_INVALIDPARAM;
 
+	// if viewer is active, set interior particle array size
+	int size = sim->getParticleCount();
+	
+	// not for ICE
+#ifndef ICE
+	if(Viewer::Instance().IsRunning())Viewer::Instance().setParticleArraySize(sim->getParticleCount());
+#endif
+	// set grid
+	ParticleContainer *pc = sim->getParticleContainer();
+	
+#ifndef ICE
+	// valid?
+	// beware, everything currently only in 2D!
+	if(pc && Viewer::Instance().IsRunning())
+	{
+		utils::BoundingBox bb;
+		bb = pc->getBoundingBox();
+		int xcount = 1;
+		int ycount = 1;
+
+		// linked cell?
+		if(pc->getType() == PCT_LINKEDCELL)
+		{
+			xcount = ((LinkedCellParticleContainer*)pc)->getCellExtent()[0];
+			ycount = ((LinkedCellParticleContainer*)pc)->getCellExtent()[1];
+		}
+
+		Viewer::Instance().setGrid(bb.center[0] - bb.extent[0] * 0.5, bb.center[1] - bb.extent[1] * 0.5, bb.extent[0], bb.extent[1], xcount, ycount);
+	}
+#endif
 	return S_OK;
+}
+
+// worker Thread, runs simulation
+void MolSim::workerMain(MolSim *molsim)
+{
+	// simply run it
+	molsim->sim->Run();
 }
 
 err_type MolSim::Run()
@@ -80,20 +117,65 @@ err_type MolSim::Run()
 	case AS_SINGLETEST:
 		runSingleTest(strTestCase);
 		break;
-	case AS_SIMULATION:
-		// valid pointer?
-		if(!sim)return E_NOTINITIALIZED;
-	
-		// run simulation...
-		err_type e = sim->Run();
-		if(FAILED(e))return e;
+	case AS_PTEST:
+		{
+			PerformanceTest PTest;
 
-		// show statistics...
-		SimulationStatistics &stats = sim->getStatistics();
-		showStatistics(stats);
-		break;
+			// run performance tests...
+			PTest.Run(simFileName.c_str());
+
+			break;
+		}
+	case AS_SIMULATION:
+		{
+			// valid pointer?
+			if(!sim)return E_NOTINITIALIZED;
+#ifndef ICE	
+			// if viewer is active(--viewer option enabled)
+			// run multithreaded
+			// else simply run simulation in one thread
+			if(Viewer::Instance().IsRunning())
+			{	
+#ifdef USE_BOOST
+				// create boost thread
+				 boost::thread workerThread(workerMain, this);
+
+				// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
+				// run viewer's message loop
+				Viewer::Instance().MessageLoop();
+
+				// join threads
+				workerThread.join();
+#else
+				GLFWthread worker;
+			
+				// create glfw based thread
+				worker = glfwCreateThread((GLFWthreadfun)workerMain, this);
+
+				// GLFW Thread has to be the main thread, because Cocoa seems to have problems otherwise
+				// run viewer's message loop
+				Viewer::Instance().MessageLoop();
+
+				// join threads
+				glfwWaitThread(worker, GLFW_WAIT);
+#endif
+			}
+			else
+			{
+				// run simulation...
+				err_type e = sim->Run();
+				if(FAILED(e))return e;
+			}	
+#else
+			err_type e = sim->Run();
+			if(FAILED(e))return e;
+#endif
+			// show statistics...
+			SimulationStatistics &stats = sim->getStatistics();
+			showStatistics(stats);
+			break;
+		}
 	}
-	
 	return S_OK;
 }
 
@@ -112,7 +194,9 @@ err_type MolSim::Release()
 ///			returns E_FILENOTFOUND if no file exists
 err_type MolSim::parseLine(int argc, char *argsv[])
 {
-	// Syntax is molsim scene.xml
+	state = AS_NONE;
+	
+	// Syntax is molsim scene.xml (--viewer)
 	// where t_end and delta_t denote a floating point value
 	if(argc != 2 && argc != 3)
 	{
@@ -130,30 +214,10 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_HELP;
 		else if(strcmp(argsv[1], "-showtests") == 0)
 			state = AS_SHOWTESTS;
-		else
+		else if(strcmp(argsv[1], "-ptest") == 0)
 		{
-			// parse file
-
-			// check if file exists
-			if(!fileExists(argsv[1]))
-			{
-				LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
-				printUsage();
-				return E_FILENOTFOUND;
-			}
-
-			// has file correct ending?
-			if(strcmp(utils::getFileExtension(argsv[1]), "xml") != 0)
-			{
-				LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
-				printUsage();
-				return E_FILEERROR;
-			}
-
-			//everything ok...
-
-			//run Simulation
-			state = AS_SIMULATION;
+			LOG4CXX_ERROR(generalOutputLogger, ">> error: please specify a test file!");
+			return E_INVALIDPARAM;
 		}
 	}
 	else if(argc == 3)
@@ -163,6 +227,27 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			state = AS_SINGLETEST;
 			strTestCase = argsv[2];
 		}
+		// can be displayed before or after the filename
+		else if(strcmp(argsv[1], "--viewer") == 0 || strcmp(argsv[2], "--viewer") == 0)
+		{
+#ifndef ICE	
+			// initialize viewer
+			Viewer::Instance().InitAndDisplay();
+#else
+			LOG4CXX_ERROR(generalOutputLogger, ">> sorry, but currently X11 output does not work for ICE!");
+			return E_INVALIDPARAM;
+#endif		
+		}
+		else if(strcmp(argsv[1], "-ptest") == 0)
+		{
+			state = AS_PTEST;
+			simFileName = argsv[2];
+			if(strcmp(utils::getFileExtension(argsv[2]), "xml") != 0)
+			{
+				LOG4CXX_ERROR(generalOutputLogger, ">> error: invalid file format!");
+				return E_INVALIDPARAM;
+			}
+		}
 		else
 		{
 			LOG4CXX_ERROR(simulationInitializationLogger, ">> error: invalid argument");
@@ -170,6 +255,41 @@ err_type MolSim::parseLine(int argc, char *argsv[])
 			return E_INVALIDPARAM;
 		}
 	}
+
+	if(state == AS_NONE)
+		if(argc == 2 || argc == 3 )
+		{
+			int index = 1;
+		
+			//set index according where a possible -- option may be set
+			if(argsv[1][0] == '-')index = 2;
+			else index = 1;
+
+			// parse file
+
+			// check if file exists
+			if(!fileExists(argsv[index]))
+			{
+				LOG4CXX_ERROR(simulationInitializationLogger, "error: file doesn't exist!");
+				printUsage();
+				return E_FILENOTFOUND;
+			}
+
+			// has file correct ending?
+			if(strcmp(utils::getFileExtension(argsv[index]), "xml") != 0)
+			{
+				LOG4CXX_ERROR(simulationInitializationLogger, "error: file has no .xml extension!");
+				printUsage();
+				return E_FILEERROR;
+			}
+
+			// everything ok...
+			// set name
+			simFileName = argsv[index];
+
+			//run Simulation
+			state = AS_SIMULATION;
+		}
 
 	return S_OK;
 }
@@ -181,6 +301,8 @@ void MolSim::showHelp()
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-help"<<"\t\t\t"<<"show help");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-test <name>"<<"\t\t"<<"run single test case or leave\n\t\t\t\t<name> blank to run all tests");
 	LOG4CXX_INFO(generalOutputLogger, "    "<<"-showtests"<<"\t\t\t"<<"list all avaliable tests by name");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"-ptest <file>"<<"\t\t\t"<<"run performance tests for the given file");
+	LOG4CXX_INFO(generalOutputLogger, "    "<<"--viewer"<<"\t\t\t"<<"start with builtin OpenGL viewer");
 	
 }
 
@@ -241,7 +363,7 @@ void MolSim::printHelloMessage()
 
 	line();
 	cout << endl;
-	LOG4CXX_INFO(generalOutputLogger, "(c) 2012 by F.Dietz & L.Spiegelberg"); 
+	LOG4CXX_INFO(generalOutputLogger, "(c) 2012-2013 by F.Dietz & L.Spiegelberg"); 
 	cout << endl;
 	LOG4CXX_INFO(generalOutputLogger, "Molecular Simulator handling *.txt files");
 	line();
@@ -306,9 +428,20 @@ void MolSim::runSingleTest(string s)
 
 void MolSim::showStatistics(SimulationStatistics& s)
 {
-	LOG4CXX_INFO(generalOutputLogger, "Statistics\n----------------------------");
+	LOG4CXX_INFO(generalOutputLogger, "Statistics");
+	utils::line();
 	LOG4CXX_INFO(generalOutputLogger, "total particle count:\t"<<s.particle_count);
 	LOG4CXX_INFO(generalOutputLogger, "iteration count: \t"<<s.step_count);
-	LOG4CXX_INFO(generalOutputLogger, "total time:\t\t "<<s.time);
-	LOG4CXX_INFO(generalOutputLogger, "timer per step:\t"<<s.timeperstep);
+	
+	// for less than 10 seconds print detailed time out
+	if(s.time < 10.0)
+	{
+		LOG4CXX_INFO(generalOutputLogger, "total time:\t\t"<<s.time * 1000<<" ms");
+	}
+	else
+	{
+		LOG4CXX_INFO(generalOutputLogger, "total time:\t\t"<<utils::secondsToHMS((int)s.time).c_str());
+	}
+	
+	LOG4CXX_INFO(generalOutputLogger, "timer per step:\t\t"<<1000 * s.timeperstep<<" ms");
 }

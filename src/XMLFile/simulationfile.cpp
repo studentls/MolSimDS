@@ -244,6 +244,28 @@ conditions (::std::auto_ptr< conditions_type > x)
 }
 
 
+// Membrane_t
+// 
+
+const Membrane_t::pull_iterations_type& Membrane_t::
+pull_iterations () const
+{
+  return this->pull_iterations_.get ();
+}
+
+Membrane_t::pull_iterations_type& Membrane_t::
+pull_iterations ()
+{
+  return this->pull_iterations_.get ();
+}
+
+void Membrane_t::
+pull_iterations (const pull_iterations_type& x)
+{
+  this->pull_iterations_.set (x);
+}
+
+
 // algorithm_t
 // 
 
@@ -305,6 +327,36 @@ void algorithm_t::
 LinkedCell (::std::auto_ptr< LinkedCell_type > x)
 {
   this->LinkedCell_.set (x);
+}
+
+const algorithm_t::Membrane_optional& algorithm_t::
+Membrane () const
+{
+  return this->Membrane_;
+}
+
+algorithm_t::Membrane_optional& algorithm_t::
+Membrane ()
+{
+  return this->Membrane_;
+}
+
+void algorithm_t::
+Membrane (const Membrane_type& x)
+{
+  this->Membrane_.set (x);
+}
+
+void algorithm_t::
+Membrane (const Membrane_optional& x)
+{
+  this->Membrane_ = x;
+}
+
+void algorithm_t::
+Membrane (::std::auto_ptr< Membrane_type > x)
+{
+  this->Membrane_.set (x);
 }
 
 
@@ -705,24 +757,6 @@ V (::std::auto_ptr< V_type > x)
   this->V_.set (x);
 }
 
-const particle_t::m_type& particle_t::
-m () const
-{
-  return this->m_.get ();
-}
-
-particle_t::m_type& particle_t::
-m ()
-{
-  return this->m_.get ();
-}
-
-void particle_t::
-m (const m_type& x)
-{
-  this->m_.set (x);
-}
-
 const particle_t::material_optional& particle_t::
 material () const
 {
@@ -847,24 +881,6 @@ h (const h_type& x)
   this->h_.set (x);
 }
 
-const cuboid_t::m_type& cuboid_t::
-m () const
-{
-  return this->m_.get ();
-}
-
-cuboid_t::m_type& cuboid_t::
-m ()
-{
-  return this->m_.get ();
-}
-
-void cuboid_t::
-m (const m_type& x)
-{
-  this->m_.set (x);
-}
-
 const cuboid_t::material_optional& cuboid_t::
 material () const
 {
@@ -981,24 +997,6 @@ void sphere_t::
 h (const h_type& x)
 {
   this->h_.set (x);
-}
-
-const sphere_t::m_type& sphere_t::
-m () const
-{
-  return this->m_.get ();
-}
-
-sphere_t::m_type& sphere_t::
-m ()
-{
-  return this->m_.get ();
-}
-
-void sphere_t::
-m (const m_type& x)
-{
-  this->m_.set (x);
 }
 
 const sphere_t::dimensions_type& sphere_t::
@@ -1129,6 +1127,30 @@ void material_t::
 sigma (const sigma_optional& x)
 {
   this->sigma_ = x;
+}
+
+const material_t::mass_optional& material_t::
+mass () const
+{
+  return this->mass_;
+}
+
+material_t::mass_optional& material_t::
+mass ()
+{
+  return this->mass_;
+}
+
+void material_t::
+mass (const mass_type& x)
+{
+  this->mass_.set (x);
+}
+
+void material_t::
+mass (const mass_optional& x)
+{
+  this->mass_ = x;
 }
 
 
@@ -1778,6 +1800,83 @@ LinkedCell_t::
 {
 }
 
+// Membrane_t
+//
+
+Membrane_t::
+Membrane_t (const pull_iterations_type& pull_iterations)
+: ::xml_schema::type (),
+  pull_iterations_ (pull_iterations, ::xml_schema::flags (), this)
+{
+}
+
+Membrane_t::
+Membrane_t (const Membrane_t& x,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (x, f, c),
+  pull_iterations_ (x.pull_iterations_, f, this)
+{
+}
+
+Membrane_t::
+Membrane_t (const ::xercesc::DOMElement& e,
+            ::xml_schema::flags f,
+            ::xml_schema::container* c)
+: ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
+  pull_iterations_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, true, false);
+    this->parse (p, f);
+  }
+}
+
+void Membrane_t::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  for (; p.more_elements (); p.next_element ())
+  {
+    const ::xercesc::DOMElement& i (p.cur_element ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    // pull_iterations
+    //
+    if (n.name () == "pull_iterations" && n.namespace_ ().empty ())
+    {
+      if (!pull_iterations_.present ())
+      {
+        this->pull_iterations_.set (pull_iterations_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    break;
+  }
+
+  if (!pull_iterations_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_element< char > (
+      "pull_iterations",
+      "");
+  }
+}
+
+Membrane_t* Membrane_t::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class Membrane_t (*this, f, c);
+}
+
+Membrane_t::
+~Membrane_t ()
+{
+}
+
 // algorithm_t
 //
 
@@ -1785,7 +1884,8 @@ algorithm_t::
 algorithm_t ()
 : ::xml_schema::type (),
   List_ (::xml_schema::flags (), this),
-  LinkedCell_ (::xml_schema::flags (), this)
+  LinkedCell_ (::xml_schema::flags (), this),
+  Membrane_ (::xml_schema::flags (), this)
 {
 }
 
@@ -1795,7 +1895,8 @@ algorithm_t (const algorithm_t& x,
              ::xml_schema::container* c)
 : ::xml_schema::type (x, f, c),
   List_ (x.List_, f, this),
-  LinkedCell_ (x.LinkedCell_, f, this)
+  LinkedCell_ (x.LinkedCell_, f, this),
+  Membrane_ (x.Membrane_, f, this)
 {
 }
 
@@ -1805,7 +1906,8 @@ algorithm_t (const ::xercesc::DOMElement& e,
              ::xml_schema::container* c)
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   List_ (f, this),
-  LinkedCell_ (f, this)
+  LinkedCell_ (f, this),
+  Membrane_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -1848,6 +1950,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!this->LinkedCell_)
       {
         this->LinkedCell_.set (r);
+        continue;
+      }
+    }
+
+    // Membrane
+    //
+    if (n.name () == "Membrane" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< Membrane_type > r (
+        Membrane_traits::create (i, f, this));
+
+      if (!this->Membrane_)
+      {
+        this->Membrane_.set (r);
         continue;
       }
     }
@@ -2272,12 +2388,10 @@ params_t::
 
 particle_t::
 particle_t (const X_type& X,
-            const V_type& V,
-            const m_type& m)
+            const V_type& V)
 : ::xml_schema::type (),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
-  m_ (m, ::xml_schema::flags (), this),
   material_ (::xml_schema::flags (), this)
 {
 }
@@ -2289,7 +2403,6 @@ particle_t (const particle_t& x,
 : ::xml_schema::type (x, f, c),
   X_ (x.X_, f, this),
   V_ (x.V_, f, this),
-  m_ (x.m_, f, this),
   material_ (x.material_, f, this)
 {
 }
@@ -2301,7 +2414,6 @@ particle_t (const ::xercesc::DOMElement& e,
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   X_ (f, this),
   V_ (f, this),
-  m_ (f, this),
   material_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
@@ -2349,17 +2461,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // m
-    //
-    if (n.name () == "m" && n.namespace_ ().empty ())
-    {
-      if (!m_.present ())
-      {
-        this->m_.set (m_traits::create (i, f, this));
-        continue;
-      }
-    }
-
     // material
     //
     if (n.name () == "material" && n.namespace_ ().empty ())
@@ -2390,13 +2491,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "V",
       "");
   }
-
-  if (!m_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "m",
-      "");
-  }
 }
 
 particle_t* particle_t::
@@ -2418,14 +2512,12 @@ cuboid_t::
 cuboid_t (const X_type& X,
           const V_type& V,
           const N_type& N,
-          const h_type& h,
-          const m_type& m)
+          const h_type& h)
 : ::xml_schema::type (),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
   N_ (N, ::xml_schema::flags (), this),
   h_ (h, ::xml_schema::flags (), this),
-  m_ (m, ::xml_schema::flags (), this),
   material_ (::xml_schema::flags (), this)
 {
 }
@@ -2439,7 +2531,6 @@ cuboid_t (const cuboid_t& x,
   V_ (x.V_, f, this),
   N_ (x.N_, f, this),
   h_ (x.h_, f, this),
-  m_ (x.m_, f, this),
   material_ (x.material_, f, this)
 {
 }
@@ -2453,7 +2544,6 @@ cuboid_t (const ::xercesc::DOMElement& e,
   V_ (f, this),
   N_ (f, this),
   h_ (f, this),
-  m_ (f, this),
   material_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
@@ -2526,17 +2616,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // m
-    //
-    if (n.name () == "m" && n.namespace_ ().empty ())
-    {
-      if (!m_.present ())
-      {
-        this->m_.set (m_traits::create (i, f, this));
-        continue;
-      }
-    }
-
     // material
     //
     if (n.name () == "material" && n.namespace_ ().empty ())
@@ -2581,13 +2660,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "h",
       "");
   }
-
-  if (!m_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "m",
-      "");
-  }
 }
 
 cuboid_t* cuboid_t::
@@ -2610,14 +2682,12 @@ sphere_t (const X_type& X,
           const V_type& V,
           const r_type& r,
           const h_type& h,
-          const m_type& m,
           const dimensions_type& dimensions)
 : ::xml_schema::type (),
   X_ (X, ::xml_schema::flags (), this),
   V_ (V, ::xml_schema::flags (), this),
   r_ (r, ::xml_schema::flags (), this),
   h_ (h, ::xml_schema::flags (), this),
-  m_ (m, ::xml_schema::flags (), this),
   dimensions_ (dimensions, ::xml_schema::flags (), this),
   material_ (::xml_schema::flags (), this)
 {
@@ -2632,7 +2702,6 @@ sphere_t (const sphere_t& x,
   V_ (x.V_, f, this),
   r_ (x.r_, f, this),
   h_ (x.h_, f, this),
-  m_ (x.m_, f, this),
   dimensions_ (x.dimensions_, f, this),
   material_ (x.material_, f, this)
 {
@@ -2647,7 +2716,6 @@ sphere_t (const ::xercesc::DOMElement& e,
   V_ (f, this),
   r_ (f, this),
   h_ (f, this),
-  m_ (f, this),
   dimensions_ (f, this),
   material_ (f, this)
 {
@@ -2718,17 +2786,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       }
     }
 
-    // m
-    //
-    if (n.name () == "m" && n.namespace_ ().empty ())
-    {
-      if (!m_.present ())
-      {
-        this->m_.set (m_traits::create (i, f, this));
-        continue;
-      }
-    }
-
     // dimensions
     //
     if (n.name () == "dimensions" && n.namespace_ ().empty ())
@@ -2785,13 +2842,6 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       "");
   }
 
-  if (!m_.present ())
-  {
-    throw ::xsd::cxx::tree::expected_element< char > (
-      "m",
-      "");
-  }
-
   if (!dimensions_.present ())
   {
     throw ::xsd::cxx::tree::expected_element< char > (
@@ -2820,7 +2870,8 @@ material_t ()
 : ::xml_schema::type (),
   name_ (::xml_schema::flags (), this),
   epsilon_ (::xml_schema::flags (), this),
-  sigma_ (::xml_schema::flags (), this)
+  sigma_ (::xml_schema::flags (), this),
+  mass_ (::xml_schema::flags (), this)
 {
 }
 
@@ -2831,7 +2882,8 @@ material_t (const material_t& x,
 : ::xml_schema::type (x, f, c),
   name_ (x.name_, f, this),
   epsilon_ (x.epsilon_, f, this),
-  sigma_ (x.sigma_, f, this)
+  sigma_ (x.sigma_, f, this),
+  mass_ (x.mass_, f, this)
 {
 }
 
@@ -2842,7 +2894,8 @@ material_t (const ::xercesc::DOMElement& e,
 : ::xml_schema::type (e, f | ::xml_schema::flags::base, c),
   name_ (f, this),
   epsilon_ (f, this),
-  sigma_ (f, this)
+  sigma_ (f, this),
+  mass_ (f, this)
 {
   if ((f & ::xml_schema::flags::base) == 0)
   {
@@ -2879,6 +2932,12 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     if (n.name () == "sigma" && n.namespace_ ().empty ())
     {
       this->sigma_.set (sigma_traits::create (i, f, this));
+      continue;
+    }
+
+    if (n.name () == "mass" && n.namespace_ ().empty ())
+    {
+      this->mass_.set (mass_traits::create (i, f, this));
       continue;
     }
   }

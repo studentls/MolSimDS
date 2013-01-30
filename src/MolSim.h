@@ -27,9 +27,14 @@
 #include <iostream>
 #include <string>
 
+#include "Viewer.h"
+
 //include tests
 #include "ParticleContainerTest.h"
 #include "XMLFileReaderTest.h"
+
+// include PerformanceTest
+#include "PerformanceTest.h"
 
 /// specifies in which state the application currently is
 enum ApplicationState
@@ -39,7 +44,8 @@ enum ApplicationState
 	AS_TESTS,		/// run all tests
 	AS_SINGLETEST,	/// run single test
 	AS_HELP,		/// show help
-	AS_SHOWTESTS	/// show all avaliable tests
+	AS_SHOWTESTS,	/// show all avaliable tests
+	AS_PTEST		/// performance Test
 };
 
 /// maximal level to display test structure
@@ -50,11 +56,15 @@ class MolSim
 {
 private:
 
+	/// simulation
 	Simulation			*sim;
 
 	ApplicationState	state;
 
 	std::string			strTestCase;
+
+	/// simulation (XML) filename
+	std::string			simFileName;	
 
 	/// parse Argument line, check for variable ranges
 	err_type			parseLine(int argc, char *argsv[]);
@@ -82,6 +92,9 @@ private:
 
 	// displays statistics
 	void				showStatistics(SimulationStatistics& s);
+
+	/// worker Thread to do simulation, if viewer is active
+	static void			workerMain(MolSim *molsim);
 
 public:
 

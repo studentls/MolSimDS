@@ -21,7 +21,21 @@
 void LinkedCellParticleContainer::Iterate(void(*func)(void*, Particle&), void *data)
 {		
 	assert(Cells);
+#ifdef OPENMP
+	//openMP version
+	
+#pragma omp parallel for num_threads(threadCount)
+	for(int i = 0; i < getCellCount(); ++i)
+	{
+		if(Cells[i].empty())continue;
 
+		for(int j = 0; j < Cells[i].size(); ++j)
+		{
+			Particle& p = Cells[i][j];
+			(*func)(data, p);				
+		}
+	}
+#else
 	// go through all Cells...
 	for(int i = 0; i < getCellCount(); i++)
 	{
@@ -33,10 +47,12 @@ void LinkedCellParticleContainer::Iterate(void(*func)(void*, Particle&), void *d
 			(*func)(data, p);				
 		}
 	}
+#endif
 }
 
 void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, Particle&), void *data)
 {
+#ifndef OPENMP
 	// Step 1: calc pairwise force between particles for each cell
 
 	// go through cells
@@ -88,6 +104,138 @@ void LinkedCellParticleContainer::IteratePairwise(void(*func)(void*, Particle&, 
 			}			
 		}
 	}
+#else
+	//Open MP version
+
+	// use different indices, for different dimensions...
+	if(dim == 2)
+	{
+		// Step 1: calc pairwise force between particles for each cell
+
+		// go through cells
+	#pragma omp parallel for num_threads(threadCount)
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			// any particles contained?
+			if(Cells[i].empty())continue;
+
+			// for all particles in cell_i, calc forces in cell_i
+			for(int j = 0; j < Cells[i].size(); j++)
+			{
+				for(int k = j + 1; k < Cells[i].size(); k++)
+				{
+					Particle& p1 = Cells[i][j];
+					Particle& p2 = Cells[i][k];
+
+					func(data, p1, p2);
+				}
+			}
+		}
+
+		// Step 2: calc force with neighbouring cells
+		// use stored pairs to iterate, these may be ordered to increase performance in a special way
+		// ramaining an unsolved problem for simulations yet
+	
+		// pairs should exist!
+		assert(oddStrips.size() != 0);
+		assert(evenStrips.size() != 0);
+
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.1 go through oddStrips and calc forces
+		for(int iStrip = 0; iStrip < oddStrips.size(); iStrip++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < oddStrips[iStrip].size(); iPair++)
+			{
+				int i = oddStrips[iStrip][iPair][0];
+				int j = oddStrips[iStrip][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
+			}
+		}
+
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.2 go through evenStrips and calc forces
+		for(int iStrip = 0; iStrip < evenStrips.size(); iStrip++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < evenStrips[iStrip].size(); iPair++)
+			{
+				int i = evenStrips[iStrip][iPair][0];
+				int j = evenStrips[iStrip][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
+			}
+		}
+	}
+	else
+	{
+		// only 3D supported...
+		assert(dim == 3);
+
+		// Step 1: calc pairwise force between particles for each cell
+
+		// go through cells
+	#pragma omp parallel for num_threads(threadCount)
+		for(int i = 0; i < getCellCount(); i++)
+		{
+			// any particles contained?
+			if(Cells[i].empty())continue;
+
+			// for all particles in cell_i, calc forces in cell_i
+			for(int j = 0; j < Cells[i].size(); j++)
+			{
+				for(int k = j + 1; k < Cells[i].size(); k++)
+				{
+					Particle& p1 = Cells[i][j];
+					Particle& p2 = Cells[i][k];
+
+					func(data, p1, p2);
+				}
+			}
+		}
+
+		// Step 2: calc force with neighbouring cells
+		// use stored pairs to iterate, these may be ordered to increase performance in a special way
+		// ramaining an unsolved problem for simulations yet
+	
+		// pairs should exist!
+		assert(oddLayers.size() != 0);
+		assert(evenLayers.size() != 0);
+
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.1 go through oddLayers and calc forces
+		for(int iLayer = 0; iLayer < oddLayers.size(); iLayer++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < oddLayers[iLayer].size(); iPair++)
+			{
+				int i = oddLayers[iLayer][iPair][0];
+				int j = oddLayers[iLayer][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
+			}
+		}
+
+	#pragma omp parallel for num_threads(threadCount)
+		// 2.2 go through evenLayers and calc forces
+		for(int iLayer = 0; iLayer < evenLayers.size(); iLayer++)
+		{
+			// go through all pairs in the strip
+			for(int iPair = 0; iPair < evenLayers[iLayer].size(); iPair++)
+			{
+				int i = evenLayers[iLayer][iPair][0];
+				int j = evenLayers[iLayer][iPair][1];
+
+				// calc forces between cells i and j
+				interactCells(func, data, i, j);
+			}
+		}
+	}
+#endif
 }
 
 void LinkedCellParticleContainer::ApplyReflectiveBoundaryConditions(void(*func)(void*, Particle&, Particle&), void *data)
@@ -158,6 +306,10 @@ void	LinkedCellParticleContainer::generatePairs()
 					// get neighbours
 					std::vector<unsigned int> neighbours = getNeighbours2D(i1);
 
+					if(neighbours.empty())
+					{
+						LOG4CXX_ERROR(generalOutputLogger, "failure!");
+					}
 					// go through neighbours
 					assert(!neighbours.empty());
 					for(std::vector<unsigned int>::iterator it = neighbours.begin(); it < neighbours.end(); it++)
@@ -510,8 +662,72 @@ void LinkedCellParticleContainer::calcIndices()
 
 	calcFrameIndices(haloIndices, 0);
 	calcFrameIndices(boundaryIndices, 1);
+
+	// if OpenMP calc indices
+#ifdef OPENMP
+	calcMTIndices();
+#endif
 }
 
+void LinkedCellParticleContainer::calcMTIndices()
+{
+	// only for 2D at the moment!
+	if(dim == 2)
+	{
+
+		// (1) calc Indices for even stripes
+		for(int i = 0; i < cellCount[0] - 1; i += 2)
+		{
+			IndexStrip strip;
+			strip.constructVerticalStripIndices(i, cellCount[1], cellCount);
+
+			evenStrips.push_back(strip);
+		}
+
+		// (2) calc Indices for odd stripes
+		for(int i = 1; i < cellCount[0] - 1; i += 2)
+		{
+			IndexStrip strip;
+			strip.constructVerticalStripIndices(i, cellCount[1], cellCount);
+
+			oddStrips.push_back(strip);
+		}
+	}
+	else
+	{
+		// (1) calc Indices for even layers
+		for(int i = 0; i < cellCount[2] - 1; i += 2)
+		{
+			IndexLayer layer;
+			layer.constructVerticalInteractionSlice(i, this);
+
+			evenLayers.push_back(layer);
+		}
+
+		// (2) calc Indices for odd layer
+		for(int i = 1; i < cellCount[2] - 1; i += 2)
+		{
+			IndexLayer layer;
+			layer.constructVerticalInteractionSlice(i, this);
+
+			oddLayers.push_back(layer);
+		}
+
+		// (3) in 3D the top layer has no internal ((x,y)-pairs!) interactions, decide upon cellCount[2] where to put
+		if(cellCount[2] & 0x1) // cellCount[2] odd --> put top layer to even layers...
+		{
+			IndexLayer layer;
+			layer.constructInternalSliceIndices(cellCount[2] - 1, this);
+			evenLayers.push_back(layer);
+		}
+		else // cellCount[2] even --> put top layer to odd layers...
+		{
+			IndexLayer layer;
+			layer.constructInternalSliceIndices(cellCount[2] - 1, this);
+			oddLayers.push_back(layer);
+		}
+	}
+}
 void LinkedCellParticleContainer::calcFrameIndices(std::vector<unsigned int> &out, const unsigned int r)
 {
 	int m = cellCount[0];
@@ -603,4 +819,86 @@ void LinkedCellParticleContainer::calcFrameIndices(std::vector<unsigned int> &ou
 	default:
 		LOG4CXX_ERROR(generalOutputLogger, "failed to calculate pairs, as only dimensions 2, 3 are supported yet");
 	}
+}
+
+// located here due to c++'s internal behaviour
+void IndexLayer::constructVerticalInteractionSlice(const int zOffset, const LinkedCellParticleContainer *pc)
+{
+	// check if valid zOffset
+	assert(zOffset >= 0);
+	assert(zOffset < pc->cellCount[2] - 1);
+
+	// go through all x,y cells
+	for(int x = 0; x < pc->cellCount[0]; x++)
+		for(int y = 0; y < pc->cellCount[1]; y++)
+		{
+			// index of the root cell in this iteration
+			int index = pc->Index3DTo1D(x, y, zOffset);
+			
+			// calculate pairs
+			for(int i = -1; i <= 1; i++) // x
+				for(int j = -1; j <= 1; j++) // y
+					for(int k = 0; k <= 1; k++) // z
+					{
+						// reject if not in boundaries
+						if(x + i < 0 || x + i >= pc->cellCount[0])continue;
+						if(y + j < 0 || y + j >= pc->cellCount[1])continue;
+						if(zOffset + k < 0 || zOffset + k >= pc->cellCount[2])continue;
+
+						// calc a neighbour
+						int index2 = pc->Index3DTo1D(x + i, y + j, zOffset + k);
+
+						// valid index?
+						if(index2 < 0 || index2 > pc->getCellCount())continue;
+
+						//unordered pairs!
+						if(index < index2)this->push_back(pc->makePair(index, index2));
+						
+					}
+		}
+}
+
+void IndexLayer::constructInternalSliceIndices(const int zOffset, const LinkedCellParticleContainer *pc)
+{
+	// check if valid zOffset
+	assert(zOffset >= 0);
+	assert(zOffset <= pc->cellCount[2] - 1); // top layer allowed!
+
+	// go through all x,y cells
+	for(int x = 0; x < pc->cellCount[0]; x++)
+		for(int y = 0; y < pc->cellCount[1]; y++)
+		{
+			// index of the root cell in this iteration
+			int index = pc->Index3DTo1D(x, y, zOffset);
+			
+			// calculate pairs
+			for(int i = -1; i <= 1; i++) // x
+				for(int j = -1; j <= 1; j++) // y
+					{
+						// reject if not in boundaries
+						if(x + i < 0 || x + i >= pc->cellCount[0])continue;
+						if(y + j < 0 || y + j >= pc->cellCount[1])continue;
+
+						// calc a neighbour
+						int index2 = pc->Index3DTo1D(x + i, y + j, zOffset);
+
+						// valid index?
+						if(index2 < 0 || index2 > pc->getCellCount())continue;
+
+						//unordered pairs!
+						if(index < index2)this->push_back(pc->makePair(index, index2));
+						
+					}
+		}
+}
+
+
+// layer fixes
+IndexStrip::IndexStrip()
+{
+    utils::TFastArray<utils::Vector<unsigned int, 2> >();
+}
+IndexLayer::IndexLayer()
+{
+    utils::TFastArray<utils::Vector<unsigned int, 2> >();
 }

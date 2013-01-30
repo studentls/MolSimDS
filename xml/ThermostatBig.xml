@@ -2,7 +2,7 @@
 
 <!--
 
-file: ThermostatSmall.xml small experiment to test Thermostat functionality
+file: ThermostatBig.xml big experiment for Thermostat functionality
 author: F.Dietz & L.Spiegelberg
 
 -->
@@ -16,9 +16,9 @@ author: F.Dietz & L.Spiegelberg
     
     <iterationsperoutput>10</iterationsperoutput>
     <initialTemperature>40</initialTemperature>
-    <iterationsTillThermostatApplication>100</iterationsTillThermostatApplication>
-    <targetTemperature>100</targetTemperature>
-    <temperatureStepSize>10</temperatureStepSize>
+    <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
+    <targetTemperature>40</targetTemperature>
+    <temperatureStepSize>0</temperatureStepSize>
     <gravity>-12.44</gravity>
    
     <delta_t>0.0005</delta_t>
@@ -26,14 +26,14 @@ author: F.Dietz & L.Spiegelberg
     <outputfmt>VTK</outputfmt>
     <sigma>1.0</sigma>
     
-    <t_end>25.0</t_end>
+    <t_end>50.0</t_end>
     <t_start>0.0</t_start>
     
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.5</cutoff_radius>
-        <sizeofdomainX>63.0</sizeofdomainX>
-        <sizeofdomainY>36.0</sizeofdomainY>
+        <sizeofdomainX>300.0</sizeofdomainX>
+        <sizeofdomainY>54.0</sizeofdomainY>
         <sizeofdomainZ>0.0</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
@@ -48,15 +48,14 @@ author: F.Dietz & L.Spiegelberg
 
   <data>
     <!-- material1-->
-    <material epsilon="1.0" sigma="1.0" name="Liquid1"/>
+    <material epsilon="1.0" sigma="1.2" name="Liquid1" mass="1.0"/>
     <!-- material1-->
-    <material epsilon="1.0" sigma="0.9412" name="Liquid2"/>
+    <material epsilon="1.0" sigma="1.1" name="Liquid2" mass="2.0"/>
     
     <!-- C1 -->
     <cuboid>
       <h>1.2</h>
-      <m>1</m>
-      <N>50 14 1</N>
+      <N>250 20 1</N>
       <V>0.0 0.0 0.0</V>
       <X>0.6 2.0 0.0</X>
       <material>Liquid1</material>
@@ -65,10 +64,9 @@ author: F.Dietz & L.Spiegelberg
     <!-- C2 -->
     <cuboid>
       <h>1.2</h>
-      <m>2.0</m>
-      <N>50 14 1</N>
+      <N>250 20 1</N>
       <V>0.0 0.0 0.0</V>
-      <X>0.6 19.0 0.0</X>
+      <X>0.6 27.0 0.0</X>
       <material>Liquid2</material>
     </cuboid>
     

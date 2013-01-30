@@ -121,4 +121,16 @@ typedef unsigned char	byte;
 #define SAFE_DELETE_A(x)	{if((x))delete [] (x); (x) = NULL;}
 
 
+//openMP stuff
+
+// include openMP
+#include <omp.h>
+
+// MSVC++
+#ifndef OPENMP
+#ifdef _OPENMP
+#define OPENMP
+#endif
+#endif
+
 #endif

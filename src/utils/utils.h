@@ -19,5 +19,6 @@
 #include "Vector.h"
 #include "Timer.h"
 #include "Plane.h"
+#include "TFastArray.h"
 
 #endif

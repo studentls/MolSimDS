@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+
+<!--
+
+file: ThermostatSmall.xml small experiment to test Thermostat functionality
+author: F.Dietz & L.Spiegelberg
+
+-->
+
+<simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="simulationfile.xsd">
+
+  <params>
+    <dimension>2</dimension>
+    <output>out</output>
+    
+    <iterationsperoutput>10</iterationsperoutput>
+    <initialTemperature>40</initialTemperature>
+    <iterationsTillThermostatApplication>100</iterationsTillThermostatApplication>
+    <targetTemperature>100</targetTemperature>
+    <temperatureStepSize>10</temperatureStepSize>
+    <gravity>-12.44</gravity>
+   
+    <delta_t>0.0005</delta_t>
+    <epsilon>5.0</epsilon>
+    <outputfmt>VTK</outputfmt>
+    <sigma>1.0</sigma>
+    
+    <t_end>25.0</t_end>
+    <t_start>0.0</t_start>
+    
+    <algorithm>
+      <LinkedCell>
+        <cutoff_radius>2.5</cutoff_radius>
+        <sizeofdomainX>63.0</sizeofdomainX>
+        <sizeofdomainY>36.0</sizeofdomainY>
+        <sizeofdomainZ>0.0</sizeofdomainZ>
+        <offset>0.0 0.0 0.0</offset>
+        <conditions>
+          <condition value="front" type="reflective"></condition>
+          <condition value="left" type="periodic"></condition>
+          <condition value="right" type="periodic"></condition>
+        </conditions>
+      </LinkedCell>
+    </algorithm>
+    
+  </params>
+
+  <data>
+    <!-- material1-->
+    <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
+    <!-- material1-->
+    <material epsilon="1.0" sigma="0.9412" name="Liquid2" mass="2.0"/>
+    
+    <!-- C1 -->
+    <cuboid>
+      <h>1.2</h>
+      <N>50 14 1</N>
+      <V>0.0 0.0 0.0</V>
+      <X>0.6 2.0 0.0</X>
+      <material>Liquid1</material>
+    </cuboid>
+    
+    <!-- C2 -->
+    <cuboid>
+      <h>1.2</h>
+      <N>50 14 1</N>
+      <V>0.0 0.0 0.0</V>
+      <X>0.6 19.0 0.0</X>
+      <material>Liquid2</material>
+    </cuboid>
+    
+  </data>
+
+</simulationfile>

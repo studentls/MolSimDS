@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+
+<!--
+
+file: ThermostatBig.xml big experiment for Thermostat functionality
+author: F.Dietz & L.Spiegelberg
+
+-->
+
+<simulationfile xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:noNamespaceSchemaLocation="simulationfile.xsd">
+
+  <params>
+    <dimension>3</dimension>
+    <output>out</output>
+    
+    <iterationsperoutput>10</iterationsperoutput>
+    <gravity>-0.001</gravity>
+   
+    <delta_t>0.01</delta_t>
+    <epsilon>1.0</epsilon>
+    <outputfmt>VTK</outputfmt>
+    <sigma>1.0</sigma>
+    
+    <t_end>500.0</t_end>
+    <t_start>0.0</t_start>
+    
+    <algorithm>
+      <Membrane>
+        <pull_iterations>15000</pull_iterations>
+      </Membrane>
+    </algorithm>
+    
+  </params>
+
+  <data>
+  </data>
+
+</simulationfile>

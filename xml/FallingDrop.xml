@@ -47,7 +47,7 @@ This file can therefore be ignored.
 
   <data>
     <!-- material1-->
-    <material epsilon="1.0" sigma="1.2" name="bassinMat"/>
+    <material epsilon="1.0" sigma="1.2" name="bassinMat" mass="1.0"/>
     
     <!-- the liquid in the bassin -->
     
@@ -58,7 +58,6 @@ This file can therefore be ignored.
       <X>150.0 150.0 0.0</X>
       <V>0.0 0.0 0.0</V>
       <r>20</r>
-      <m>1.0</m>
       <h>1.2</h>
       <dimensions>2</dimensions>
       <material>bassinMat</material>
