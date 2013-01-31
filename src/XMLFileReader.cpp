@@ -128,7 +128,19 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 
 	// set gravity factor
 	if(file->params().gravity().present())
-		desc.gravitational_constant = file->params().gravity().get();
+	{
+		// get data
+		desc.gravitational_constant = file->params().gravity().get().factor();
+
+		// dimension?
+		if(file->params().gravity().get().dimension().present())
+		{
+			std::string str = file->params().gravity().get().dimension().get();
+			if(str.at(0) == 'x' || str.at(0) == 'X' || str.at(0) == '0')desc.gravitational_dimension = 0;
+			if(str.at(0) == 'y' || str.at(0) == 'Y' || str.at(0) == '1')desc.gravitational_dimension = 1;
+			if(str.at(0) == 'z' || str.at(0) == 'Z' || str.at(0) == '2')desc.gravitational_dimension = 2;
+		}
+	}
 	else desc.gravitational_constant = 0.0;
 
 	// save cutoff radius if linked cell is used...

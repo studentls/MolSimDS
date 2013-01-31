@@ -463,11 +463,12 @@ void Simulation::gravityCalculator(void *data, Particle& p)
 	// add gravitational force, based on G = m * g
 	utils::Vector<double, 3> grav_force;
 	// act on the last dimension
-	int dimensionToAffect = desc->dimensions - 1;
+	int dimensionToAffect = desc->gravitational_dimension;
+
+	assert(dimensionToAffect >= 0 && dimensionToAffect <= 2);
 
 	// only the last dimension is affected...
-	//grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
-	grav_force[1] = desc->materials[p.type].mass * desc->gravitational_constant;
+	grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
 
 	p.addForce(grav_force);
 }
@@ -673,11 +674,12 @@ void Simulation::rdfCalculator(void* data, Particle& p1, Particle& p2)
 	int index = distance / tdata->delta_t;
 
 	if(index < 0)index = 0;
-	if(index >= tdata->distanceCounter.size())index = tdata->distanceCounter.size() - 1;
+	if(index < tdata->distanceCounter.size()) // ignore distances greater than cutoff radius!
+	{
+		assert(index >= 0 && index < tdata->distanceCounter.size());
 
-	assert(index >= 0 && index < tdata->distanceCounter.size());
-
-	tdata->distanceCounter[index]++;
+		tdata->distanceCounter[index]++;
+	}
 
 }
 

@@ -119,6 +119,7 @@ public:
 	std::vector<Material>	materials;
 
 	double	gravitational_constant;
+	byte	gravitational_dimension;
 
 	SimulationOutputFormat output_fmt;
 
@@ -165,6 +166,9 @@ public:
 
 		// use LJ as a standard
 		potentialForce = PF_LJ;
+
+		// per default use Y-axis
+		gravitational_dimension = 1;
 	}
 
 	/// copy constructor
@@ -190,6 +194,7 @@ public:
 		outname =  desc.outname;
 		
 		gravitational_constant = desc.gravitational_constant;
+		gravitational_dimension = desc.gravitational_dimension; 
 
 		// copy materials
 		materials = desc.materials;
@@ -238,7 +243,8 @@ public:
 
 		outname =  desc.outname;
 		
-		gravitational_constant = desc.gravitational_constant;
+		gravitational_constant = desc.gravitational_constant;		
+		gravitational_dimension = desc.gravitational_dimension; 
 
 		// copy materials
 		materials = desc.materials;

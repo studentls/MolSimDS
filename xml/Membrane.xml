@@ -15,7 +15,7 @@ author: F.Dietz & L.Spiegelberg
     <output>out</output>
     
     <iterationsperoutput>10</iterationsperoutput>
-    <gravity>-0.001</gravity>
+    <gravity factor="-0.001" dimension="z"></gravity>
    
     <delta_t>0.01</delta_t>
     <epsilon>1.0</epsilon>

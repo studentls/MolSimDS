@@ -16,7 +16,7 @@ author: F.Dietz & L.Spiegelberg
     <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
     <targetTemperature>0.5</targetTemperature>
     <temperatureStepSize>0.2</temperatureStepSize>
-    <gravity>-12.44</gravity>
+    <gravity factor="-12.44"></gravity>
     <output>TXT</output>
     <outputfmt>TXT</outputfmt>
     <iterationsperoutput>1000</iterationsperoutput>

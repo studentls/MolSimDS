@@ -238,6 +238,7 @@ class material_t;
 class data_t;
 class simulationfile_t;
 class condition;
+class gravity;
 class thermodynamicaldata;
 class outputfmt;
 
@@ -968,9 +969,9 @@ class params_t: public ::xml_schema::type
 
   // gravity
   // 
-  typedef ::xml_schema::decimal gravity_type;
+  typedef ::gravity gravity_type;
   typedef ::xsd::cxx::tree::optional< gravity_type > gravity_optional;
-  typedef ::xsd::cxx::tree::traits< gravity_type, char, ::xsd::cxx::tree::schema_type::decimal > gravity_traits;
+  typedef ::xsd::cxx::tree::traits< gravity_type, char > gravity_traits;
 
   const gravity_optional&
   gravity () const;
@@ -983,6 +984,9 @@ class params_t: public ::xml_schema::type
 
   void
   gravity (const gravity_optional& x);
+
+  void
+  gravity (::std::auto_ptr< gravity_type > p);
 
   // iterationsTillThermostatApplication
   // 
@@ -1973,6 +1977,84 @@ class condition: public ::xml_schema::string
   protected:
   ::xsd::cxx::tree::one< value_type > value_;
   type_optional type_;
+};
+
+class gravity: public ::xml_schema::string
+{
+  public:
+  // dimension
+  // 
+  typedef ::xml_schema::string dimension_type;
+  typedef ::xsd::cxx::tree::optional< dimension_type > dimension_optional;
+  typedef ::xsd::cxx::tree::traits< dimension_type, char > dimension_traits;
+
+  const dimension_optional&
+  dimension () const;
+
+  dimension_optional&
+  dimension ();
+
+  void
+  dimension (const dimension_type& x);
+
+  void
+  dimension (const dimension_optional& x);
+
+  void
+  dimension (::std::auto_ptr< dimension_type > p);
+
+  // factor
+  // 
+  typedef ::xml_schema::decimal factor_type;
+  typedef ::xsd::cxx::tree::traits< factor_type, char, ::xsd::cxx::tree::schema_type::decimal > factor_traits;
+
+  const factor_type&
+  factor () const;
+
+  factor_type&
+  factor ();
+
+  void
+  factor (const factor_type& x);
+
+  // Constructors.
+  //
+  gravity (const factor_type&);
+
+  gravity (const char*,
+           const factor_type&);
+
+  gravity (const ::std::string&,
+           const factor_type&);
+
+  gravity (const ::xml_schema::string&,
+           const factor_type&);
+
+  gravity (const ::xercesc::DOMElement& e,
+           ::xml_schema::flags f = 0,
+           ::xml_schema::container* c = 0);
+
+  gravity (const gravity& x,
+           ::xml_schema::flags f = 0,
+           ::xml_schema::container* c = 0);
+
+  virtual gravity*
+  _clone (::xml_schema::flags f = 0,
+          ::xml_schema::container* c = 0) const;
+
+  virtual 
+  ~gravity ();
+
+  // Implementation.
+  //
+  protected:
+  void
+  parse (::xsd::cxx::xml::dom::parser< char >&,
+         ::xml_schema::flags);
+
+  protected:
+  dimension_optional dimension_;
+  ::xsd::cxx::tree::one< factor_type > factor_;
 };
 
 class thermodynamicaldata: public ::xsd::cxx::tree::fundamental_base< ::xml_schema::unsigned_int, char, ::xml_schema::simple_type >

@@ -17,7 +17,7 @@ This file can therefore be ignored.
   <params>
     <dimension>2</dimension>
     <brownianMotionFactor>0.1</brownianMotionFactor>
-    <gravity>-12.44</gravity>
+    <gravity factor="-12.44"></gravity>
     <output>Drop</output>
 
     <iterationsperoutput>10</iterationsperoutput>

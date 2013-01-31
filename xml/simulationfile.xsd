@@ -119,7 +119,17 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="sigma" type="xsd:decimal"></xsd:element>
       <xsd:element name="brownianMotionFactor" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
       
-      <xsd:element name="gravity" type="xsd:decimal" minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="gravity" minOccurs="0" maxOccurs="1">
+        <xsd:complexType>
+          <xsd:simpleContent>
+            <xsd:extension base="xsd:string">
+              <xsd:attribute name="dimension" type="xsd:string" use="optional"></xsd:attribute><!-- specify, x,y or z!-->
+              <xsd:attribute name="factor" type="xsd:decimal" use="required"></xsd:attribute>
+              <!-- specify, x,y or z!-->
+            </xsd:extension>
+          </xsd:simpleContent>
+        </xsd:complexType>
+      </xsd:element>
       <xsd:element name="iterationsTillThermostatApplication" type="xsd:int"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="initialTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="targetTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>

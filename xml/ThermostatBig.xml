@@ -20,7 +20,7 @@ author: F.Dietz & L.Spiegelberg
     <targetTemperature>40</targetTemperature>
     <temperatureStepSize>0</temperatureStepSize>
     <initThermostat></initThermostat>
-    <gravity>-12.44</gravity>
+    <gravity factor="-12.44"></gravity>
    
     <delta_t>0.0005</delta_t>
     <epsilon>5.0</epsilon>

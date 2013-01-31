@@ -665,6 +665,12 @@ gravity (const gravity_optional& x)
   this->gravity_ = x;
 }
 
+void params_t::
+gravity (::std::auto_ptr< gravity_type > x)
+{
+  this->gravity_.set (x);
+}
+
 const params_t::iterationsTillThermostatApplication_optional& params_t::
 iterationsTillThermostatApplication () const
 {
@@ -1561,6 +1567,58 @@ void condition::
 type (::std::auto_ptr< type_type > x)
 {
   this->type_.set (x);
+}
+
+
+// gravity
+// 
+
+const gravity::dimension_optional& gravity::
+dimension () const
+{
+  return this->dimension_;
+}
+
+gravity::dimension_optional& gravity::
+dimension ()
+{
+  return this->dimension_;
+}
+
+void gravity::
+dimension (const dimension_type& x)
+{
+  this->dimension_.set (x);
+}
+
+void gravity::
+dimension (const dimension_optional& x)
+{
+  this->dimension_ = x;
+}
+
+void gravity::
+dimension (::std::auto_ptr< dimension_type > x)
+{
+  this->dimension_.set (x);
+}
+
+const gravity::factor_type& gravity::
+factor () const
+{
+  return this->factor_.get ();
+}
+
+gravity::factor_type& gravity::
+factor ()
+{
+  return this->factor_.get ();
+}
+
+void gravity::
+factor (const factor_type& x)
+{
+  this->factor_.set (x);
 }
 
 
@@ -2667,9 +2725,12 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
     //
     if (n.name () == "gravity" && n.namespace_ ().empty ())
     {
+      ::std::auto_ptr< gravity_type > r (
+        gravity_traits::create (i, f, this));
+
       if (!this->gravity_)
       {
-        this->gravity_.set (gravity_traits::create (i, f, this));
+        this->gravity_.set (r);
         continue;
       }
     }
@@ -3813,6 +3874,115 @@ _clone (::xml_schema::flags f,
 
 condition::
 ~condition ()
+{
+}
+
+// gravity
+//
+
+gravity::
+gravity (const factor_type& factor)
+: ::xml_schema::string (),
+  dimension_ (::xml_schema::flags (), this),
+  factor_ (factor, ::xml_schema::flags (), this)
+{
+}
+
+gravity::
+gravity (const char* _xsd_string_base,
+         const factor_type& factor)
+: ::xml_schema::string (_xsd_string_base),
+  dimension_ (::xml_schema::flags (), this),
+  factor_ (factor, ::xml_schema::flags (), this)
+{
+}
+
+gravity::
+gravity (const ::std::string& _xsd_string_base,
+         const factor_type& factor)
+: ::xml_schema::string (_xsd_string_base),
+  dimension_ (::xml_schema::flags (), this),
+  factor_ (factor, ::xml_schema::flags (), this)
+{
+}
+
+gravity::
+gravity (const ::xml_schema::string& _xsd_string_base,
+         const factor_type& factor)
+: ::xml_schema::string (_xsd_string_base),
+  dimension_ (::xml_schema::flags (), this),
+  factor_ (factor, ::xml_schema::flags (), this)
+{
+}
+
+gravity::
+gravity (const gravity& x,
+         ::xml_schema::flags f,
+         ::xml_schema::container* c)
+: ::xml_schema::string (x, f, c),
+  dimension_ (x.dimension_, f, this),
+  factor_ (x.factor_, f, this)
+{
+}
+
+gravity::
+gravity (const ::xercesc::DOMElement& e,
+         ::xml_schema::flags f,
+         ::xml_schema::container* c)
+: ::xml_schema::string (e, f | ::xml_schema::flags::base, c),
+  dimension_ (f, this),
+  factor_ (f, this)
+{
+  if ((f & ::xml_schema::flags::base) == 0)
+  {
+    ::xsd::cxx::xml::dom::parser< char > p (e, false, true);
+    this->parse (p, f);
+  }
+}
+
+void gravity::
+parse (::xsd::cxx::xml::dom::parser< char >& p,
+       ::xml_schema::flags f)
+{
+  while (p.more_attributes ())
+  {
+    const ::xercesc::DOMAttr& i (p.next_attribute ());
+    const ::xsd::cxx::xml::qualified_name< char > n (
+      ::xsd::cxx::xml::dom::name< char > (i));
+
+    if (n.name () == "dimension" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< dimension_type > r (
+        dimension_traits::create (i, f, this));
+
+      this->dimension_.set (r);
+      continue;
+    }
+
+    if (n.name () == "factor" && n.namespace_ ().empty ())
+    {
+      this->factor_.set (factor_traits::create (i, f, this));
+      continue;
+    }
+  }
+
+  if (!factor_.present ())
+  {
+    throw ::xsd::cxx::tree::expected_attribute< char > (
+      "factor",
+      "");
+  }
+}
+
+gravity* gravity::
+_clone (::xml_schema::flags f,
+        ::xml_schema::container* c) const
+{
+  return new class gravity (*this, f, c);
+}
+
+gravity::
+~gravity ()
 {
 }
 
