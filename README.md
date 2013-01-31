@@ -8,7 +8,7 @@ Linux
 -----
 
 to build on Linux run first sh find.sh 
-and then make
+and then make or run directly build.sh
 
 
 Windows
@@ -25,7 +25,7 @@ an XCode project(Mountain Lion) is provided
 ICE
 --------
 
-to compile on LRZ HPC ICE use the makefile MakefileICE. Therefore you will need to have all necessary libraries(CppUnit, Log4Cxx, (GLFW), libxsd) copied into two folders /include and /lib in your home directory. To compile without GLFW give gcc the flag -DICE. Code is compatible with GCC 4.7
+to compile on LRZ HPC ICE read the instructions in makefiles/ICE
 
 -------
 Note:
@@ -36,7 +36,9 @@ To generate docfiles, run doxygen Doxyfile.doxy
 
 To compile sources, ensure to have the following libraries installed: 
 
-Log4Cxx, CppUnit, Xerces 3.1.3, OpenGL, GLFW, GLEW, boost thread
+Log4Cxx, CppUnit, Xerces 3.1.3, OpenGL, GLFW
+
+boost thread can be optionally used for MT, if USE_BOOST is set as a flag
 
 
 Usage
