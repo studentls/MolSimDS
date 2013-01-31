@@ -429,8 +429,8 @@ void LinkedCellParticleContainer::SetPeriodicBoundaries(bool xAxis, bool yAxis, 
 						for (int y2 = 0; y2 < cellCount[1]; y2++)
 							for (int z2 = 0; z2 < cellCount[2]; z2++)
 							{
-								int index1 = Index2DTo1D(x1, y1);
-								int index2 = Index2DTo1D(x2, y2);
+								int index1 = Index3DTo1D(x1, y1, z1);
+								int index2 = Index3DTo1D(x2, y2, z2);
 
 								// ensure that every pair is only taken once
 								if (index1 <= index2)

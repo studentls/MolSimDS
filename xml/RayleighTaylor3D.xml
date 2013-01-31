@@ -14,7 +14,7 @@ author: F.Dietz & L.Spiegelberg
     <dimension>3</dimension>
     <output>out</output>
     
-    <iterationsperoutput>10</iterationsperoutput>
+    <iterationsperoutput>200</iterationsperoutput>
     <initialTemperature>40</initialTemperature>
     <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
     <targetTemperature>40</targetTemperature>

@@ -284,59 +284,61 @@ void Simulation::forceSLJCalculator(void* data, Particle& p1, Particle& p2)
 {
 	SimulationDesc *desc = (SimulationDesc*)data;
 
-	// assert indices
-	assert(p1.type >= 0);
-	assert(p2.type >= 0);
-	assert(p1.type < desc->materials.size());
-	assert(p2.type < desc->materials.size());
+	/// implement this correctly!
 
-	double eps24 = desc->getEpsilon24(p1.type, p2.type);
-	double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
+	//// assert indices
+	//assert(p1.type >= 0);
+	//assert(p2.type >= 0);
+	//assert(p1.type < desc->materials.size());
+	//assert(p2.type < desc->materials.size());
 
-	// optimized version
-	double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
-				// cache this for better performance
-	double temp1 = sigmaSq * invdistSq; 
-	double pow6 = temp1 * temp1 * temp1;
-	double pow12 = pow6 * pow6;
+	//double eps24 = desc->getEpsilon24(p1.type, p2.type);
+	//double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
 
-	double temp2 = pow6 - 2.0 * pow12;
+	//// optimized version
+	//double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
+	//			// cache this for better performance
+	//double temp1 = sigmaSq * invdistSq; 
+	//double pow6 = temp1 * temp1 * temp1;
+	//double pow12 = pow6 * pow6;
 
-	double prefactor = eps24 * invdistSq; // cache also here values...
-	double factor = prefactor * temp2;
+	//double temp2 = pow6 - 2.0 * pow12;
 
-	utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
+	//double prefactor = eps24 * invdistSq; // cache also here values...
+	//double factor = prefactor * temp2;
+
+	//utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
 
 
-	// calculate smoothing factor
-	double S = 1.0;
+	//// calculate smoothing factor
+	//double S = 1.0;
 
-	double distance = p1.x.distance(p2.x);
+	//double distance = p1.x.distance(p2.x);
 
-	if(distance >= desc->cutoffRadius)
-	{
-		S = 0.0;
-	}
-	else if(distance <= desc ->SLJfactor)
-	{
-		S = 1.0;
-	}
-	else
-	{
-		// use smooth function
-		S = 1.0 - (distance - desc->SLJfactor)*(distance - desc->SLJfactor)
-			+ (3.0 * desc->cutoffRadius - desc->SLJfactor - 2.0 * distance) /
-			((desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor));
-	}
-	
-	// simply multiply LJ potential with linear smoothing function
-	force = force * S;
+	//if(distance >= desc->cutoffRadius)
+	//{
+	//	S = 0.0;
+	//}
+	//else if(distance <= desc ->SLJfactor)
+	//{
+	//	S = 1.0;
+	//}
+	//else
+	//{
+	//	// use smooth function
+	//	S = 1.0 - (distance - desc->SLJfactor)*(distance - desc->SLJfactor)
+	//		+ (3.0 * desc->cutoffRadius - desc->SLJfactor - 2.0 * distance) /
+	//		((desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor));
+	//}
+	//
+	//// simply multiply LJ potential with linear smoothing function
+	//force = force * S;
 
-	// add individual particle to particle force to sum
-	p1.addForce(force);
-	
-	// new function to avoid unnecessary object construction
-	p2.substractForce(force);
+	//// add individual particle to particle force to sum
+	//p1.addForce(force);
+	//
+	//// new function to avoid unnecessary object construction
+	//p2.substractForce(force);
 }
 
 void Simulation::forceGravitationCalculator(void* data, Particle& p1, Particle& p2)
