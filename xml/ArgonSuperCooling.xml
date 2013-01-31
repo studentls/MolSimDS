@@ -2,7 +2,7 @@
 
 <!--
 
-file: used to create an equilibrated fluid
+file: used to perform supercooling experiment
 author: F.Dietz & L.Spiegelberg
 
 -->
@@ -12,26 +12,26 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <dimension>3</dimension>
-    <output>argoneq</output>
+    <output>argonsupercooling</output>
     
     <iterationsperoutput>100</iterationsperoutput>
-    <initialTemperature>0.01</initialTemperature>
-    <iterationsTillThermostatApplication>40</iterationsTillThermostatApplication>
-    <targetTemperature>3.0</targetTemperature>
-    <temperatureStepSize>0.001</temperatureStepSize>
+    <initialTemperature>3.0</initialTemperature>
+    <iterationsTillThermostatApplication>25</iterationsTillThermostatApplication>
+    <targetTemperature>0.02</targetTemperature>
+    <temperatureStepSize>-0.0025</temperatureStepSize>
    
     <delta_t>0.001</delta_t>
     <epsilon>1.0</epsilon>
-    <outputfmt>TXT</outputfmt>
+    <outputfmt>VTK</outputfmt>
     <sigma>1.0</sigma>
     
-    <t_end>150.0</t_end>
+    <t_end>100.0</t_end>
     <t_start>0.0</t_start>
     <potentialforce>
       <SLJ></SLJ>
     </potentialforce>
-    <!--<thermodynamicaldata iterationsTillCalculation="100" iterationsPerCalculation="4" deltat="0.2"></thermodynamicaldata>
-   -->
+    <thermodynamicaldata iterationsTillCalculation="1000" iterationsPerCalculation="5" deltat="0.2"></thermodynamicaldata>
+   
     <algorithm>
       <LinkedCell>
         <cutoff_radius>2.3</cutoff_radius>
@@ -56,14 +56,8 @@ author: F.Dietz & L.Spiegelberg
     <!-- material1-->
     <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
     
-    <!-- C1 -->
-    <cuboid>
-      <h>1.15</h>
-      <N>8 8 8</N>
-      <V>0.0 0.0 0.0</V>
-      <X>0.575 0.575 0.575</X>
-      <material>Liquid1</material>
-    </cuboid>
+    <!-- use txt inputfile -->
+    <inputfile>argoneq.txt</inputfile>
     
   </data>
 

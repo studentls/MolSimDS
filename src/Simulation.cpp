@@ -166,6 +166,17 @@ err_type Simulation::Run()
 		// calculate statistical data if wished
 		if(desc.iterationsTillTStatisticsCalculation > 0)
 		{
+			// set new reference time t_0 for diffusion calculation
+			if(iteration != 0 && iteration % desc.iterationsTillTStatisticsCalculation == 0)
+			{
+				std::vector<Particle> tmp = particles->getParticles();
+				for(std::vector<Particle>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+				{
+					assert(it->id >= 0 && it->id < thermostatistics->initialPositions.capacity());
+					thermostatistics->initialPositions[it->id] = (it->x);
+				}
+			}
+			
 			if(iteration % desc.iterationsTillTStatisticsCalculation < desc.iterationsPerTStatisticsCalculation)
 				calculateThermostatisticalData((double)iteration * desc.delta_t + desc.start_time);
 
@@ -225,6 +236,8 @@ err_type Simulation::Run()
 			// output data
 			if(iteration != 0 && iteration % desc.iterationsTillTStatisticsCalculation == 0)writeThermostatisticalDataToFile();
 
+	// write final output
+	plotParticles(iteration);
 
 	// output that the output has finished
 	cout << endl;
@@ -453,7 +466,8 @@ void Simulation::gravityCalculator(void *data, Particle& p)
 	int dimensionToAffect = desc->dimensions - 1;
 
 	// only the last dimension is affected...
-	grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
+	//grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
+	grav_force[1] = desc->materials[p.type].mass * desc->gravitational_constant;
 
 	p.addForce(grav_force);
 }
@@ -607,8 +621,15 @@ void Simulation::adjustThermostat()
 	// inc temperature
 	desc.temperature += desc.temperatureStepSize;
 
-	// secure that temperature is not above target temperature
-	if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	// secure that temperature is cut at target temperature
+	if(desc.temperatureStepSize > 0)
+	{
+		if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	}
+	else
+	{
+		if(desc.temperature < desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	}
 	// calc beta
 
 	//get energy of the system
@@ -617,14 +638,16 @@ void Simulation::adjustThermostat()
 	double EnergyAtTheMoment = desc.kineticEnergy;
 	
 	// proposed energy
-	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
+	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() * desc.temperature;
 
 	// beta
 	double beta = sqrt(EnergyProposed / EnergyAtTheMoment);
-
+	
 	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
 
-	
+	//get energy of the system
+	desc.kineticEnergy = 0.0;	
+	particles->Iterate(kineticEnergyCalculator, (void*)&desc);
 }
 
 void Simulation::diffusionCalculator(void* data, Particle& p)
@@ -684,9 +707,12 @@ void Simulation::calculateThermostatisticalData(const double t)
 		a = a * a * a;
 		double b = (i+1) * thermostatistics->delta_t;
 		b = b * b * b;
-		double density = (double)thermostatistics->distanceCounter[i] / (4.0 * PI / 3.0 * (b - a));
+		double density = (double)thermostatistics->distanceCounter[i] / ((4.0 * PI / 3.0) * (b - a));
 		thermostatistics->rdfValues.push_back(utils::Vector<double, 2>(t, density));
 	}
+
+	// out temperature
+	// LOG4CXX_INFO(simulationLogger, ">> temperature: "<<desc.temperature<< " kinetic energy: "<<desc.kineticEnergy);
 }
 
 err_type Simulation::writeThermostatisticalDataToFile()
@@ -707,7 +733,7 @@ err_type Simulation::writeThermostatisticalDataToFile()
 	fprintf(pFile, "steps, point of time, diffusion");
 
 	// add columns for rdf
-	for(int j = 0; j < thermostatistics->rdfValues.size(); j++)fprintf(pFile, ", rdf%d", j);
+	for(int j = 0; j < thermostatistics->distanceCounter.size(); j++)fprintf(pFile, ", rdf%d", j);
 	fprintf(pFile, "\n");
 
 	// calc num diffusion pairs
