@@ -19,11 +19,12 @@ author: F.Dietz & L.Spiegelberg
     <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
     <targetTemperature>40</targetTemperature>
     <temperatureStepSize>0</temperatureStepSize>
-    <gravity>-12.44</gravity>
+    <initThermostat></initThermostat>
+    <gravity factor="-12.44"></gravity>
    
     <delta_t>0.0005</delta_t>
     <epsilon>5.0</epsilon>
-    <outputfmt>VTK</outputfmt>
+    <outputfmt>None</outputfmt>
     <sigma>1.0</sigma>
     
     <t_end>50.0</t_end>

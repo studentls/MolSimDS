@@ -200,5 +200,11 @@
     <None Include="xml\ArgonEquilibration.xml">
       <Filter>xml</Filter>
     </None>
+    <None Include="xml\ArgonCooling.xml">
+      <Filter>xml</Filter>
+    </None>
+    <None Include="xml\ArgonSuperCooling.xml">
+      <Filter>xml</Filter>
+    </None>
   </ItemGroup>
 </Project>

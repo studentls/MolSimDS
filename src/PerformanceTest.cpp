@@ -35,9 +35,11 @@ err_type PerformanceTest::Run(const char *xmlFile)
 	int perfstepcount = 1000; // use 1000 steps to analyse Performance as a maximum
 	int maximumthreads = 16; // perf up to 16 threads
 
+#ifdef OPENMP
 	// treshold maximum threads!
 	int numprocs = omp_get_num_procs();
 	maximumthreads = (maximumthreads > numprocs) ? numprocs : maximumthreads;
+#endif
 
 	LOG4CXX_INFO(generalOutputLogger, ">> init performance tests for file "<<xmlFile);
 

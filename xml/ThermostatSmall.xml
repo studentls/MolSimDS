@@ -19,7 +19,8 @@ author: F.Dietz & L.Spiegelberg
     <iterationsTillThermostatApplication>100</iterationsTillThermostatApplication>
     <targetTemperature>100</targetTemperature>
     <temperatureStepSize>10</temperatureStepSize>
-    <gravity>-12.44</gravity>
+    <initThermostat></initThermostat>
+    <gravity factor="-12.44"></gravity>
    
     <delta_t>0.0005</delta_t>
     <epsilon>5.0</epsilon>

@@ -92,7 +92,7 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 	calculateF();
 
 	// is a thermostat present? if yes, initialize it
-	if(desc.applyThermostat())initializeThermostat();
+	if(desc.applyThermostat())if(desc.initThermostat)initializeThermostat();
 
 	return S_OK;
 }
@@ -166,6 +166,17 @@ err_type Simulation::Run()
 		// calculate statistical data if wished
 		if(desc.iterationsTillTStatisticsCalculation > 0)
 		{
+			// set new reference time t_0 for diffusion calculation
+			if(iteration != 0 && iteration % desc.iterationsTillTStatisticsCalculation == 0)
+			{
+				std::vector<Particle> tmp = particles->getParticles();
+				for(std::vector<Particle>::const_iterator it = tmp.begin(); it != tmp.end(); it++)
+				{
+					assert(it->id >= 0 && it->id < thermostatistics->initialPositions.capacity());
+					thermostatistics->initialPositions[it->id] = (it->x);
+				}
+			}
+			
 			if(iteration % desc.iterationsTillTStatisticsCalculation < desc.iterationsPerTStatisticsCalculation)
 				calculateThermostatisticalData((double)iteration * desc.delta_t + desc.start_time);
 
@@ -225,6 +236,8 @@ err_type Simulation::Run()
 			// output data
 			if(iteration != 0 && iteration % desc.iterationsTillTStatisticsCalculation == 0)writeThermostatisticalDataToFile();
 
+	// write final output
+	plotParticles(iteration);
 
 	// output that the output has finished
 	cout << endl;
@@ -282,63 +295,80 @@ void Simulation::forceResetter(void* data, Particle& p) {
 
 void Simulation::forceSLJCalculator(void* data, Particle& p1, Particle& p2)
 {
+	using namespace utils;
+
 	SimulationDesc *desc = (SimulationDesc*)data;
 
-	/// implement this correctly!
-
-	//// assert indices
-	//assert(p1.type >= 0);
-	//assert(p2.type >= 0);
-	//assert(p1.type < desc->materials.size());
-	//assert(p2.type < desc->materials.size());
-
-	//double eps24 = desc->getEpsilon24(p1.type, p2.type);
-	//double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
-
-	//// optimized version
-	//double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
-	//			// cache this for better performance
-	//double temp1 = sigmaSq * invdistSq; 
-	//double pow6 = temp1 * temp1 * temp1;
-	//double pow12 = pow6 * pow6;
-
-	//double temp2 = pow6 - 2.0 * pow12;
-
-	//double prefactor = eps24 * invdistSq; // cache also here values...
-	//double factor = prefactor * temp2;
-
-	//utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
+	// assert indices
+	assert(p1.type >= 0);
+	assert(p2.type >= 0);
+	assert(p1.type < desc->materials.size());
+	assert(p2.type < desc->materials.size());
 
 
-	//// calculate smoothing factor
-	//double S = 1.0;
+	/// the force will be calculated as
+	// F = U_LJ(r) * S'(r) + U_LJ'(r) * S(r)
+	// where r = ||x_i - x_j||_2	
+	
+	double eps24 = desc->getEpsilon24(p1.type, p2.type);
+	double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
 
-	//double distance = p1.x.distance(p2.x);
+	double ULennardJones = 0.0;
+	double ULennardJonesGradient = 0.0;
+	double Smoothing = 0.0;
+	double SmoothingGradient = 0.0;
 
-	//if(distance >= desc->cutoffRadius)
-	//{
-	//	S = 0.0;
-	//}
-	//else if(distance <= desc ->SLJfactor)
-	//{
-	//	S = 1.0;
-	//}
-	//else
-	//{
-	//	// use smooth function
-	//	S = 1.0 - (distance - desc->SLJfactor)*(distance - desc->SLJfactor)
-	//		+ (3.0 * desc->cutoffRadius - desc->SLJfactor - 2.0 * distance) /
-	//		((desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor));
-	//}
-	//
-	//// simply multiply LJ potential with linear smoothing function
-	//force = force * S;
+	double r_c = desc->cutoffRadius;
+	double r_l = desc->SLJfactor;
+	double eps = eps24 / 24.0;	
 
-	//// add individual particle to particle force to sum
-	//p1.addForce(force);
-	//
-	//// new function to avoid unnecessary object construction
-	//p2.substractForce(force);
+	// calc vector	
+	Vector<double, 3> dir = p2.x - p1.x;
+	double norm = dir.L2Norm();
+	double r = norm;
+	double invnorm = 1.0 / norm; // inverted norm
+	dir = dir * (invnorm); // normalize vector
+
+
+	// calc U_LJ, S, U_LJ', S'
+
+	// U_LJ
+	double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
+	double temp1 = sigmaSq * invdistSq; 
+	double pow6 = temp1 * temp1 * temp1;
+	double pow12 = pow6 * pow6;
+	ULennardJones = 4.0 * eps * (pow12 - pow6);
+
+	// U_LJ'
+	ULennardJonesGradient = 24.0 * eps * invnorm * (pow6 - 2.0 * pow12);
+
+	double rdiff = r_c-r_l;
+
+	// S
+	if(r < r_l)Smoothing = 1.0;
+	else if(r > r_c)Smoothing = 0.0;
+	else
+	{
+		Smoothing = 1.0 - (r - r_l) * (r - r_l) * (3.0 * r_c - r_l - 2.0 * r)/(rdiff*rdiff*rdiff);
+	}
+
+	// S'
+	//SmoothingGradient = - 2.0 / (rdiff) * (-rdiff + rdiff * r_l / norm + 3.0 * norm - 4.0 * r_l - r_l * r_l / norm) * xDif;
+	double rtmp1 = r - r_c;
+	double rtmp2 = r_c-r_l;
+	SmoothingGradient = 6.0 * rtmp1 * (r - r_l) / (rtmp2 * rtmp2 * rtmp2); 
+
+	// composite force(multiplication rule)
+	double force = ULennardJones * SmoothingGradient + ULennardJonesGradient * Smoothing;
+
+	// apply force
+	Vector<double, 3> forcevector = dir * force; // direction * force
+
+	// add individual particle to particle force to sum
+	p1.addForce(forcevector);
+	
+	// new function to avoid unnecessary object construction
+	p2.substractForce(forcevector);
 }
 
 void Simulation::forceGravitationCalculator(void* data, Particle& p1, Particle& p2)
@@ -433,7 +463,9 @@ void Simulation::gravityCalculator(void *data, Particle& p)
 	// add gravitational force, based on G = m * g
 	utils::Vector<double, 3> grav_force;
 	// act on the last dimension
-	int dimensionToAffect = desc->dimensions - 1;
+	int dimensionToAffect = desc->gravitational_dimension;
+
+	assert(dimensionToAffect >= 0 && dimensionToAffect <= 2);
 
 	// only the last dimension is affected...
 	grav_force[dimensionToAffect] = desc->materials[p.type].mass * desc->gravitational_constant;
@@ -590,8 +622,15 @@ void Simulation::adjustThermostat()
 	// inc temperature
 	desc.temperature += desc.temperatureStepSize;
 
-	// secure that temperature is not above target temperature
-	if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	// secure that temperature is cut at target temperature
+	if(desc.temperatureStepSize > 0)
+	{
+		if(desc.temperature > desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	}
+	else
+	{
+		if(desc.temperature < desc.targetTemperature)desc.temperature = desc.targetTemperature;
+	}
 	// calc beta
 
 	//get energy of the system
@@ -600,14 +639,16 @@ void Simulation::adjustThermostat()
 	double EnergyAtTheMoment = desc.kineticEnergy;
 	
 	// proposed energy
-	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() *desc.temperature;
+	double EnergyProposed = 0.5 * desc.dimensions * particles->getParticleCount() * desc.temperature;
 
 	// beta
 	double beta = sqrt(EnergyProposed / EnergyAtTheMoment);
-
+	
 	particles->Iterate(applyTemperatureScalingFactor, (double*)&beta);
 
-	
+	//get energy of the system
+	desc.kineticEnergy = 0.0;	
+	particles->Iterate(kineticEnergyCalculator, (void*)&desc);
 }
 
 void Simulation::diffusionCalculator(void* data, Particle& p)
@@ -633,11 +674,12 @@ void Simulation::rdfCalculator(void* data, Particle& p1, Particle& p2)
 	int index = distance / tdata->delta_t;
 
 	if(index < 0)index = 0;
-	if(index >= tdata->distanceCounter.size())index = tdata->distanceCounter.size() - 1;
+	if(index < tdata->distanceCounter.size()) // ignore distances greater than cutoff radius!
+	{
+		assert(index >= 0 && index < tdata->distanceCounter.size());
 
-	assert(index >= 0 && index < tdata->distanceCounter.size());
-
-	tdata->distanceCounter[index]++;
+		tdata->distanceCounter[index]++;
+	}
 
 }
 
@@ -667,9 +709,12 @@ void Simulation::calculateThermostatisticalData(const double t)
 		a = a * a * a;
 		double b = (i+1) * thermostatistics->delta_t;
 		b = b * b * b;
-		double density = (double)thermostatistics->distanceCounter[i] / (4.0 * PI / 3.0 * (b - a));
+		double density = (double)thermostatistics->distanceCounter[i] / ((4.0 * PI / 3.0) * (b - a));
 		thermostatistics->rdfValues.push_back(utils::Vector<double, 2>(t, density));
 	}
+
+	// out temperature
+	// LOG4CXX_INFO(simulationLogger, ">> temperature: "<<desc.temperature<< " kinetic energy: "<<desc.kineticEnergy);
 }
 
 err_type Simulation::writeThermostatisticalDataToFile()
@@ -690,7 +735,7 @@ err_type Simulation::writeThermostatisticalDataToFile()
 	fprintf(pFile, "steps, point of time, diffusion");
 
 	// add columns for rdf
-	for(int j = 0; j < thermostatistics->rdfValues.size(); j++)fprintf(pFile, ", rdf%d", j);
+	for(int j = 0; j < thermostatistics->distanceCounter.size(); j++)fprintf(pFile, ", rdf%d", j);
 	fprintf(pFile, "\n");
 
 	// calc num diffusion pairs

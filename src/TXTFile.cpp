@@ -246,7 +246,7 @@ err_type TXTFile::writeFile(const char *filename, const std::vector<Particle>& p
 	fprintf(pFile, "\ndata:\n");
 	for(std::vector<Particle>::const_iterator it = particles.begin(); it != particles.end(); it++)
 	{
-		fprintf(pFile, "%lf %lf %lf, %lf %lf %lf, %lf, %d\n", it->x[0], it->x[1], it->x[2],
+		fprintf(pFile, "%lf %lf %lf, %lf %lf %lf, %d\n", it->x[0], it->x[1], it->x[2],
 			it->v[0], it->v[1], it->v[2], it->type);
 	}
 	
