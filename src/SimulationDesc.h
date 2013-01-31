@@ -97,6 +97,7 @@ public:
 	double					temperature;							/// current temperature in Kelvin
 	double					targetTemperature;						/// target temperature
 	double					temperatureStepSize;					/// after timestepsTillThermostatApplication the temperature will be increased till it reaches targetTemperature
+	bool					initThermostat;							/// specify if thermostat shall be initialized...
 
 	unsigned int			dimensions;								/// Dimensions of the simulation, can be 2 or 3
 
@@ -160,6 +161,8 @@ public:
 		iterationsPerTStatisticsCalculation = 0;
 		rdfdelta_t = 0.1;
 
+		initThermostat = false;		
+
 		// use LJ as a standard
 		potentialForce = PF_LJ;
 	}
@@ -178,7 +181,7 @@ public:
 		temperature = desc.temperature;
 		targetTemperature = desc.targetTemperature;
 		temperatureStepSize = desc.temperatureStepSize;
-
+		initThermostat = desc.initThermostat;		
 
 		dimensions = desc.dimensions;
 
@@ -225,7 +228,8 @@ public:
 		iterationsTillThermostatApplication = desc.iterationsTillThermostatApplication;
 		temperature = desc.temperature;
 		targetTemperature = desc.targetTemperature;
-		temperatureStepSize = desc.temperatureStepSize;
+		temperatureStepSize = desc.temperatureStepSize;		
+		initThermostat = desc.initThermostat;		
 
 
 		dimensions = desc.dimensions;

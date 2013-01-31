@@ -1038,6 +1038,27 @@ class params_t: public ::xml_schema::type
   void
   targetTemperature (const targetTemperature_optional& x);
 
+  // initThermostat
+  // 
+  typedef ::xml_schema::string initThermostat_type;
+  typedef ::xsd::cxx::tree::optional< initThermostat_type > initThermostat_optional;
+  typedef ::xsd::cxx::tree::traits< initThermostat_type, char > initThermostat_traits;
+
+  const initThermostat_optional&
+  initThermostat () const;
+
+  initThermostat_optional&
+  initThermostat ();
+
+  void
+  initThermostat (const initThermostat_type& x);
+
+  void
+  initThermostat (const initThermostat_optional& x);
+
+  void
+  initThermostat (::std::auto_ptr< initThermostat_type > p);
+
   // temperatureStepSize
   // 
   typedef ::xml_schema::decimal temperatureStepSize_type;
@@ -1203,6 +1224,7 @@ class params_t: public ::xml_schema::type
   iterationsTillThermostatApplication_optional iterationsTillThermostatApplication_;
   initialTemperature_optional initialTemperature_;
   targetTemperature_optional targetTemperature_;
+  initThermostat_optional initThermostat_;
   temperatureStepSize_optional temperatureStepSize_;
   thermodynamicaldata_optional thermodynamicaldata_;
   ::xsd::cxx::tree::one< t_start_type > t_start_;

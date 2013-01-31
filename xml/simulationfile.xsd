@@ -123,6 +123,7 @@ author: Leonhard Spiegelberg & Florian Dietz
       <xsd:element name="iterationsTillThermostatApplication" type="xsd:int"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="initialTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="targetTemperature" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
+      <xsd:element name="initThermostat" type="xsd:string" minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="temperatureStepSize" type="xsd:decimal"  minOccurs="0" maxOccurs="1"></xsd:element>
       <xsd:element name="thermodynamicaldata" minOccurs="0" maxOccurs="1">
         <xsd:complexType>

@@ -96,6 +96,11 @@ err_type XMLFileReader::readFile(const char *filename, bool validate)
 		desc.temperature = file->params().initialTemperature().get();
 		desc.targetTemperature = file->params().targetTemperature().get();
 		desc.temperatureStepSize = file->params().temperatureStepSize().get();
+
+		// set to true per default
+		// init thermostat?	
+		if(file->params().initThermostat().present())desc.initThermostat = true;
+		else desc.initThermostat = false;
 	}
 	else
 	{

@@ -92,7 +92,7 @@ err_type Simulation::CreateSimulationFromXMLFile(const char *filename)
 	calculateF();
 
 	// is a thermostat present? if yes, initialize it
-	if(desc.applyThermostat())initializeThermostat();
+	if(desc.applyThermostat())if(desc.initThermostat)initializeThermostat();
 
 	return S_OK;
 }
@@ -327,7 +327,7 @@ void Simulation::forceSLJCalculator(void* data, Particle& p1, Particle& p2)
 	ULennardJones = 4.0 * eps * (pow12 - pow6);
 
 	// U_LJ'
-	ULennardJonesGradient = 24.0 * eps *(pow6 - 2.0 * pow12);
+	ULennardJonesGradient = 24.0 * eps * invnorm * (pow6 - 2.0 * pow12);
 
 	double rdiff = r_c-r_l;
 

@@ -737,6 +737,36 @@ targetTemperature (const targetTemperature_optional& x)
   this->targetTemperature_ = x;
 }
 
+const params_t::initThermostat_optional& params_t::
+initThermostat () const
+{
+  return this->initThermostat_;
+}
+
+params_t::initThermostat_optional& params_t::
+initThermostat ()
+{
+  return this->initThermostat_;
+}
+
+void params_t::
+initThermostat (const initThermostat_type& x)
+{
+  this->initThermostat_.set (x);
+}
+
+void params_t::
+initThermostat (const initThermostat_optional& x)
+{
+  this->initThermostat_ = x;
+}
+
+void params_t::
+initThermostat (::std::auto_ptr< initThermostat_type > x)
+{
+  this->initThermostat_.set (x);
+}
+
 const params_t::temperatureStepSize_optional& params_t::
 temperatureStepSize () const
 {
@@ -2428,6 +2458,7 @@ params_t (const dimension_type& dimension,
   iterationsTillThermostatApplication_ (::xml_schema::flags (), this),
   initialTemperature_ (::xml_schema::flags (), this),
   targetTemperature_ (::xml_schema::flags (), this),
+  initThermostat_ (::xml_schema::flags (), this),
   temperatureStepSize_ (::xml_schema::flags (), this),
   thermodynamicaldata_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
@@ -2462,6 +2493,7 @@ params_t (const dimension_type& dimension,
   iterationsTillThermostatApplication_ (::xml_schema::flags (), this),
   initialTemperature_ (::xml_schema::flags (), this),
   targetTemperature_ (::xml_schema::flags (), this),
+  initThermostat_ (::xml_schema::flags (), this),
   temperatureStepSize_ (::xml_schema::flags (), this),
   thermodynamicaldata_ (::xml_schema::flags (), this),
   t_start_ (t_start, ::xml_schema::flags (), this),
@@ -2488,6 +2520,7 @@ params_t (const params_t& x,
   iterationsTillThermostatApplication_ (x.iterationsTillThermostatApplication_, f, this),
   initialTemperature_ (x.initialTemperature_, f, this),
   targetTemperature_ (x.targetTemperature_, f, this),
+  initThermostat_ (x.initThermostat_, f, this),
   temperatureStepSize_ (x.temperatureStepSize_, f, this),
   thermodynamicaldata_ (x.thermodynamicaldata_, f, this),
   t_start_ (x.t_start_, f, this),
@@ -2514,6 +2547,7 @@ params_t (const ::xercesc::DOMElement& e,
   iterationsTillThermostatApplication_ (f, this),
   initialTemperature_ (f, this),
   targetTemperature_ (f, this),
+  initThermostat_ (f, this),
   temperatureStepSize_ (f, this),
   thermodynamicaldata_ (f, this),
   t_start_ (f, this),
@@ -2669,6 +2703,20 @@ parse (::xsd::cxx::xml::dom::parser< char >& p,
       if (!this->targetTemperature_)
       {
         this->targetTemperature_.set (targetTemperature_traits::create (i, f, this));
+        continue;
+      }
+    }
+
+    // initThermostat
+    //
+    if (n.name () == "initThermostat" && n.namespace_ ().empty ())
+    {
+      ::std::auto_ptr< initThermostat_type > r (
+        initThermostat_traits::create (i, f, this));
+
+      if (!this->initThermostat_)
+      {
+        this->initThermostat_.set (r);
         continue;
       }
     }
