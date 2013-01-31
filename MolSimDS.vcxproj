@@ -174,7 +174,9 @@
     <None Include="xml\FallingDropInitialize.xml" />
     <None Include="xml\Membrane.xml" />
     <None Include="xml\PerformanceTest.xml" />
-    <None Include="xml\RayleighTaylor3D.xml" />
+    <None Include="xml\RayleighTaylor3D.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="xml\RayleighTaylor3DPerf.xml" />
     <None Include="xml\ThermostatBig.xml" />
     <None Include="xml\ThermostatSmall.xml" />

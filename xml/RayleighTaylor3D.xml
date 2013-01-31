@@ -12,9 +12,9 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <dimension>3</dimension>
-    <output>out</output>
+    <output>rayleigh3d</output>
     
-    <iterationsperoutput>200</iterationsperoutput>
+    <iterationsperoutput>50</iterationsperoutput>
     <initialTemperature>40</initialTemperature>
     <iterationsTillThermostatApplication>1000</iterationsTillThermostatApplication>
     <targetTemperature>40</targetTemperature>

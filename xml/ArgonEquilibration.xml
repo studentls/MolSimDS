@@ -11,38 +11,41 @@ author: F.Dietz & L.Spiegelberg
        xsi:noNamespaceSchemaLocation="simulationfile.xsd">
 
   <params>
-    <dimension>2</dimension>
-    <output>out</output>
+    <dimension>3</dimension>
+    <output>argoneq</output>
     
-    <iterationsperoutput>10</iterationsperoutput>
-    <initialTemperature>40</initialTemperature>
-    <iterationsTillThermostatApplication>100</iterationsTillThermostatApplication>
-    <targetTemperature>100</targetTemperature>
-    <temperatureStepSize>10</temperatureStepSize>
-    <gravity>-12.44</gravity>
+    <iterationsperoutput>100</iterationsperoutput>
+    <initialTemperature>0.01</initialTemperature>
+    <iterationsTillThermostatApplication>40</iterationsTillThermostatApplication>
+    <targetTemperature>3.0</targetTemperature>
+    <temperatureStepSize>0.001</temperatureStepSize>
    
-    <delta_t>0.0005</delta_t>
-    <epsilon>5.0</epsilon>
+    <delta_t>0.001</delta_t>
+    <epsilon>1.0</epsilon>
     <outputfmt>VTK</outputfmt>
     <sigma>1.0</sigma>
     
-    <t_end>25.0</t_end>
+    <t_end>150.0</t_end>
     <t_start>0.0</t_start>
     <potentialforce>
-      <LJ></LJ>
+      <SLJ></SLJ>
     </potentialforce>
-    <thermodynamicaldata iterationsTillCalculation="100" iterationsPerCalculation="4" deltat="0.2"></thermodynamicaldata>
+    <!--<thermodynamicaldata iterationsTillCalculation="100" iterationsPerCalculation="4" deltat="0.2"></thermodynamicaldata>
+   -->
     <algorithm>
       <LinkedCell>
-        <cutoff_radius>2.5</cutoff_radius>
-        <sizeofdomainX>63.0</sizeofdomainX>
-        <sizeofdomainY>36.0</sizeofdomainY>
-        <sizeofdomainZ>0.0</sizeofdomainZ>
+        <cutoff_radius>2.3</cutoff_radius>
+        <sizeofdomainX>9.2</sizeofdomainX>
+        <sizeofdomainY>9.2</sizeofdomainY>
+        <sizeofdomainZ>9.2</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
           <condition value="front" type="reflective"></condition>
+          <condition value="back" type="reflective"></condition>
           <condition value="left" type="periodic"></condition>
           <condition value="right" type="periodic"></condition>
+          <condition value="top" type="periodic"></condition>
+          <condition value="bottom" type="periodic"></condition>
         </conditions>
       </LinkedCell>
     </algorithm>
@@ -52,25 +55,14 @@ author: F.Dietz & L.Spiegelberg
   <data>
     <!-- material1-->
     <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
-    <!-- material1-->
-    <material epsilon="1.0" sigma="0.9412" name="Liquid2" mass="2.0"/>
     
     <!-- C1 -->
     <cuboid>
-      <h>1.2</h>
-      <N>50 14 1</N>
+      <h>1.15</h>
+      <N>8 8 8</N>
       <V>0.0 0.0 0.0</V>
-      <X>0.6 2.0 0.0</X>
+      <X>0.575 0.575 0.575</X>
       <material>Liquid1</material>
-    </cuboid>
-    
-    <!-- C2 -->
-    <cuboid>
-      <h>1.2</h>
-      <N>50 14 1</N>
-      <V>0.0 0.0 0.0</V>
-      <X>0.6 19.0 0.0</X>
-      <material>Liquid2</material>
     </cuboid>
     
   </data>

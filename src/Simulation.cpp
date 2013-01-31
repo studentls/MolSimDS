@@ -282,63 +282,80 @@ void Simulation::forceResetter(void* data, Particle& p) {
 
 void Simulation::forceSLJCalculator(void* data, Particle& p1, Particle& p2)
 {
+	using namespace utils;
+
 	SimulationDesc *desc = (SimulationDesc*)data;
 
-	/// implement this correctly!
-
-	//// assert indices
-	//assert(p1.type >= 0);
-	//assert(p2.type >= 0);
-	//assert(p1.type < desc->materials.size());
-	//assert(p2.type < desc->materials.size());
-
-	//double eps24 = desc->getEpsilon24(p1.type, p2.type);
-	//double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
-
-	//// optimized version
-	//double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
-	//			// cache this for better performance
-	//double temp1 = sigmaSq * invdistSq; 
-	//double pow6 = temp1 * temp1 * temp1;
-	//double pow12 = pow6 * pow6;
-
-	//double temp2 = pow6 - 2.0 * pow12;
-
-	//double prefactor = eps24 * invdistSq; // cache also here values...
-	//double factor = prefactor * temp2;
-
-	//utils::Vector<double, 3> force = (p2.x - p1.x) * factor;
+	// assert indices
+	assert(p1.type >= 0);
+	assert(p2.type >= 0);
+	assert(p1.type < desc->materials.size());
+	assert(p2.type < desc->materials.size());
 
 
-	//// calculate smoothing factor
-	//double S = 1.0;
+	/// the force will be calculated as
+	// F = U_LJ(r) * S'(r) + U_LJ'(r) * S(r)
+	// where r = ||x_i - x_j||_2	
+	
+	double eps24 = desc->getEpsilon24(p1.type, p2.type);
+	double sigmaSq = desc->getSigmaSq(p1.type, p2.type);		
 
-	//double distance = p1.x.distance(p2.x);
+	double ULennardJones = 0.0;
+	double ULennardJonesGradient = 0.0;
+	double Smoothing = 0.0;
+	double SmoothingGradient = 0.0;
 
-	//if(distance >= desc->cutoffRadius)
-	//{
-	//	S = 0.0;
-	//}
-	//else if(distance <= desc ->SLJfactor)
-	//{
-	//	S = 1.0;
-	//}
-	//else
-	//{
-	//	// use smooth function
-	//	S = 1.0 - (distance - desc->SLJfactor)*(distance - desc->SLJfactor)
-	//		+ (3.0 * desc->cutoffRadius - desc->SLJfactor - 2.0 * distance) /
-	//		((desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor) * (desc->cutoffRadius - desc->SLJfactor));
-	//}
-	//
-	//// simply multiply LJ potential with linear smoothing function
-	//force = force * S;
+	double r_c = desc->cutoffRadius;
+	double r_l = desc->SLJfactor;
+	double eps = eps24 / 24.0;	
 
-	//// add individual particle to particle force to sum
-	//p1.addForce(force);
-	//
-	//// new function to avoid unnecessary object construction
-	//p2.substractForce(force);
+	// calc vector	
+	Vector<double, 3> dir = p2.x - p1.x;
+	double norm = dir.L2Norm();
+	double r = norm;
+	double invnorm = 1.0 / norm; // inverted norm
+	dir = dir * (invnorm); // normalize vector
+
+
+	// calc U_LJ, S, U_LJ', S'
+
+	// U_LJ
+	double invdistSq  = 1.0 / p1.x.distanceSq(p2.x);
+	double temp1 = sigmaSq * invdistSq; 
+	double pow6 = temp1 * temp1 * temp1;
+	double pow12 = pow6 * pow6;
+	ULennardJones = 4.0 * eps * (pow12 - pow6);
+
+	// U_LJ'
+	ULennardJonesGradient = 24.0 * eps *(pow6 - 2.0 * pow12);
+
+	double rdiff = r_c-r_l;
+
+	// S
+	if(r < r_l)Smoothing = 1.0;
+	else if(r > r_c)Smoothing = 0.0;
+	else
+	{
+		Smoothing = 1.0 - (r - r_l) * (r - r_l) * (3.0 * r_c - r_l - 2.0 * r)/(rdiff*rdiff*rdiff);
+	}
+
+	// S'
+	//SmoothingGradient = - 2.0 / (rdiff) * (-rdiff + rdiff * r_l / norm + 3.0 * norm - 4.0 * r_l - r_l * r_l / norm) * xDif;
+	double rtmp1 = r - r_c;
+	double rtmp2 = r_c-r_l;
+	SmoothingGradient = 6.0 * rtmp1 * (r - r_l) / (rtmp2 * rtmp2 * rtmp2); 
+
+	// composite force(multiplication rule)
+	double force = ULennardJones * SmoothingGradient + ULennardJonesGradient * Smoothing;
+
+	// apply force
+	Vector<double, 3> forcevector = dir * force; // direction * force
+
+	// add individual particle to particle force to sum
+	p1.addForce(forcevector);
+	
+	// new function to avoid unnecessary object construction
+	p2.substractForce(forcevector);
 }
 
 void Simulation::forceGravitationCalculator(void* data, Particle& p1, Particle& p2)

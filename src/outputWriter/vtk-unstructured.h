@@ -274,14 +274,6 @@ class Cells;
 
 #include <xsd/cxx/xml/dom/parsing-header.hxx>
 
-#ifndef XSD_DONT_INCLUDE_INLINE
-#define XSD_DONT_INCLUDE_INLINE
-
-#undef XSD_DONT_INCLUDE_INLINE
-#else
-
-#endif // XSD_DONT_INCLUDE_INLINE
-
 class DataArrayList_t: public ::xml_schema::simple_type,
   public ::xsd::cxx::tree::list< ::xml_schema::decimal, char, ::xsd::cxx::tree::schema_type::decimal >
 {
@@ -1075,10 +1067,6 @@ class Cells: public ::xml_schema::type
   DataArray_sequence DataArray_;
 };
 
-#ifndef XSD_DONT_INCLUDE_INLINE
-
-#endif // XSD_DONT_INCLUDE_INLINE
-
 #include <iosfwd>
 
 ::std::ostream&
@@ -1338,10 +1326,6 @@ operator<< (::xercesc::DOMElement&, const Points&);
 
 void
 operator<< (::xercesc::DOMElement&, const Cells&);
-
-#ifndef XSD_DONT_INCLUDE_INLINE
-#include "vtk-unstructured.ixx"
-#endif // XSD_DONT_INCLUDE_INLINE
 
 #include <xsd/cxx/post.hxx>
 
