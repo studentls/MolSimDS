@@ -40,8 +40,8 @@ author: F.Dietz & L.Spiegelberg
         <sizeofdomainZ>9.2</sizeofdomainZ>
         <offset>0.0 0.0 0.0</offset>
         <conditions>
-          <condition value="front" type="reflective"></condition>
-          <condition value="back" type="reflective"></condition>
+          <condition value="front" type="periodic"></condition>
+          <condition value="back" type="periodic"></condition>
           <condition value="left" type="periodic"></condition>
           <condition value="right" type="periodic"></condition>
           <condition value="top" type="periodic"></condition>
