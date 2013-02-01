@@ -12,9 +12,9 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <dimension>3</dimension>
-    <output>argoneq</output>
+    <output>argoneqnew</output>
     
-    <iterationsperoutput>100</iterationsperoutput>
+    <iterationsperoutput>300</iterationsperoutput>
     <initialTemperature>0.01</initialTemperature>
     <iterationsTillThermostatApplication>40</iterationsTillThermostatApplication>
     <targetTemperature>3.0</targetTemperature>

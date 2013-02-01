@@ -12,7 +12,7 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <dimension>3</dimension>
-    <output>out</output>
+    <output>membrane</output>
     
     <iterationsperoutput>10</iterationsperoutput>
     <gravity factor="-0.001" dimension="z"></gravity>

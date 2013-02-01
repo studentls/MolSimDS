@@ -12,7 +12,7 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <dimension>3</dimension>
-    <output>argoncooling</output>
+    <output>argoncoolingnew</output>
     
     <iterationsperoutput>100</iterationsperoutput>
     <initialTemperature>3.0</initialTemperature>
@@ -57,7 +57,7 @@ author: F.Dietz & L.Spiegelberg
     <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
     
     <!-- use txt inputfile -->
-    <inputfile>argoneq.txt</inputfile>
+    <inputfile>argoneqnew.txt</inputfile>
     
   </data>
 

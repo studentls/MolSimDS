@@ -12,9 +12,9 @@ author: F.Dietz & L.Spiegelberg
 
   <params>
     <dimension>3</dimension>
-    <output>argonsupercooling</output>
+    <output>argonsupercoolingnew</output>
     
-    <iterationsperoutput>100</iterationsperoutput>
+    <iterationsperoutput>200</iterationsperoutput>
     <initialTemperature>3.0</initialTemperature>
     <iterationsTillThermostatApplication>25</iterationsTillThermostatApplication>
     <targetTemperature>0.02</targetTemperature>
@@ -57,7 +57,7 @@ author: F.Dietz & L.Spiegelberg
     <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
     
     <!-- use txt inputfile -->
-    <inputfile>argoneq.txt</inputfile>
+    <inputfile>argoneqnew.txt</inputfile>
     
   </data>
 

@@ -344,19 +344,22 @@ void Simulation::forceSLJCalculator(void* data, Particle& p1, Particle& p2)
 
 	double rdiff = r_c-r_l;
 
-	// S
+	// S and S'
+	SmoothingGradient = 0.0; // 0 per default
 	if(r < r_l)Smoothing = 1.0;
 	else if(r > r_c)Smoothing = 0.0;
 	else
 	{
 		Smoothing = 1.0 - (r - r_l) * (r - r_l) * (3.0 * r_c - r_l - 2.0 * r)/(rdiff*rdiff*rdiff);
-	}
 
-	// S'
-	//SmoothingGradient = - 2.0 / (rdiff) * (-rdiff + rdiff * r_l / norm + 3.0 * norm - 4.0 * r_l - r_l * r_l / norm) * xDif;
-	double rtmp1 = r - r_c;
-	double rtmp2 = r_c-r_l;
-	SmoothingGradient = 6.0 * rtmp1 * (r - r_l) / (rtmp2 * rtmp2 * rtmp2); 
+		// S'
+		double rtmp1 = r - r_c;
+		double rtmp2 = r_c-r_l;
+
+		// correct?
+		SmoothingGradient = 6.0 * rtmp1 * (r - r_l) / (rtmp2 * rtmp2 * rtmp2); 
+	}	
+	
 
 	// composite force(multiplication rule)
 	double force = ULennardJones * SmoothingGradient + ULennardJonesGradient * Smoothing;
