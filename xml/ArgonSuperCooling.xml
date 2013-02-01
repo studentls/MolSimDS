@@ -30,7 +30,7 @@ author: F.Dietz & L.Spiegelberg
     <potentialforce>
       <SLJ></SLJ>
     </potentialforce>
-    <thermodynamicaldata iterationsTillCalculation="1000" iterationsPerCalculation="5" deltat="0.2"></thermodynamicaldata>
+    <thermodynamicaldata iterationsTillCalculation="1500" iterationsPerCalculation="5" deltat="0.1"></thermodynamicaldata>
    
     <algorithm>
       <LinkedCell>
@@ -57,7 +57,7 @@ author: F.Dietz & L.Spiegelberg
     <material epsilon="1.0" sigma="1.0" name="Liquid1" mass="1.0"/>
     
     <!-- use txt inputfile -->
-    <inputfile>argoneqnew.txt</inputfile>
+    <inputfile>argoneqnew_150000.txt</inputfile>
     
   </data>
 
