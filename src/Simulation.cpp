@@ -803,6 +803,9 @@ void Simulation::notifyViewer()
 			particles[pos].x = it->x[0];
 			particles[pos].y = it->x[1];
 			particles[pos].z = it->x[2];
+			particles[pos].vx = it->v[0];			
+			particles[pos].vy = it->v[1];			
+			particles[pos].vz = it->v[2];
 			particles[pos].type = it->type;
 			pos++;
 		}

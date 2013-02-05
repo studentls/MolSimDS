@@ -132,7 +132,10 @@ public:
 	}
 
 	/// get reference to last object
-	inline T& last()	{return _data[_size -1];}
+	inline T& last()	{assert(_size -1 >= 0); return _data[_size - 1];}
+	
+	/// get reference to first object
+	inline T& first()	{assert(_size > 0); return _data[0];}
 };
 
 }

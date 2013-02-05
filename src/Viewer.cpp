@@ -127,6 +127,17 @@ void Viewer::Process()
 	mouseOldWheel = mouseWheel;
 
 	zoomFactor *= powf(1.0f - factor, (float)deltaw);
+
+
+	// sync keys
+	for(int i = 0; i < 512; i++)oldKeys[i] = curKeys[i];
+
+	// new key states
+	for(int i = 0; i < GLFW_KEY_SPECIAL+69; i++)curKeys[i] = (glfwGetKey(i) == GLFW_PRESS);
+
+
+	// change state if key up is registered
+	if(keyUp(GLFW_KEY_SPACE))state = (state + 1) % STATE_COUNT;
 }
 
 void Viewer::Draw()
@@ -211,11 +222,41 @@ void Viewer::Draw()
 
 		float x = particles[i].x;
 		float y = particles[i].y;
+		float vx = particles[i].vx;
+		float vy = particles[i].vy;
 
-		// color according to array
-		utils::Color col = colArray[particles[i].type % COLOR_COUNT];
+		utils::Color col;
+
+		// render color due to state
+		if(state == STATE_POSITIONS)
+		{
+			// color according to array
+			col = colArray[particles[i].type % COLOR_COUNT];
+		}
+		else if(state == STATE_VELOCITY)
+		{
+			// interpolate color
+			
+			/*float minLengthSq = minVel[0] * minVel[0] + minVel[1] * minVel[1];
+			float maxLengthSq = maxVel[0] * maxVel[0] + maxVel[1] * maxVel[1];*/
+
+			float l = sqrtf(vx * vx + vy*vy);
+
+			float minLengthSq = 0.0f;
+			float maxLengthSq = 30.0f;
+
+			float t = l / (maxLengthSq - minLengthSq);
+
+			if(t > 1.0f)t = 1.0f;
+			if(t < 0.0f)t = 0.0f;
+
+			// interpolate color from gradient
+			col = gradient.getColor(1.0f - t);
+		}
+
 
 		glColor3f(col.r, col.g, col.b);
+
 
 		glTexCoord2d(0.0,0.0); glVertex3f(x - fSize2, y - fSize2, 0.0);
 		glTexCoord2d(1.0,0.0); glVertex3f(x + fSize2, y - fSize2, 0.0f);
@@ -389,6 +430,25 @@ void Viewer::generateColors()
 	colArray[7] = Color(0.0f, 0.0f, 0.0f);	
 	colArray[8] = Color(0.0f, 0.0f, 0.0f);	
 	colArray[9] = Color(0.0f, 0.0f, 0.0f);
+}
+
+void Viewer::calcMinMaxValues()
+{
+	// set to infty
+	for(int i = 0; i < 3; i++)minVel[i] = +99999.9f;
+	for(int i = 0; i < 3; i++)maxVel[i] = -99999.9f;
+
+	// go through particles
+	for(int i = 0; i < this->particle_count; i++)
+	{
+		minVel[0] = utils::min(minVel[0], particles[i].vx);
+		minVel[1] = utils::min(minVel[1], particles[i].vy);
+		minVel[2] = utils::min(minVel[2], particles[i].vz);
+
+		maxVel[0] = utils::max(maxVel[0], particles[i].vx);
+		maxVel[1] = utils::max(maxVel[1], particles[i].vy);
+		maxVel[2] = utils::max(maxVel[2], particles[i].vz);
+	}
 }
 
 #endif

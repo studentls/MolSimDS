@@ -26,14 +26,29 @@
 // include GLFW library
 //windows
 #ifdef WINDOWS
+#define NOMINMAX
 // for point sprites the GL extensions are needed
 #include <gl/glew.h>
 #include <gl/glfw.h>
+
+#ifdef min
+#undef min
+#endif
+
+#ifdef max
+#undef max
+#endif
+
 #else
 //Mac/Linux
 #include <GL/glfw.h>
 #endif
 
+
+/// some states for the viewer
+#define STATE_VELOCITY  0x0
+#define STATE_POSITIONS 0x1
+#define STATE_COUNT 2
 
 // define appropriate lib to use for thread synchronization
 #ifdef USE_BOOST
@@ -51,7 +66,76 @@ struct VParticle
 	float x;
 	float y;
 	float z;
+
+	float vx;
+	float vy;
+	float vz;
+
 	short type;
+};
+
+/// holds a color and position
+struct GradientEntry
+{
+	utils::Color c;
+	float		pos;
+};
+
+/// simple gradient class
+class Gradient
+{
+private:
+	utils::TFastArray<GradientEntry> entries;
+public:
+
+	utils::Color getColor(const float position)
+	{
+		assert(entries.size() >= 2);
+		
+		int i = 1;
+
+		if(position <= 0.0f)return entries.first().c;
+		if(position >= 1.0f)return entries.last().c;
+
+		// go through entries
+		while(i < entries.size())
+		{
+			if(position < entries[i].pos)break;
+			i++;
+		}
+
+		// fix float problems
+		i = utils::min((unsigned int)i, entries.size() -1);
+
+		assert(i < entries.size());
+
+		// found i index of greater entry
+		float dist = entries[i].pos - entries[i-1].pos;
+
+		// interpolate colors
+		float interpos = (position - entries[i-1].pos) / dist;
+
+		return (1.0f - interpos) * entries[i - 1].c + interpos * entries[i].c;
+	}
+
+	void	createDefaultGradient()
+	{
+		// put some nice default colors
+		GradientEntry entry;
+		entry.c = utils::Color(0xFF53007C);
+		entry.pos = 0.0f;
+		entries.push_back(entry);
+		entry.c = utils::Color(0xFF174477);
+		entry.pos = 0.25f;
+		entries.push_back(entry);
+		entry.c = utils::Color(0xFF4A97D6);
+		entry.pos = 0.75f;
+		entries.push_back(entry);
+		entry.c = utils::Color(0xFFAECDE5);
+		entry.pos = 1.0f;
+		entries.push_back(entry);	
+		
+	}
 };
 
 /// based on OpenGL
@@ -90,6 +174,16 @@ private:
 	VParticle				*particles;
 	unsigned int			particle_size;	/// array size
 	unsigned int			particle_count;	/// count of valid particles in array
+	utils::Vector<float, 3> minVel;
+	utils::Vector<float, 3> maxVel;
+	Gradient				gradient; /// some nice colors
+	int						state; /// state of the viewer, what will be rendered?
+
+	/// array to form a key up event
+	bool					oldKeys[512];
+	bool					curKeys[512];
+
+	inline bool				keyUp(const int key)	{return oldKeys[key] && !curKeys[key];}
 
 	/// color array			
 	utils::Color			colArray[COLOR_COUNT];
@@ -116,6 +210,9 @@ private:
 
 	/// Process function, handle events
 	void					Process();
+
+	/// calculate min/max velocity
+	void					calcMinMaxValues();
 
 	/// draws the grid for the particles...
 	/// @param xcount cells in x direction
@@ -184,6 +281,18 @@ private:
 		grid.xcount = grid.ycount = 5;
 
 		zoomFactor = 1.0f;
+
+		// init gradient
+		gradient.createDefaultGradient();
+
+		// per default velocity
+		state = STATE_VELOCITY;
+
+		// false keys
+		for(int i = 0; i < 512; i++)
+		{
+			oldKeys[i] = curKeys[i] = false;
+		}
 
 		// Init GLFW Lib
 		if(glfwInit() != GL_TRUE)
@@ -265,7 +374,7 @@ public:
 	inline int		LockParticles(VParticle **out, const int unsigned count)
 	{
 #ifdef WINDOWS
-		particle_count = min(count, particle_size);
+		particle_count = utils::min(count, particle_size);
 #else
 		particle_count = std::min(count, particle_size);
 #endif
@@ -292,6 +401,9 @@ public:
 #else
 		glfwUnlockMutex(mutex);
 #endif
+
+		// calc min max values
+		calcMinMaxValues();
 
 		// null pointer
 		*out = NULL;

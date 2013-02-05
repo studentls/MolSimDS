@@ -132,6 +132,18 @@ namespace utils
 	{
 		return low + ((double)(rand()%RAND_MAX)/(double)RAND_MAX)/(high - low);
 	}
+
+	/// min function
+	template<typename T> T min(const T& a, const T& b)
+	{
+		return a > b ? b : a;
+	}
+
+	/// max function
+	template<typename T> T max(const T& a, const T& b)
+	{
+		return a < b ? b : a;
+	}
 }
 
 #endif
