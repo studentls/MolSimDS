@@ -187,7 +187,6 @@ bool MembraneContainer::AddParticlesFromFileNew(const char *filename)
 utils::BoundingBox MembraneContainer::getBoundingBox()
 {
 	using namespace utils;
-	using namespace std;
 
 	// some work has to be done here,
 	// calc bounding box

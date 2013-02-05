@@ -64,7 +64,6 @@ void ListParticleContainer::IteratePairwise(void(*func)(void *data, Particle&, P
 utils::BoundingBox ListParticleContainer::getBoundingBox()
 {
 	using namespace utils;
-	using namespace std;
 
 	// some work has to be done here,
 	// calc bounding box
@@ -75,7 +74,7 @@ utils::BoundingBox ListParticleContainer::getBoundingBox()
 
 	if(!particles.empty())
 	{
-		for(vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
+		for(std::vector<Particle>::iterator it = particles.begin(); it != particles.end(); it++)
 		{
 			for(int i = 0; i < 3; i++)
 			{
