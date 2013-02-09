@@ -331,7 +331,7 @@ err_type XMLFileReader::makeParticleContainer(ParticleContainer **out)
 		}
 
 		// make Cuboid and add to particle
-		ParticleGenerator::makeSphere(pc, center, v,radius, h, dim, desc.brownianMotionFactor, type);
+		ParticleGenerator::makeSphere(pc, center, v, radius, h, type, dim, desc.brownianMotionFactor);
 		vector<Particle> temp = pc.getParticles();
 		particles.insert(particles.begin(), temp.begin(), temp.end());
 	

@@ -174,7 +174,9 @@
     <None Include="xml\ArgonSuperCooling.xml">
       <SubType>Designer</SubType>
     </None>
-    <None Include="xml\FallingDrop.xml" />
+    <None Include="xml\FallingDrop.xml">
+      <SubType>Designer</SubType>
+    </None>
     <None Include="xml\FallingDropInitialize.xml" />
     <None Include="xml\Membrane.xml" />
     <None Include="xml\PerformanceTest.xml" />
